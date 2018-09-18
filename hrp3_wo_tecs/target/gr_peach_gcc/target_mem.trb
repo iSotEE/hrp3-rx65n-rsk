@@ -1,0 +1,16 @@
+# -*- coding: utf-8 -*-
+#
+#		パス4の生成スクリプトのターゲット依存部（GR-PEACH用）
+#
+#  $Id: target_mem.trb 275 2018-03-11 23:05:58Z ertl-hiro $
+#
+
+#
+#  生成スクリプトのコア依存部（チップ依存部は飛ばす）
+#
+IncludeTrb("core_mem.trb")
+
+#
+#  エラーチェック処理
+#
+IncludeTrb("target_check.trb")

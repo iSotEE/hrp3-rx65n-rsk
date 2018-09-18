@@ -1,0 +1,44 @@
+#
+#		Makefileのコア依存部（RX用）
+#
+
+#
+#  コア依存部ディレクトリ名の定義
+#
+COREDIR = $(SRCDIR)/arch/$(CORE)_$(TOOL)/common
+
+#
+#  ツール依存部ディレクトリ名の定義 
+#
+TOOLDIR = $(SRCDIR)/arch/$(TOOL)
+
+#
+#  コンパイルオプション
+#
+INCLUDES += -include=$(COREDIR) -include=$(TOOLDIR)
+COPTS += -lang=c -output=obj -obj_path=. -nologo -endian=little -dbl_size=8
+
+#
+#  カーネルに関する定義
+#
+KERNEL_DIRS += $(COREDIR)
+KERNEL_ASMOBJS += core_support.obj kernel_cfg_asm.obj
+KERNEL_COBJS += core_kernel_impl.obj
+SYSSVC_ASMOBJS += core_start.obj
+
+#
+#  コンフィギュレータ関係の変数の定義
+#
+CFG_TABS := $(CFG_TABS) --symval-table $(COREDIR)/core_sym.def
+
+#
+#  オフセットファイル生成のための定義
+#
+TARGET_OFFSET_TRB = $(COREDIR)/core_offset.trb
+
+#
+#  開発ツールのコマンド名の定義
+#
+CC = ccrx.exe
+LINK = rlink.exe
+AS = asrx.exe

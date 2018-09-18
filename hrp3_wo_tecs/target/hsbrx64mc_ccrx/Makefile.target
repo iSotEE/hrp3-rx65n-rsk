@@ -1,0 +1,27 @@
+#
+#		Makefile のターゲット依存部（hsbrx64mc用）
+#
+
+#
+#  ボード名, プロセッサ名，コア名，開発環境名の定義
+#
+BOARD = hsbrx64mc
+PRC   = rx64m
+CORE  = rx
+TOOL  = ccrx
+
+#
+#  コンパイルオプション
+#
+INCLUDES := $(INCLUDES) -include=$(TARGETDIR)
+
+#
+#  プロセッサ依存部
+#
+include $(SRCDIR)/arch/$(CORE)_$(TOOL)/$(PRC)/Makefile.prc
+
+#
+#  カーネルに関する定義
+#
+KERNEL_DIRS += $(TARGETDIR)
+KERNEL_COBJS += target_kernel_impl.obj

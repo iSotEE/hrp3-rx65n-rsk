@@ -1,0 +1,32 @@
+# -*- coding: utf-8 -*-
+#
+#		オフセットファイル生成用Rubyテンプレート（RX用）
+#
+#
+
+#
+#  ターゲット非依存部のインクルード
+#
+IncludeTrb("kernel/genoffset.trb")
+
+#
+#  フィールドのオフセットの定義の生成
+#
+$offsetH.append(<<EOS)
+; offset
+TCB_p_tinib .equ #{$offsetof_TCB_p_tinib}
+TCB_sp      .equ #{$offsetof_TCB_sp}
+TCB_pc      .equ #{$offsetof_TCB_pc}
+TINIB_exinf .equ #{$offsetof_TINIB_exinf}
+TINIB_task  .equ #{$offsetof_TINIB_task}
+
+; macros
+IPL_LOCK .equ #{$IPL_LOCK}
+TIPM_LOCK .equ #{$TIPM_LOCK}
+TIPM_LOCK_ALL .equ #{$TIPM_LOCK_ALL}
+EXC_GET_PSW_OFFSET .equ #{$EXC_GET_PSW_OFFSET}
+PSW_I_MASK .equ #{$PSW_I_MASK}
+PSW_IPL_MASK .equ #{$PSW_IPL_MASK}
+LOG_DSP_ENTER .equ #{$LOG_DSP_ENTER}
+LOG_DSP_LEAVE .equ #{$LOG_DSP_LEAVE}
+EOS

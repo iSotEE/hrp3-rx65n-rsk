@@ -1,0 +1,6 @@
+eclipse.preferences.version=1
+environment/project/com.renesas.cdt.managedbuild.renesas.ccrx.base.toolchain.1633216451/E2STUDIODIR/delimiter=;
+environment/project/com.renesas.cdt.managedbuild.renesas.ccrx.base.toolchain.1633216451/E2STUDIODIR/operation=append
+environment/project/com.renesas.cdt.managedbuild.renesas.ccrx.base.toolchain.1633216451/E2STUDIODIR/value=${renesas.support.base}
+environment/project/com.renesas.cdt.managedbuild.renesas.ccrx.base.toolchain.1633216451/append=true
+environment/project/com.renesas.cdt.managedbuild.renesas.ccrx.base.toolchain.1633216451/appendContributed=true

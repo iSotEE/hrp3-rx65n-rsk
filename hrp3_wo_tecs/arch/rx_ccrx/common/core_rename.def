@@ -1,0 +1,16 @@
+# core_support.src
+call_exit_kernel
+dispatch
+exit_and_dispatch
+start_dispatch
+start_r
+
+# core_kernel_impl.c
+default_exc_handler
+default_int_handler
+intnest
+lock_flag
+saved_ipl
+
+# kernel_cfg.c
+cfg_int_table

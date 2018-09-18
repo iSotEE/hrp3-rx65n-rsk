@@ -1,0 +1,201 @@
+# -*- coding: utf-8 -*-
+# 
+#		パス2の生成スクリプトのターゲット依存部（ダミーターゲット用）
+#
+#   $Id: target_kernel.trb 434 2018-08-12 07:34:53Z ertl-hiro $
+# 
+
+# 
+#  使用できる割込み番号とそれに対応する割込みハンドラ番号
+# 
+$INTNO_VALID = [ *(0..31) ]
+$INHNO_VALID = $INTNO_VALID
+
+# 
+#  使用できるCPU例外ハンドラ番号
+# 
+$EXCNO_VALID = [ *(0..7) ]
+
+#
+#  保護ドメイン初期化コンテキストブロック
+#
+
+# カーネルドメインの保護ドメイン初期化コンテキストブロック
+$kernelDominictxb = "{ 0 }"
+
+# 保護ドメイン初期化コンテキストブロックの生成
+def GenerateDominictxb(key, params)
+  return("{ 0 }")
+end
+
+#
+#  スタートアップモジュールの定義
+# 
+$START_OBJS = [ "start.o" ]
+
+#
+#  コンパイラが必ず用いるライブラリの定義
+# 
+$TARGET_LIBS = [ "-lgcc" ]
+
+# 
+#  標準のセクションの定義
+#
+$defaultSections = [
+  { SECNAME: ".text",   MEMREG: :stdrom, MEMATR: $mematrTextSec },
+  { SECNAME: ".rodata", MEMREG: :stdrom, MEMATR: $mematrRodataSec },
+  { SECNAME: ".data",   MEMREG: :stdram, MEMATR: $mematrDataSec },
+  { SECNAME: ".bss",    MEMREG: :stdram, MEMATR: $mematrBssSec },
+  { SECNAME: ".noinit", MEMREG: :stdram, MEMATR: $mematrNoinitSec }
+]
+
+$targetStandardSecnameList = [ "COMMON" ]
+
+#
+#  ユーザスタック領域のセクション名と確保方法
+#
+def SecnameUserStack(tskid)
+  return(".ustack_#{tskid}")
+end
+
+def AllocUserStack(stack, size, secname)
+  ustksz = (size + $CHECK_USTKSZ_ALIGN - 1) & ~($CHECK_USTKSZ_ALIGN - 1)
+  $kernelCfgC.add("static STK_T #{stack}[COUNT_STK_T(#{ustksz})] " \
+					"__attribute__((section(\"#{secname}\"),nocommon));")
+  return("ROUND_STK_T(#{ustksz})")
+end
+
+# レッドゾーン方式におけるダミースタック領域の確保
+def AllocDummyUserStack(stack, size, secname)
+  # staticを付けると，コンパイラが，この変数を参照していないという警告
+  # を出し，場合によっては変数を削除するため，staticを付けない．
+  ustksz = (size + $CHECK_USTKSZ_ALIGN - 1) & ~($CHECK_USTKSZ_ALIGN - 1)
+  $kernelCfgC.add("STK_T #{stack}[COUNT_STK_T(#{ustksz})] " \
+					"__attribute__((section(\"#{secname}\"),nocommon));")
+end
+
+#
+#  システムスタック領域の確保方法
+#
+def AllocSystemStack(stack, size)
+  $kernelCfgC.add("static STK_T #{stack}[COUNT_STK_T(#{size})] " \
+					"__attribute__((section(\".noinit_kernel\"),nocommon));")
+  return("ROUND_STK_T(#{size})")
+end
+
+#
+#  固定長メモリプール領域のセクション名の確保方法
+#
+def SecnameUserMempfix(mpfid)
+  return(".mpf_#{mpfid}")
+end
+
+def AllocUserMempfix(mpf, blkcnt, blksz, secname)
+  $kernelCfgC.add("static MPF_T #{mpf}[(#{blkcnt}) * COUNT_MPF_T(#{blksz})] " \
+					"__attribute__((section(\"#{secname}\"),nocommon));")
+end
+
+#
+#  ターゲット非依存部のインクルード
+#
+IncludeTrb("kernel/kernel.trb")
+
+if $TOPPERS_ML_AUTO
+  #
+  #  自動メモリ配置の場合
+  #
+
+  # 
+  #  セクションのアライン単位（文字列）
+  # 
+  $TARGET_SEC_ALIGN_STR = "4"
+
+  # 
+  #  メモリ保護単位のアライン単位（文字列）
+  # 
+  $TARGET_MP_ALIGN_STR = "4K"
+
+  #
+  #  ターゲット依存のOUTPUT記述の生成
+  #
+  def GenerateOutput()
+    $ldscript.add(<<EOS)
+OUTPUT_FORMAT("elf32-littlearm", "elf32-bigarm","elf32-littlearm")
+OUTPUT_ARCH(arm)
+EOS
+  end
+
+  #
+  #  ターゲット依存のPROVIDE記述の生成
+  #
+  def GenerateProvide()
+    $ldscript.add(<<EOS)
+PROVIDE(_gp = 0);
+PROVIDE(hardware_init_hook = 0);
+PROVIDE(software_init_hook = 0);
+PROVIDE(software_term_hook = 0);
+EOS
+  end
+
+  #
+  #  リンカのためのセクション記述の生成
+  #
+  def SectionDescription(secname)
+    case secname
+    when ".text"
+      return(".text .text.*")
+    when ".rodata"
+      return(".rodata .rodata.*")
+    when ".data"
+      return(".data .data.*")
+    when ".bss"
+      return(".bss .bss.* COMMON")
+    else
+      return(secname)
+    end
+  end
+
+  def HookEndLabel(regname)
+    $ldscript.add(<<EOS)
+	.preinit_array ALIGN(4) : {
+		PROVIDE_HIDDEN (__preinit_array_start = .);
+		KEEP (*(.preinit_array))
+		PROVIDE_HIDDEN (__preinit_array_end = .);
+	} > #{regname}
+	.init_array ALIGN(4) : {
+		PROVIDE_HIDDEN (__init_array_start = .);
+		KEEP (*(SORT(.init_array.*)))
+		KEEP (*(.init_array))
+		PROVIDE_HIDDEN (__init_array_end = .);
+	} > #{regname}
+	.fini_array ALIGN(4) : {
+		PROVIDE_HIDDEN (__fini_array_start = .);
+		KEEP (*(SORT(.fini_array.*)))
+		KEEP (*(.fini_array))
+		PROVIDE_HIDDEN (__fini_array_end = .);
+	} > #{regname}
+	.ARM.exidx ALIGN(4) : {
+		__exidx_start = .;
+		*(.ARM.exidx* .gnu.linkonce.armexidx.*)
+		__exidx_end = .;
+	} > #{regname}
+	.jcr ALIGN(4) : {
+		KEEP (*(.jcr))
+	} > #{regname}
+EOS
+  end
+
+  #
+  #  仮のリンカスクリプトの生成
+  #
+  IncludeTrb("arch/gcc/ldscript.trb")
+else
+  #
+  #  手動メモリ配置の場合
+  #
+
+  #
+  #  メモリ保護単位に関する情報を生成する
+  #
+  GenerateMemProt()
+end
