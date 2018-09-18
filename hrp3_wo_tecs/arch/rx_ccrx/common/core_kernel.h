@@ -59,6 +59,7 @@
 #define TOPPERS_TARGET_SUPPORT_CLR_INT		/* clr_int */
 #define TOPPERS_TARGET_SUPPORT_RAS_INT		/* ras_int */
 #define TOPPERS_TARGET_SUPPORT_PRB_INT		/* prb_int */
+#define TOPPERS_TARGET_SUPPORT_ML_MANUAL	/* 手動メモリ配置 */
 
 /*
  *  カーネル管理の割込み優先度の範囲

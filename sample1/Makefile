@@ -41,9 +41,35 @@
 # 
 
 #
+# Compiler (ccrx) dependent functions
+#
+define compiler_cc # 1: src file, 2: cflags
+$(CC) $(patsubst -D%,-define=%,$(patsubst -I%,-include=%,$(2))) $(1)
+endef
+define compiler_as # 1: src file, 2: asflags
+$(AS) -debug $(2) $(INCLUDES) -output=$@ $(1)
+endef
+define linker # 1: output, 2: input, 3: cflags, 4: ldflags
+$(LINK) -debug $(4) -list=$(1).map -show=symbol -output=$(1) $(2)
+endef
+define archive # 1: lib file name, 2: obj files
+$(LINK) -form=library=u -output=$(1) $(2)
+endef
+define obj2srec # 1: obj file name, 2: srec file name
+$(LINK) $(1) -form=stype -output=$(2)
+endef
+define obj2syms # 1: obj file name, 2: syms file name
+$(PYTHON) map2syms.py $(1).map $(2)
+endef
+PYTHON = $(E2STUDIODIR)\eclipse\features\com.renesas.python.win32.x86_2.7.12.002\python\python.exe
+SED = $(E2STUDIODIR)\Utilities\sed.exe
+CC_CONVERTER = $(E2STUDIODIR)\Utilities\\ccrx\renesas_cc_converter.exe
+OBJ_LDFLAGS += -subcommand=section.clnk
+
+#
 #  ターゲットの指定（Makefile.targetで上書きされるのを防ぐため）
 #
-all:
+all: clean
 
 #
 #  ターゲット略称の定義
@@ -54,13 +80,13 @@ TARGET = hsbrx64mc_ccrx
 #  プログラミング言語の定義
 #
 SRCLANG = c
-ifeq ($(SRCLANG),c)
-	LIBS = -lc
-endif
+#ifeq ($(SRCLANG),c)
+#	LIBS = -lc
+#endif
 ifeq ($(SRCLANG),c++)
 	USE_CXX = true
-	CXXLIBS = -lstdc++ -lm -lc
-	CXXRTS = cxxrt.o newlibrt.o
+#	CXXLIBS = -lstdc++ -lm -lc
+#	CXXRTS = cxxrt.o newlibrt.o
 endif
 
 #
@@ -71,7 +97,7 @@ SRCDIR = ../hrp3_wo_tecs
 #
 #  オブジェクトファイル名の拡張子の設定
 #
-OBJEXT = 
+OBJEXT = abs
 
 #
 #  カーネルライブラリ（libkernel.a）のディレクトリ名
@@ -162,12 +188,12 @@ endif
 #
 #  共通コンパイルオプションの定義
 #
-COPTS := -g  $(COPTS)
+COPTS := -debug  $(COPTS)
 ifndef OMIT_WARNING_ALL
-	COPTS := -Wall $(COPTS)
+	COPTS := $(COPTS)
 endif
 ifndef OMIT_OPTIMIZATION
-	COPTS := -O2 $(COPTS)
+	COPTS := $(COPTS) -optimize=0
 endif
 ifdef ML_MANUAL
 	CDEFS := -DTOPPERS_ML_MANUAL $(CDEFS)
@@ -358,30 +384,29 @@ omit_svc.h:
 #
 cfg1_out.c cfg1_out.db: cfg1_out.timestamp ;
 cfg1_out.timestamp: $(APPL_CFG) $(TECSGEN_TIMESTAMP)
-	$(CFG) --pass 1 $(CFG_KERNEL) $(INCLUDES) $(CFG_TABS) \
+	$(CFG) --pass 1 $(CFG_KERNEL) $(patsubst -include=%,-I%,$(INCLUDES)) $(CFG_TABS) \
 						-M $(DEPDIR)/cfg1_out_c.d $(TARGET_KERNEL_CFG) $<
 
 $(CFG1_OUT): $(START_OBJS) cfg1_out.o $(END_OBJS) $(HIDDEN_OBJS) \
 													$(CFG1_OUT_LDSCRIPT)
-	$(LINK) $(CFLAGS) $(LDFLAGS) $(CFG1_OUT_LDFLAGS) -o $(CFG1_OUT) \
-						$(START_OBJS) cfg1_out.o $(END_OBJS)
+	$(call linker,$(CFG1_OUT),$(START_OBJS) cfg1_out.obj $(LIBS) $(END_OBJS),$(CFLAGS),$(LDFLAGS) $(CFG1_OUT_LDFLAGS))
 
 cfg1_out.syms: $(CFG1_OUT)
-	$(NM) -n $(CFG1_OUT) > cfg1_out.syms
+	$(call obj2syms,$(CFG1_OUT),cfg1_out.syms)
 
 cfg1_out.srec: $(CFG1_OUT)
-	$(OBJCOPY) -O srec -S $(CFG1_OUT) cfg1_out.srec
+	$(call obj2srec,$(CFG1_OUT),cfg1_out.srec)
 
 $(CFG2_OUT_SRCS) cfg2_out.db: kernel_cfg.timestamp ;
 kernel_cfg.timestamp: cfg1_out.db cfg1_out.syms cfg1_out.srec
-	$(CFG) --pass 2 $(CFG_KERNEL) $(INCLUDES) -T $(TARGET_KERNEL_TRB)
+	$(CFG) --pass 2 $(CFG_KERNEL) $(patsubst -include=%,-I%,$(INCLUDES)) -T $(TARGET_KERNEL_TRB)
 
 #
 #  オフセットファイル（offset.h）の生成規則
 #
 $(OFFSET_H): offset.timestamp ;
 offset.timestamp: cfg1_out.db cfg1_out.syms cfg1_out.srec
-	$(CFG) --pass 2 -O $(CFG_KERNEL) $(INCLUDES) -T $(TARGET_OFFSET_TRB) \
+	$(CFG) --pass 2 -O $(CFG_KERNEL) $(patsubst -include=%,-I%,$(INCLUDES)) -T $(TARGET_OFFSET_TRB) \
 				--rom-symbol cfg1_out.syms --rom-image cfg1_out.srec
 
 #
@@ -430,7 +455,7 @@ $(OBJNAME).srec: $(OBJFILE)
 .PHONY: check
 check: check.timestamp ;
 check.timestamp: cfg2_out.db $(OBJNAME).syms $(OBJNAME).srec
-	$(CFG) --pass 3 $(CFG_KERNEL) -O $(INCLUDES) -T $(TARGET_CHECK_TRB) \
+	$(CFG) --pass 3 $(CFG_KERNEL) -O $(patsubst -include=%,-I%,$(INCLUDES)) -T $(TARGET_CHECK_TRB) \
 				--rom-symbol $(OBJNAME).syms --rom-image $(OBJNAME).srec
 	@echo "configuration check passed"
 
@@ -439,7 +464,7 @@ check.timestamp: cfg2_out.db $(OBJNAME).syms $(OBJNAME).srec
 #
 .PHONY: clean
 clean:
-	rm -f \#* *~ *.o $(DEPDIR)/*.d $(CLEAN_FILES) check.timestamp
+	rm -f \#* *~ *.obj $(DEPDIR)/*.d $(CLEAN_FILES) check.timestamp
 	rm -f $(OBJFILE) $(OBJNAME).syms $(OBJNAME).srec $(OBJNAME).bin
 	rm -f kernel_cfg.timestamp $(CFG2_OUT_SRCS) cfg2_out.db
 	rm -f offset.timestamp $(OFFSET_H)
@@ -449,6 +474,7 @@ clean:
 ifndef KERNEL_LIB
 	rm -f libkernel.a
 endif
+	rm -rf *.map
 
 .PHONY: cleankernel
 cleankernel:
@@ -469,7 +495,7 @@ ALL_CFG_COBJS = $(CFG_COBJS) cfg1_out.o
 ALL_CFG_ASMOBJS = $(CFG_ASMOBJS)
 
 $(ALL_CFG_COBJS): %.o: %.c
-	$(CC) -c -MD -MP -MF $(DEPDIR)/$*.d $(CFLAGS) $(CFG_CFLAGS) $<
+	$(call compiler_cc,$<,$(CFLAGS) $(CFG_CFLAGS))
 
 $(ALL_CFG_COBJS:.o=.s): %.s: %.c
 	$(CC) -S $(CFLAGS) $(CFG_CFLAGS) $<
@@ -517,74 +543,31 @@ ifdef DEVTOOLDIR
 	OBJDUMP := $(DEVTOOLDIR)/$(OBJDUMP)
 endif
 
+ifndef LINK
 ifdef USE_CXX
 	LINK = $(CXX)
 else
 	LINK = $(CC)
 endif
+endif
 
 #
 #  コンパイルルールの定義
 #
-$(KERNEL_COBJS): %.o: %.c
-	$(CC) -c -MD -MP -MF $(DEPDIR)/$*.d $(CFLAGS) $(KERNEL_CFLAGS) $<
+$(KERNEL_COBJS): %.obj: %.c
+	$(call compiler_cc,$<,$(CFLAGS) $(KERNEL_CFLAGS))
 
-$(KERNEL_COBJS:.o=.s): %.s: %.c
-	$(CC) -S $(CFLAGS) $(KERNEL_CFLAGS) $<
+$(KERNEL_ASMOBJS): %.obj: %.src
+	$(call compiler_as,$<,$(ASFLAGS) $(KERNEL_ASFLAGS))
 
-$(KERNEL_LCOBJS): %.o:
-	$(CC) -DTOPPERS_$(*F) -o $@ -c -MD -MP -MF $(DEPDIR)/$*.d \
-									$(CFLAGS) $(KERNEL_CFLAGS) $<
+$(SYSSVC_COBJS): %.obj: %.c
+	$(call compiler_cc,$<,$(CFLAGS) $(SYSSVC_CFLAGS))
 
-$(KERNEL_LCOBJS:.o=.s): %.s:
-	$(CC) -DTOPPERS_$(*F) -o $@ -S $(CFLAGS) $(KERNEL_CFLAGS) $<
+$(SYSSVC_ASMOBJS): %.obj: %.src
+	$(call compiler_as,$<,$(ASFLAGS) $(SYSSVC_ASFLAGS))
 
-$(KERNEL_ASMOBJS): %.o: %.S
-	$(CC) -c -MD -MP -MF $(DEPDIR)/$*.d $(CFLAGS) $(KERNEL_CFLAGS) $<
+$(APPL_COBJS): %.obj: %.c
+	$(call compiler_cc,$<,$(CFLAGS) $(APPL_CFLAGS))
 
-$(SYSSVC_COBJS): %.o: %.c
-	$(CC) -c -MD -MP -MF $(DEPDIR)/$*.d $(CFLAGS) $(SYSSVC_CFLAGS) $<
-
-$(SYSSVC_COBJS:.o=.s): %.s: %.c
-	$(CC) -S $(CFLAGS) $(SYSSVC_CFLAGS) $<
-
-$(SYSSVC_ASMOBJS): %.o: %.S
-	$(CC) -c -MD -MP -MF $(DEPDIR)/$*.d $(CFLAGS) $(SYSSVC_CFLAGS) $<
-
-$(APPL_COBJS): %.o: %.c
-	$(CC) -c -MD -MP -MF $(DEPDIR)/$*.d $(CFLAGS) $(APPL_CFLAGS) $<
-
-$(APPL_COBJS:.o=.s): %.s: %.c
-	$(CC) -S $(CFLAGS) $(APPL_CFLAGS) $<
-
-$(APPL_CXXOBJS): %.o: %.cpp
-	$(CXX) -c -MD -MP -MF $(DEPDIR)/$*.d $(CFLAGS) $(APPL_CFLAGS) $<
-
-$(APPL_CXXOBJS:.o=.s): %.s: %.cpp
-	$(CXX) -S $(CFLAGS) $(APPL_CFLAGS) $<
-
-$(APPL_ASMOBJS): %.o: %.S
-	$(CC) -c -MD -MP -MF $(DEPDIR)/$*.d $(CFLAGS) $(APPL_CFLAGS) $<
-
-#
-#  デフォルトコンパイルルールを上書き
-#
-%.o: %.c
-	@echo "*** Default compile rules should not be used."
-	$(CC) -c -MD -MP -MF $(DEPDIR)/$*.d $(CFLAGS) $<
-
-%.s: %.c
-	@echo "*** Default compile rules should not be used."
-	$(CC) -S $(CFLAGS) $<
-
-%.o: %.cpp
-	@echo "*** Default compile rules should not be used."
-	$(CXX) -c -MD -MP -MF $(DEPDIR)/$*.d $(CFLAGS) $<
-
-%.s: %.cpp
-	@echo "*** Default compile rules should not be used."
-	$(CXX) -S $(CFLAGS) $<
-
-%.o: %.S
-	@echo "*** Default compile rules should not be used."
-	$(CC) -c -MD -MP -MF $(DEPDIR)/$*.d $(CFLAGS) $<
+$(APPL_ASMOBJS): %.obj: %.src
+	$(call compiler_as,$<,$(ASFLAGS) $(APPL_ASFLAGS))
