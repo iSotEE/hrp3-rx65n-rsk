@@ -396,8 +396,8 @@ extern void start_r(void);
 	{																					\
 																						\
 		/*  スタックポインタ初期値の設定  */											\
-		( p_tcb )->tskctxb.sp = ( void * )((( uint32_t ) ( p_tcb )->p_tinib->stk ) + 	\
-								( p_tcb )->p_tinib->stksz );							\
+		( p_tcb )->tskctxb.sp = ( void * )((( uint32_t ) ( p_tcb )->p_tinib->sstk ) + 	\
+								( p_tcb )->p_tinib->sstksz );							\
 		/* 起動番地の設定 */															\
 		( p_tcb )->tskctxb.pc = ( FP ) start_r;											\
 	}																					\

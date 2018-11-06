@@ -54,6 +54,21 @@
 #define INTNO1_INTPRI		-15
 #define intno1_clear()		// エッジなので不要
 
+#if defined(TOPPERS_ML_MANUAL)
+#define TASK1_STK		(0x1000U)
+#define TASK1_STKSZ		(TASK2_STK - TASK1_STK)
+#define TASK2_STK		(0x1400U)
+#define TASK2_STKSZ		(ALM_TASK_STK - TASK2_STK)
+#define ALM_TASK_STK	(0x1800U)
+#define ALM_TASK_STKSZ	(TASK3_STK - ALM_TASK_STK)
+#define TASK3_STK		(0x1c00U)
+#define TASK3_STKSZ		(MAIN_TASK_STK - TASK3_STK)
+#define MAIN_TASK_STK	(0x2000U)
+#define MAIN_TASK_STKSZ	(EXC_TASK_STK - MAIN_TASK_STK)
+#define EXC_TASK_STK	(0x2400U)
+#define EXC_TASK_STKSZ	(0x0400U)
+#endif
+
 /*
  *  コアで共通な定義（チップ依存部は飛ばす）
  */

@@ -1,0 +1,2 @@
+-start=B_1,R_1,B_2,R_2,B,R,SI/00002800,C$VECT,P_START,C_1,C_2,C,D_1,D_2,D,P,W_1,W_2,W,L/FFF00000
+-rom=D=R,D_1=R_1,D_2=R_2
