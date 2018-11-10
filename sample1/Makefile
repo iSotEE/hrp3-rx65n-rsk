@@ -238,8 +238,8 @@ SYSSVC_DIRS := $(TECSGENDIR) $(SRCDIR)/tecs_kernel \
 				$(SYSSVC_DIRS) $(SRCDIR)/syssvc \
 				$(TECSDIR)/tecs $(TECSDIR)/tecs/rpc
 SYSSVC_ASMOBJS := $(SYSSVC_ASMOBJS)
-SYSSVC_COBJS := $(SYSSVC_COBJS)  $(TECS_KERNEL_COBJS) \
-				prb_str.obj $(INIT_TECS_COBJ) $(CXXRTS)
+SYSSVC_COBJS := $(SYSSVC_COBJS) syslog.obj banner.obj serial.obj logtask.obj $(TECS_KERNEL_COBJS) \
+				$(INIT_TECS_COBJ) $(CXXRTS)
 SYSSVC_CFLAGS := $(SYSSVC_CFLAGS) -DTOPPERS_SVC_CALL
 INCLUDES := $(INCLUDES) -I$(TECSGENDIR) -I$(SRCDIR)/tecs_kernel \
 				-I$(TECSDIR)/tecs -I$(TECSDIR)/tecs/rpc
@@ -435,7 +435,7 @@ $(OBJFILE): $(ALL_OBJS) $(LIBS_DEP) $(LDSCRIPT)
 #  シンボルファイルの生成
 #
 $(OBJNAME).syms: $(OBJFILE)
-	$(NM) -n $(OBJFILE) > $(OBJNAME).syms
+	$(call obj2syms,$(OBJFILE),$(OBJNAME).syms)
 
 #
 #  バイナリファイルの生成
@@ -447,7 +447,7 @@ $(OBJNAME).bin: $(OBJFILE)
 #  Sレコードファイルの生成
 #
 $(OBJNAME).srec: $(OBJFILE)
-	$(OBJCOPY) -O srec -S $(OBJFILE) $(OBJNAME).srec
+	$(call obj2srec,$(OBJFILE),$(OBJNAME).srec)
 
 #
 #  エラーチェック処理
