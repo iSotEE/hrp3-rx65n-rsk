@@ -91,6 +91,7 @@ kernelCfgAsm.add(<<EOS)
 	.glb	_start
 	.glb	_kernel_interrupt
 	.glb	_kernel_exception
+	.glb	_kernel_service_call
 	.glb	__kernel_default_exc_handler
 EOS
 
@@ -124,7 +125,7 @@ INHNO_RANGE.each do |inhno|
   elsif DEBUG_UNREG_INT
     inthdr = "__kernel_default_int_handler"
   end
-  if inthdr
+  if inthdr && inhno != $SVC_SERVICE_CALL
     kernelCfgAsm.add(<<EOS)
 	.glb	#{inthdr}
 	.glb	__kernel#{inthdr}_#{inhno}_entry
@@ -192,6 +193,11 @@ VVECTOR_TOP:
 vvector_table:
 EOS
 INHNO_RANGE.each do |inhno|
+  if inhno == $SVC_SERVICE_CALL
+    kernelCfgAsm.add("\t.lword\t_kernel_service_call		; SVC_SERVICE_CALL")
+    next
+  end
+  
   inhhdr = "_kernel_default_int_handler_entry"
   if $cfgData[:DEF_INH].has_key?(inhno)
     inh = $cfgData[:DEF_INH][inhno]

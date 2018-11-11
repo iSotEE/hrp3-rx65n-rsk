@@ -61,17 +61,21 @@
 
 	.glb	__kernel_p_runtsk
 	.glb	__kernel_p_schedtsk
+	.glb	__kernel_svc_table
+	.glb	__kernel_tmax_fncd
+	.glb	__kernel_svcinib_table
+	.glb	__kernel_rundom
 
 	.glb	__kernel_dispatch
 	.glb	__kernel_exit_and_dispatch
 	.glb	__kernel_start_r
 	.glb	_kernel_interrupt
 	.glb	_kernel_exception
+	.glb	_kernel_service_call
 	.glb	__kernel_intnest
 	.glb	__kernel_call_exit_kernel
 	.glb	__kernel_start_dispatch
 
-	.glb	_ext_tsk
 	.glb	__kernel_exit_kernel
 
 .if	TIPM_LOCK != TIPM_LOCK_ALL
@@ -194,6 +198,19 @@ dispatch_r:
 	rts  	                        	; dispatch 呼び出し元へ戻る.
 
 ;
+;  タスクの終了処理
+;
+_call_ext_tsk:
+	mov.l	#TFN_EXT_TSK, r14
+	mov.l	#0, r15
+	int		#SVC_SERVICE_CALL
+	mov.l	#TFN_EXT_KER, r14
+	mov.l	#0, r15
+	int		#SVC_SERVICE_CALL
+_call_ext_tsk_loop:
+	bra		_call_ext_tsk_loop
+
+;
 ;  タスク起動処理(タスク先頭へのタスクディスパッチャ出口)
 ;
 ;  呼び出し条件:
@@ -202,7 +219,7 @@ dispatch_r:
 ;  ここでは, CPUロック解除状態にし, タスクを起動する.
 ;
 __kernel_start_r:
-	mov.l 	#_ext_tsk, r5
+	mov.l 	#_call_ext_tsk, r5
 	push.l	r5							; 戻り番地をスタックに積む
 	ld_TCB_p_tinib	r5, r14, r4
 	ld_TINIB_exinf	r1, r5, r4			; 拡張情報を第一引数に設定
@@ -662,5 +679,259 @@ exception_from_nonkernelint:	; 多重割込み
 exception_return:
 	add		#EXCINF_REG_SIZE, r0		; CPU例外情報の破棄
 	bra		interrupt_return
+
+;
+;  サービスコールの出入口処理
+;
+;  呼出し条件:
+;  ・割込み発生時のH/W処理により,スタックに割込みからの復帰PCとPSWが
+;    保存されている.
+;  ・r5は機能コード
+;
+_kernel_service_call:
+	;
+	;  機能コードの下限値チェック
+	;
+	cmp		#TMIN_FNCD, r5
+ret_svc_rsfn: ; TODO: 処理
+	blt		ret_svc_rsfn
+
+	;
+	;  第5パラメータを取得してr14に格納する
+	;
+	mov.l	4[sp], r15				; 元のPSWをr15に
+	tst		#PSW_U_MASK, r15
+	beq		service_call_1			; 呼び出し元は特権モードの場合は遷移
+	mvfc	usp, r14
+	mov.l	[r14], r14
+	bra		service_call_2
+service_call_1:
+	mov.l	8[sp], r14				; sp状態はPC, PSW, 第五パラメータ // TODO: PC before 第五パラメータ?
+service_call_2:
+
+	;
+	;  機能コードが0より大きければ，拡張サービスコール処理へ
+	;
+	cmp		#0, r5
+	bgt		extsvc_entry
+
+	;
+	;  ソフトウェア割込み前のシステム状態に戻す
+	;
+	tst		#PSW_I_MASK, r15
+	beq		service_call_3
+	setpsw	i
+
+service_call_3:
+	;
+	;  サービスコールを呼び出す
+	;
+	push.l	r14						; 第5パラメータをスタックに積む
+	mov.l	#__kernel_svc_table, r14
+	abs		r5
+	rotl	#2, r5
+	add		r5, r14					; サービスコールの番地を算出
+	jsr		r14						; サービスコールへ分岐
+
+	;
+	;  サービスコールからのリターン処理
+	;
+service_call_return:
+	add		#4, sp					; 第5パラメータを捨てる
+
+	;
+	;  ソフトウェア割込みからのリターン後のシステム状態が，この時点での
+	;  システム状態になるように準備する
+	;
+	mvfc	psw, r14				; psw → r14
+	and		#PSW_I_MASK, r14
+	mov.l	4[sp], r15
+	and		#~PSW_I_MASK, r15
+	or		r14, r15
+	mov.l	r15, 4[sp]
+
+	;
+	;  サービスコールからのリターン
+	;
+ret_svc_1:
+	rte
+
+	;
+	;  拡張サービスコールの出入口処理
+	;
+	;  呼び出し条件：
+	;  ・r5は機能コード、r14は第5パラメータ、r15は元のPSW
+	;
+extsvc_entry:
+	;
+	;  第5パラメータをスタックに積む
+	;
+	;  第5パラメータを早めに積んで，使用できるレジスタを確保する．r15
+	;  をスタックに積むのは，第6パラメータ（cdmid）を置く領域を確保す
+	;  るためであり，積んでいる値には意味がない．
+	;
+	pushm	r14-r15					; r15はスペース確保のため
+
+	;
+	;  機能コードの上限値チェック
+	;
+	mov.l	#__kernel_tmax_fncd, r14
+	mov.l	[r14], r14
+	cmp		r14, r5
+ret_extsvc_rsfn: ; TODO: impl
+	bgt		ret_extsvc_rsfn
+
+	;
+	;  拡張サービスコールルーチンの先頭番地を取得．NULLでないかチェック
+	;
+	mov.l	#__kernel_svcinib_table-8, r14
+	rotl	#3, r5
+	add		r5, r14						; p_svcinibを取得
+	mov.l	SVCINIB_svcrtn[r14], r15	; p_svcinib->svcrtnを取得
+	cmp		#0, r15						; p_svcinib->svcrtnがNULLか？
+	beq		ret_extsvc_rsfn
+
+	;
+	;  非タスクコンテキストからの呼出しなら，extsvc_entry_1へ分岐
+	;
+	mov.l	#__kernel_intnest, r5
+	mov.w	[r5], r5
+	cmp		#0, r5
+	mov.l	#TDOM_KERNEL, r5
+	bnz		extsvc_entry_1
+
+    ;
+    ;  システムスタックの残量チェック［NGKI3197］
+    ;
+   	mov.l	#__kernel_p_runtsk, r5
+	mov.l	[r5], r5
+	mov.l	TCB_p_tinib[r5], r5
+	mov.l	TINIB_sstk[r5], r5		; スタックの先頭番地 → r5
+	sub		r5, sp, r5				; スタック残量 → r5
+ret_extsvc_nomem: ; TODO:
+	blt		ret_extsvc_nomem		; スタック残量 < 0 ならエラー
+	mov.l	SVCINIB_stksz[r14], r14	; p_svcinib->stksz → r14
+	cmp		r14, r5					; スタックの残量 < r14 ならエラー
+	blt		ret_extsvc_nomem
+
+    ;
+    ;  svclevelのチェックとインクリメント［NGKI3198］
+    ;
+   	mov.l	#__kernel_p_runtsk, r5
+	mov.l	[r5], r5
+	mov.b	TCB_svclevel[r5], r14
+	cmp		#255, r14				; svclevel == UINT8_MAX ならエラー
+ret_extsvc_sys: ; TODO:
+	beq		ret_extsvc_sys
+	add		#1, r14					; svclevelをインクリメント
+	mov.b	r14, TCB_svclevel[r5]
+
+	;
+	;  cdmidを求め，rundomを更新する
+	;
+   	mov.l	#__kernel_rundom, r14
+   	mov.l	[r14], r5					; rundom → r5
+   	cmp		#0, r5
+   	mov.l	#TDOM_KERNEL, r5			; rundomがTACP_KERNELであれば
+   	beq		extsvc_entry_1				;			  extsvc_entry_1へ
+   	mov.l	#0, [r14]					; rundomをTACP_KERNELに設定
+   	mov.l	#__kernel_p_runtsk, r5		; ドメインID → r5
+	mov.l	[r5], r5
+	mov.l	TCB_p_tinib[r5], r5
+	mov.l	TINIB_domid[r5], r5
+
+extsvc_entry_1:
+	;
+	;  ソフトウェア割込み前のシステム状態に戻す
+	;
+	; 【この時点のレジスタ状態】
+	;  r15:拡張サービスコールルーチンの先頭番地
+	;  r5 :cdmid（呼出し元の保護ドメインID）
+	;
+	mov.l	12[sp], r14			; スタックに保存した元のPSWを取得
+	tst		#PSW_I_MASK, r14
+	beq		extsvc_entry_2
+	setpsw	i
+extsvc_entry_2:
+	mov.l	r5, 4[sp]			; cdmidをスタック上に置く（r15の場所）
+
+.if 0 ; TODO: support me!
+#ifdef LOG_EXTSVC_ENTER
+	push	{r0-r3,r4}				/* r4はアラインメントのため */
+	push	{lr}					/* cdmidをスタックに積む */
+	ldr		lr, [sp,#24]			/* 第5パラメータをスタックに積む */
+	push	{lr}
+	push	{r3}					/* 第4パラメータをスタックに積む */
+	ldr		r3, [sp,#20]			/* 第3パラメータ → r3 */
+	ldr		r2, [sp,#16]			/* 第2パラメータ → r2 */
+	ldr		r1, [sp,#12]			/* 第1パラメータ → r1 */
+	mov		r0, r5					/* 機能コード → r0 */
+	bl		log_extsvc_enter
+	add		sp, sp, #12				/* 3つのパラメータを捨てる */
+	pop		{r0-r3,r4}
+#endif /* LOG_EXTSVC_ENTER */
+.endif
+
+	;
+	;  拡張サービスコールを呼び出す
+	;
+	jsr		r15
+
+.if 0 ; TODO: support me
+#ifdef LOG_EXTSVC_LEAVE
+	push	{r0,r1}					/* r1はアラインメントのため */
+	mov		r1, r0					/* 拡張サービスコールの返り値 → r1 */
+	mov		r0, r5					/* 機能コード → r0 */
+	bl		log_extsvc_leave
+	pop		{r0,r1}
+#endif /* LOG_EXTSVC_LEAVE */
+.endif
+
+ret_extsvc:
+	add		#8, sp				; 第5〜6パラメータを捨てる
+
+	;
+	;  ソフトウェア割込みからのリターン後のシステム状態が，この時点での
+	;  システム状態になるように準備する
+	;
+	mvfc	psw, r14				; psw → r14
+	and		#PSW_I_MASK, r14
+	mov.l	4[sp], r15
+	and		#~PSW_I_MASK, r15
+	or		r14, r15
+	mov.l	r15, 4[sp]
+
+
+	;
+	;  カーネル管理の割込みを禁止する．
+	;
+; TODO: mask カーネル管理の割込み ONLY
+	clrpsw	i
+
+	;
+	;  非タスクコンテキストからの呼出しなら，リターン
+	;
+	mov.l	#__kernel_intnest, r5
+	mov.w	[r5], r5
+	cmp		#0, r5
+	bnz		ret_svc_1
+
+    ;
+    ;  svclevelのデクリメントし，0にならなければリターン
+    ;
+   	mov.l	#__kernel_p_runtsk, r5
+	mov.l	[r5], r5
+	mov.b	TCB_svclevel[r5], r14
+	sub		#1, r14					; svclevelをデクリメント
+	mov.b	r14, TCB_svclevel[r5]
+	bne		ret_svc_1
+
+	;
+	;  rundomの設定
+	;
+	mov.l	TCB_p_dominib[r5], r14
+	mov.l	#__kernel_rundom, r5
+	mov.l	DOMINIB_domptn[r14], [r5]
+	bra		ret_svc_1
 
 	.end

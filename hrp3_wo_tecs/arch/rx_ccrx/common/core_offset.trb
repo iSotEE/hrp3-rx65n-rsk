@@ -14,11 +14,18 @@ IncludeTrb("kernel/genoffset.trb")
 #
 $offsetH.append(<<EOS)
 ; offset
-TCB_p_tinib .equ #{$offsetof_TCB_p_tinib}
-TCB_sp      .equ #{$offsetof_TCB_sp}
-TCB_pc      .equ #{$offsetof_TCB_pc}
-TINIB_exinf .equ #{$offsetof_TINIB_exinf}
-TINIB_task  .equ #{$offsetof_TINIB_task}
+TCB_p_tinib    .equ #{$offsetof_TCB_p_tinib}
+TCB_p_dominib  .equ #{$offsetof_TCB_p_dominib}
+TCB_sp         .equ #{$offsetof_TCB_sp}
+TCB_pc         .equ #{$offsetof_TCB_pc}
+TCB_svclevel   .equ #{$offsetof_TCB_svclevel}
+TINIB_exinf    .equ #{$offsetof_TINIB_exinf}
+TINIB_task     .equ #{$offsetof_TINIB_task}
+TINIB_sstk     .equ #{$offsetof_TINIB_sstk}
+TINIB_domid    .equ #{$offsetof_TINIB_domid}
+SVCINIB_svcrtn .equ #{$offsetof_SVCINIB_svcrtn}
+SVCINIB_stksz  .equ #{$offsetof_SVCINIB_stksz}
+DOMINIB_domptn .equ #{$offsetof_DOMINIB_domptn}
 
 ; macros
 IPL_LOCK .equ #{$IPL_LOCK}
@@ -26,7 +33,14 @@ TIPM_LOCK .equ #{$TIPM_LOCK}
 TIPM_LOCK_ALL .equ #{$TIPM_LOCK_ALL}
 EXC_GET_PSW_OFFSET .equ #{$EXC_GET_PSW_OFFSET}
 PSW_I_MASK .equ #{$PSW_I_MASK}
+PSW_U_MASK .equ #{$PSW_U_MASK}
 PSW_IPL_MASK .equ #{$PSW_IPL_MASK}
 LOG_DSP_ENTER .equ #{$LOG_DSP_ENTER}
 LOG_DSP_LEAVE .equ #{$LOG_DSP_LEAVE}
+TFN_EXT_TSK .equ #{$TFN_EXT_TSK}
+TFN_EXT_KER .equ #{$TFN_EXT_KER}
+SVC_SERVICE_CALL .equ #{$SVC_SERVICE_CALL}
+TMIN_FNCD .equ #{$TMIN_FNCD}
+TDOM_KERNEL .equ #{$TDOM_KERNEL}
+
 EOS
