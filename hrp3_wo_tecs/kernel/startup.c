@@ -37,7 +37,7 @@
  *  アの利用により直接的または間接的に生じたいかなる損害に関しても，そ
  *  の責任を負わない．
  * 
- *  $Id: startup.c 285 2018-03-21 02:55:49Z ertl-hiro $
+ *  $Id: startup.c 509 2018-10-27 16:22:39Z ertl-hiro $
  */
 
 /*
@@ -112,13 +112,6 @@ sta_ker(void)
 	 *  初期化ルーチンの実行
 	 */ 
 	call_inirtn();
-
-	/*
-	 *  タイムウィンドウ切換え処理の起動
-	 */
-	if (newscyc_twdswitch) {
-		target_twdtimer_raise_int();
-	}
 
 	/*
 	 *  高分解能タイマの設定

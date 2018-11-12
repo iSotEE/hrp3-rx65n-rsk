@@ -260,7 +260,7 @@ trcv_pdq(ID pdqid, intptr_t *p_data, PRI *p_datapri, TMO tmout)
 Inline ER
 set_tim(SYSTIM systim)
 {
-	CAL_SVC_1M(ER, TFN_SET_TIM, SYSTIM, systim);
+	CAL_SVC_1M_SYSTIM(ER, TFN_SET_TIM, SYSTIM, systim);
 }
 
 Inline ER
@@ -704,21 +704,21 @@ chg_spr(ID tskid, uint_t subpri)
 #endif /* TOPPERS_SUPPORT_SUBPRIO */
 
 Inline ER
-mrot_rdq(ID domid, PRI tskpri)
+mrot_rdq(ID schedno, PRI tskpri)
 {
-	CAL_SVC_2M(ER, TFN_MROT_RDQ, ID, domid, PRI, tskpri);
+	CAL_SVC_2M(ER, TFN_MROT_RDQ, ID, schedno, PRI, tskpri);
 }
 
 Inline ER
-mget_lod(ID domid, PRI tskpri, uint_t *p_load)
+mget_lod(ID schedno, PRI tskpri, uint_t *p_load)
 {
-	CAL_SVC_3M(ER, TFN_MGET_LOD, ID, domid, PRI, tskpri, uint_t *, p_load);
+	CAL_SVC_3M(ER, TFN_MGET_LOD, ID, schedno, PRI, tskpri, uint_t *, p_load);
 }
 
 Inline ER
-mget_nth(ID domid, PRI tskpri, uint_t nth, ID *p_tskid)
+mget_nth(ID schedno, PRI tskpri, uint_t nth, ID *p_tskid)
 {
-	CAL_SVC_4M(ER, TFN_MGET_NTH, ID, domid, PRI, tskpri, uint_t, nth, ID *, p_tskid);
+	CAL_SVC_4M(ER, TFN_MGET_NTH, ID, schedno, PRI, tskpri, uint_t, nth, ID *, p_tskid);
 }
 
 #endif /* TOPPERS_MACRO_ONLY */

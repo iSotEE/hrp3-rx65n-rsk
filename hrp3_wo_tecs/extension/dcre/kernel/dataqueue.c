@@ -37,7 +37,7 @@
  *  アの利用により直接的または間接的に生じたいかなる損害に関しても，そ
  *  の責任を負わない．
  * 
- *  $Id: dataqueue.c 81 2015-12-31 12:44:23Z ertl-hiro $
+ *  $Id: dataqueue.c 520 2018-11-01 12:41:13Z ertl-hiro $
  */
 
 /*
@@ -573,8 +573,8 @@ snd_dtq(ID dtqid, intptr_t data)
 	}
 	else {
 		winfo_sdtq.data = data;
-		p_runtsk->tstat = TS_WAITING_SDTQ;
-		wobj_make_wait((WOBJCB *) p_dtqcb, (WINFO_WOBJ *) &winfo_sdtq);
+		wobj_make_wait((WOBJCB *) p_dtqcb, TS_WAITING_SDTQ,
+											(WINFO_WOBJ *) &winfo_sdtq);
 		dispatch();
 		ercd = winfo_sdtq.winfo.wercd;
 	}
@@ -616,7 +616,7 @@ psnd_dtq(ID dtqid, intptr_t data)
 				dispatch();
 			}
 			else {
-				request_dispatch();
+				request_dispatch_retint();
 			}
 		}
 		ercd = E_OK;
@@ -673,9 +673,8 @@ tsnd_dtq(ID dtqid, intptr_t data, TMO tmout)
 	}
 	else {
 		winfo_sdtq.data = data;
-		p_runtsk->tstat = TS_WAITING_SDTQ;
-		wobj_make_wait_tmout((WOBJCB *) p_dtqcb, (WINFO_WOBJ *) &winfo_sdtq,
-														&tmevtb, tmout);
+		wobj_make_wait_tmout((WOBJCB *) p_dtqcb, TS_WAITING_SDTQ,
+								(WINFO_WOBJ *) &winfo_sdtq, &tmevtb, tmout);
 		dispatch();
 		ercd = winfo_sdtq.winfo.wercd;
 	}
@@ -721,7 +720,7 @@ fsnd_dtq(ID dtqid, intptr_t data)
 				dispatch();
 			}
 			else {
-				request_dispatch();
+				request_dispatch_retint();
 			}
 		}
 		ercd = E_OK;
@@ -770,8 +769,7 @@ rcv_dtq(ID dtqid, intptr_t *p_data)
 		ercd = E_OK;
 	}
 	else {
-		p_runtsk->tstat = TS_WAITING_RDTQ;
-		make_wait(&(winfo_rdtq.winfo));
+		make_wait(TS_WAITING_RDTQ, &(winfo_rdtq.winfo));
 		queue_insert_prev(&(p_dtqcb->rwait_queue), &(p_runtsk->task_queue));
 		winfo_rdtq.p_dtqcb = p_dtqcb;
 		LOG_TSKSTAT(p_runtsk);
@@ -872,8 +870,7 @@ trcv_dtq(ID dtqid, intptr_t *p_data, TMO tmout)
 		ercd = E_TMOUT;
 	}
 	else {
-		p_runtsk->tstat = TS_WAITING_RDTQ;
-		make_wait_tmout(&(winfo_rdtq.winfo), &tmevtb, tmout);
+		make_wait_tmout(TS_WAITING_RDTQ, &(winfo_rdtq.winfo), &tmevtb, tmout);
 		queue_insert_prev(&(p_dtqcb->rwait_queue), &(p_runtsk->task_queue));
 		winfo_rdtq.p_dtqcb = p_dtqcb;
 		LOG_TSKSTAT(p_runtsk);

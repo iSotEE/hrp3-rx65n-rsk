@@ -35,7 +35,7 @@
  *  アの利用により直接的または間接的に生じたいかなる損害に関しても，そ
  *  の責任を負わない．
  * 
- *  $Id: target_test.h 403 2018-05-25 05:54:49Z ertl-hiro $
+ *  $Id: target_test.h 515 2018-10-31 07:13:31Z ertl-hiro $
  */
 
 /*
@@ -64,7 +64,7 @@
  *  テストプログラムで使用する時間パラメータに関する定義
  */
 #ifdef TOPPERS_USE_QEMU
-#define TEST_TIME_CP	1000U
+#define TEST_TIME_CP	10000U
 #endif /* TOPPERS_USE_QEMU */
 
 /*

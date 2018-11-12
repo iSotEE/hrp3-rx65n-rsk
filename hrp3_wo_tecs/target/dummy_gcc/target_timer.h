@@ -35,7 +35,7 @@
  *  アの利用により直接的または間接的に生じたいかなる損害に関しても，そ
  *  の責任を負わない．
  * 
- *  $Id: target_timer.h 450 2018-09-03 09:38:48Z ertl-hiro $
+ *  $Id: target_timer.h 510 2018-10-27 16:30:45Z ertl-hiro $
  */
 
 /*
@@ -50,9 +50,6 @@
 
 /*
  *  高分解能タイマ割込みハンドラ登録のための定数
- *
- *  高分解能タイマ割込みは，タイムウィンドウ割込みよりも高い優先度とし
- *  なければならない（同優先度も不可）．
  */
 #define INHNO_HRT		TINTNO_HRT			/* 割込みハンドラ番号 */
 #define INTNO_HRT		TINTNO_HRT			/* 割込み番号 */
@@ -116,12 +113,12 @@ extern void target_hrt_handler(void);
 /*
  *  タイムウィンドウタイマ割込みハンドラ登録のための定数
  *
- *  タイムウィンドウ割込みは，最低優先度とすることを原則とする．高分解
- *  能タイマ割込みより低い優先度としなければならない（同優先度も不可）．
+ *  タイムウィンドウタイマ割込みの優先度は，高分解能タイマ割込みと同じ
+ *  にしなければならない．
  */
 #define INHNO_TWDTIMER		TINTNO_TWDTIMER		/* 割込みハンドラ番号 */
 #define INTNO_TWDTIMER		TINTNO_TWDTIMER		/* 割込み番号 */
-#define INTPRI_TWDTIMER		TMAX_INTPRI			/* 割込み優先度 */
+#define INTPRI_TWDTIMER		INTPRI_HRT			/* 割込み優先度 */
 #define INTATR_TWDTIMER		TA_EDGE				/* 割込み属性 */
 
 #ifndef TOPPERS_MACRO_ONLY
@@ -151,14 +148,6 @@ Inline PRCTIM
 target_twdtimer_stop(void)
 {
 	return(0U);
-}
-
-/*
- *  タイムウィンドウタイマ割込みの要求
- */
-Inline void
-target_twdtimer_raise_int(void)
-{
 }
 
 /*

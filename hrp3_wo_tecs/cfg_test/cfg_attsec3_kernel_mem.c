@@ -49,17 +49,16 @@ extern char __start_mo_srwdata_kernel_A4[];
 extern char __start_mo_srwdata_kernel[];
 extern char __start_mo_srwdata_kernel_A6[];
 extern char __start_mo_srwdata_kernel_A2[];
-extern char __start_mo_rwdata_shared[];
-extern char __aend_mo_rwdata_shared[];
+extern char __aend_mo_srwdata_kernel_A2[];
 
-const uint_t _kernel_tnum_meminib = 31U;
+const uint_t _kernel_tnum_meminib = 30U;
 
-void *const _kernel_memtop_table[31] = {
+void *const _kernel_memtop_table[30] = {
 	0,
 	__start_mo_text_kernel /* 0x01000000 */,
-	__start_mo_rodata_kernel /* 0x01003000 */,
-	__start_mo_text_shared /* 0x01004000 */,
-	__aend_mo_text_shared /* 0x01005000 */,
+	__start_mo_rodata_kernel /* 0x0100a000 */,
+	__start_mo_text_shared /* 0x0100b000 */,
+	__aend_mo_text_shared /* 0x0100c000 */,
 	__start_mo_RAM_text_kernel /* 0x01800000 */,
 	__start_mo_RAM_rodata_kernel /* 0x01801000 */,
 	__start_mo_RAM_text_kernel_A7 /* 0x01802000 */,
@@ -84,11 +83,10 @@ void *const _kernel_memtop_table[31] = {
 	__start_mo_srwdata_kernel /* 0x01817000 */,
 	__start_mo_srwdata_kernel_A6 /* 0x01818000 */,
 	__start_mo_srwdata_kernel_A2 /* 0x01819000 */,
-	__start_mo_rwdata_shared /* 0x0181a000 */,
-	__aend_mo_rwdata_shared /* 0x0181b000 */
+	__aend_mo_srwdata_kernel_A2 /* 0x0181a000 */
 };
 
-const MEMINIB _kernel_meminib_table[31] = {
+const MEMINIB _kernel_meminib_table[30] = {
 	{ TA_NOEXS, 0U, 0U, 0U },
 	{ TA_TEXTSEC, 0U, TACP_KERNEL, TACP_KERNEL },
 	{ TA_RODATASEC, 0U, TACP_KERNEL, TACP_KERNEL },
@@ -118,7 +116,6 @@ const MEMINIB _kernel_meminib_table[31] = {
 	{ 0x0, TACP_KERNEL, TACP_KERNEL, TACP_KERNEL },
 	{ 0x6, TACP_KERNEL, TACP_KERNEL, TACP_KERNEL },
 	{ 0x2, TACP_KERNEL, TACP_KERNEL, TACP_KERNEL },
-	{ 0x0, TACP_SHARED, TACP_SHARED, TACP_SHARED },
 	{ TA_NOEXS, 0U, 0U, 0U }
 };
 
@@ -162,13 +159,10 @@ extern char __start_RAM_istext_kernel_A27[];
 extern char __start_RAM_srodata_kernel_A23[];
 extern char __end_RAM_srodata_kernel_A23[];
 extern char __start_RAM_isrodata_kernel_A23[];
-extern char __start_data_shared[];
-extern char __end_data_shared[];
-extern char __start_idata_shared[];
 
-const uint_t _kernel_tnum_datasec = 13U;
+const uint_t _kernel_tnum_datasec = 12U;
 
-const DATASECINIB _kernel_datasecinib_table[13] = {
+const DATASECINIB _kernel_datasecinib_table[12] = {
 	{ __start_RAM_text_kernel, __end_RAM_text_kernel, __start_RAM_itext_kernel },
 	{ __start_RAM_rodata_kernel, __end_RAM_rodata_kernel, __start_RAM_irodata_kernel },
 	{ __start_RAM_text_kernel_A7, __end_RAM_text_kernel_A7, __start_RAM_itext_kernel_A7 },
@@ -180,8 +174,7 @@ const DATASECINIB _kernel_datasecinib_table[13] = {
 	{ __start_RAM_stext_kernel, __end_RAM_stext_kernel, __start_RAM_istext_kernel },
 	{ __start_RAM_srodata_kernel, __end_RAM_srodata_kernel, __start_RAM_isrodata_kernel },
 	{ __start_RAM_stext_kernel_A27, __end_RAM_stext_kernel_A27, __start_RAM_istext_kernel_A27 },
-	{ __start_RAM_srodata_kernel_A23, __end_RAM_srodata_kernel_A23, __start_RAM_isrodata_kernel_A23 },
-	{ __start_data_shared, __end_data_shared, __start_idata_shared }
+	{ __start_RAM_srodata_kernel_A23, __end_RAM_srodata_kernel_A23, __start_RAM_isrodata_kernel_A23 }
 };
 
 /*

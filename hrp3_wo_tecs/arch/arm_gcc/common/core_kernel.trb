@@ -37,7 +37,7 @@
 #   アの利用により直接的または間接的に生じたいかなる損害に関しても，そ
 #   の責任を負わない．
 # 
-#   $Id: core_kernel.trb 436 2018-08-12 09:10:12Z ertl-hiro $
+#   $Id: core_kernel.trb 487 2018-10-23 14:48:52Z ertl-hiro $
 # 
 
 #
@@ -74,7 +74,7 @@ $START_OBJS = [ "start.o" ]
 #
 #  コンパイラが必ず用いるライブラリの定義
 # 
-$TARGET_LIBS = [ "-lgcc" ]
+$TARGET_LIBS = [ "libgcc.a" ]
 
 # 
 #  標準のセクションの定義
@@ -87,7 +87,12 @@ $defaultSections = [
   { SECNAME: ".noinit", MEMREG: :stdram, MEMATR: $mematrNoinitSec }
 ]
 
-$targetStandardSecnameList = [ "COMMON" ]
+#
+#  ATT_SECで登録できないセクション名の定義
+#
+$targetStandardSecnameList = [
+  "COMMON", ".system_stack", ".page_table", ".shared_code"
+]
 
 #
 #  ユーザスタック領域のセクション名と確保方法
@@ -117,7 +122,7 @@ end
 #
 def AllocSystemStack(stack, size)
   $kernelCfgC.add("static STK_T #{stack}[COUNT_STK_T(#{size})] " \
-					"__attribute__((section(\".noinit_kernel\"),nocommon));")
+					"__attribute__((section(\".system_stack\"),nocommon));")
   return("ROUND_STK_T(#{size})")
 end
 
@@ -213,9 +218,22 @@ end
 #
 #  ターゲット依存のメモリオブジェクト情報の操作
 #
-# カーネルドメインに.page_tableセクションを登録する．
 def TargetMemoryObject()
   if $TOPPERS_ML_AUTO
+    # カーネルドメインに.system_stackセクションを登録する．
+    params = {}
+    params[:type] = :ATTSEC
+    params[:linker] = true
+    params[:domain] = $TDOM_KERNEL
+    params[:memreg] = $standardMemreg[$TDOM_KERNEL][:stdram]
+    params[:secname] = ".system_stack"
+    params[:mematr] = $targetMematrSstack || $mematrNoinitSec
+    params[:acptn1] = $defaultAcptn[$TDOM_KERNEL]
+    params[:acptn2] = $defaultAcptn[$TDOM_KERNEL]
+    params[:acptn4] = $defaultAcptn[$TDOM_KERNEL]
+    $memObj[$lastMOKey += 1] = params
+
+    # カーネルドメインに.page_tableセクションを登録する．
     params = {}
     params[:type] = :ATTSEC
     params[:linker] = true
@@ -226,6 +244,19 @@ def TargetMemoryObject()
     params[:acptn1] = $defaultAcptn[$TDOM_KERNEL]
     params[:acptn2] = $defaultAcptn[$TDOM_KERNEL]
     params[:acptn4] = $defaultAcptn[$TDOM_KERNEL]
+    $memObj[$lastMOKey += 1] = params
+
+    # 無所属に.shared_codeセクションを登録する．
+    params = {}
+    params[:type] = :ATTSEC
+    params[:linker] = true
+    params[:domain] = $TDOM_NONE
+    params[:memreg] = $standardMemreg[$TDOM_NONE][:stdrom]
+    params[:secname] = ".shared_code"
+    params[:mematr] = $mematrTextSec
+    params[:acptn1] = $defaultAcptn[$TDOM_NONE]
+    params[:acptn2] = $defaultAcptn[$TDOM_NONE]
+    params[:acptn4] = $defaultAcptn[$TDOM_NONE]
     $memObj[$lastMOKey += 1] = params
   end
 end

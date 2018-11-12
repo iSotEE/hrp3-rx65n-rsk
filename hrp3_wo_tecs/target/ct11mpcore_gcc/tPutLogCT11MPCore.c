@@ -34,7 +34,7 @@
  *  アの利用により直接的または間接的に生じたいかなる損害に関しても，そ
  *  の責任を負わない．
  * 
- *  $Id: tPutLogCT11MPCore.c 285 2018-03-21 02:55:49Z ertl-hiro $
+ *  $Id: tPutLogCT11MPCore.c 532 2018-11-11 04:46:48Z ertl-hiro $
  */
 
 /*
@@ -64,7 +64,7 @@ void
 ePutLog_putChar(char c)
 {
 	if(c == '\n'){
-		while(!cSIOPort_putChar('\r'));
+		while (!cSIOPort_putChar('\r')) ;
 	}
-	while(!cSIOPort_putChar(c));
+	while (!cSIOPort_putChar(c)) ;
 }

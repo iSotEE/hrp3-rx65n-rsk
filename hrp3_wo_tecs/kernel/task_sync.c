@@ -5,7 +5,7 @@
  * 
  *  Copyright (C) 2000-2003 by Embedded and Real-Time Systems Laboratory
  *                              Toyohashi Univ. of Technology, JAPAN
- *  Copyright (C) 2005-2015 by Embedded and Real-Time Systems Laboratory
+ *  Copyright (C) 2005-2018 by Embedded and Real-Time Systems Laboratory
  *              Graduate School of Information Science, Nagoya Univ., JAPAN
  * 
  *  上記著作権者は，以下の(1)〜(4)の条件を満たす場合に限り，本ソフトウェ
@@ -37,7 +37,7 @@
  *  アの利用により直接的または間接的に生じたいかなる損害に関しても，そ
  *  の責任を負わない．
  * 
- *  $Id: task_sync.c 229 2017-09-01 14:03:23Z ertl-hiro $
+ *  $Id: task_sync.c 520 2018-11-01 12:41:13Z ertl-hiro $
  */
 
 /*
@@ -139,8 +139,7 @@ slp_tsk(void)
 		ercd = E_OK;
 	}
 	else {
-		p_runtsk->tstat = TS_WAITING_SLP;		/*［NGKI1260］*/
-		make_wait(&winfo);
+		make_wait(TS_WAITING_SLP, &winfo);		/*［NGKI1260］*/
 		LOG_TSKSTAT(p_runtsk);
 		dispatch();
 		ercd = winfo.wercd;
@@ -181,9 +180,8 @@ tslp_tsk(TMO tmout)
 	else if (tmout == TMO_POL) {
 		ercd = E_TMOUT;							/*［NGKI1257］*/
 	}
-	else {
-		p_runtsk->tstat = TS_WAITING_SLP;		/*［NGKI1260］*/
-		make_wait_tmout(&winfo, &tmevtb, tmout);
+	else {										/*［NGKI1260］*/
+		make_wait_tmout(TS_WAITING_SLP, &winfo, &tmevtb, tmout);
 		LOG_TSKSTAT(p_runtsk);
 		dispatch();
 		ercd = winfo.wercd;
@@ -230,7 +228,7 @@ wup_tsk(ID tskid)
 				dispatch();
 			}
 			else {
-				request_dispatch();
+				request_dispatch_retint();
 			}
 		}
 		ercd = E_OK;
@@ -321,7 +319,7 @@ rel_wai(ID tskid)
 				dispatch();
 			}
 			else {
-				request_dispatch();
+				request_dispatch_retint();
 			}
 		}
 		ercd = E_OK;
@@ -474,7 +472,8 @@ dly_tsk(RELTIM dlytim)
 		winfo.p_tmevtb = &tmevtb;
 		tmevtb.callback = (CBACK) wait_tmout_ok;
 		tmevtb.arg = (void *) p_runtsk;
-		tmevtb_enqueue(&tmevtb, dlytim, p_runtsk->p_dominib->p_tmevt_heap);
+		tmevtb_enqueue_reltim(&tmevtb, dlytim,
+								p_runtsk->p_dominib->p_tmevt_heap);
 		LOG_TSKSTAT(p_runtsk);
 		dispatch();
 		ercd = winfo.wercd;

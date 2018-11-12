@@ -35,7 +35,7 @@
  *  アの利用により直接的または間接的に生じたいかなる損害に関しても，そ
  *  の責任を負わない．
  * 
- *  $Id: target_timer.h 451 2018-09-03 09:40:27Z ertl-hiro $
+ *  $Id: target_timer.h 510 2018-10-27 16:30:45Z ertl-hiro $
  */
 
 /*
@@ -78,12 +78,12 @@
 /*
  *  タイムウィンドウ／オーバランタイマ割込みハンドラ登録のための定数
  *
- *  タイムウィンドウ割込みは，最低優先度とすることを原則とする．高分解
- *  能タイマ割込みより低い優先度としなければならない（同優先度も不可）．
+ *  タイムウィンドウタイマ割込みの優先度は，高分解能タイマ割込みと同じ
+ *  にしなければならない．
  */
 #define INHNO_TOTIMER		TIMER_TOTIMER_IRQNO		/* 割込みハンドラ番号 */
 #define INTNO_TOTIMER		TIMER_TOTIMER_IRQNO		/* 割込み番号 */
-#define INTPRI_TOTIMER		TMAX_INTPRI				/* 割込み優先度 */
+#define INTPRI_TOTIMER		INTPRI_TIMER			/* 割込み優先度 */
 #define INTATR_TOTIMER		TA_NULL					/* 割込み属性 */
 
 #ifndef TOPPERS_MACRO_ONLY
@@ -129,24 +129,6 @@ target_twdtimer_stop(void)
 	sil_wrw_mem(SP804_CR(TWDTIMER_TIMER_BASE), SP804_DISABLE|SP804_CONFIG);
 /*	sil_wrw_mem(SP804_ICR(TWDTIMER_TIMER_BASE), 0U); */
 	return((PRCTIM) sil_rew_mem(SP804_CVR(TWDTIMER_TIMER_BASE)));
-}
-
-/*
- *  タイムウィンドウタイマ割込みの要求
- *
- *  タイムウィンドウタイマ割込みが発生するまで待つ．QEMUでは，ロードレ
- *  ジスタに0を設定すると警告メッセージが出るため，1を設定している．
- */
-Inline void
-target_twdtimer_raise_int(void)
-{
-#ifdef TOPPERS_USE_QEMU
-	sil_wrw_mem(SP804_LR(TWDTIMER_TIMER_BASE), 1U);
-#else /* TOPPERS_USE_QEMU */
-	sil_wrw_mem(SP804_LR(TWDTIMER_TIMER_BASE), 0U);
-#endif /* TOPPERS_USE_QEMU */
-	sil_wrw_mem(SP804_CR(TWDTIMER_TIMER_BASE), SP804_ENABLE|SP804_CONFIG);
-	while ((sil_rew_mem(SP804_MIS(TWDTIMER_TIMER_BASE)) & 0x01U) == 0U) ;
 }
 
 /*

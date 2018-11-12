@@ -27,27 +27,25 @@ extern char __start_mo_text_shared[];
 extern char __aend_mo_text_shared[];
 extern char __start_mo_rwdata_kernel_S_0_S[];
 extern char __start_mo_rwdata_kernel[];
-extern char __start_mo_rwdata_shared[];
-extern char __aend_mo_rwdata_shared[];
+extern char __aend_mo_rwdata_kernel[];
 
-const uint_t _kernel_tnum_meminib = 12U;
+const uint_t _kernel_tnum_meminib = 11U;
 
-void *const _kernel_memtop_table[13] = {
+void *const _kernel_memtop_table[12] = {
 	0,
 	__start_mo_text_kernel /* 0x01000000 */,
-	__start_mo_rodata_kernel /* 0x01009000 */,
-	__start_mo_text_shared /* 0x0100a000 */,
-	__aend_mo_text_shared /* 0x0100b000 */,
+	__start_mo_rodata_kernel /* 0x0100a000 */,
+	__start_mo_text_shared /* 0x0100b000 */,
+	__aend_mo_text_shared /* 0x0100c000 */,
 	__start_mo_rwdata_kernel_S_0_S /* 0x01800000 */,
 	__start_mo_rwdata_kernel /* 0x01801000 */,
-	__start_mo_rwdata_shared /* 0x01808000 */,
-	__aend_mo_rwdata_shared /* 0x01809000 */,
+	__aend_mo_rwdata_kernel /* 0x01808000 */,
 	(void *)(0xf0000000) /* 0xf0000000 */,
 	(void *)(0xf1000000) /* 0xf1000000 */,
 	(void *)(((char *)(0xf1000000)) + (0x1000000)) /* 0xf2000000 */
 };
 
-const MEMINIB _kernel_meminib_table[13] = {
+const MEMINIB _kernel_meminib_table[12] = {
 	{ TA_NOEXS, 0U, 0U, 0U },
 	{ TA_TEXTSEC, 0U, TACP_KERNEL, TACP_KERNEL },
 	{ TA_RODATASEC, 0U, TACP_KERNEL, TACP_KERNEL },
@@ -55,7 +53,6 @@ const MEMINIB _kernel_meminib_table[13] = {
 	{ TA_NOEXS, 0U, 0U, 0U },
 	{ 0x0, TACP_SHARED, TACP_KERNEL, TACP_SHARED },
 	{ 0x0, TACP_KERNEL, TACP_KERNEL, TACP_KERNEL },
-	{ 0x0, TACP_SHARED, TACP_SHARED, TACP_SHARED },
 	{ TA_NOEXS, 0U, 0U, 0U },
 	{ TA_ATTMEM|(TA_NULL), TACP_KERNEL, TACP_KERNEL, TACP_KERNEL },
 	{ TA_ATTMEM|(TA_NULL), TACP_SHARED, TACP_KERNEL, TACP_SHARED },
@@ -66,15 +63,9 @@ const MEMINIB _kernel_meminib_table[13] = {
  *  Data Section Initialization Information
  */
 
-extern char __start_data_shared[];
-extern char __end_data_shared[];
-extern char __start_idata_shared[];
+const uint_t _kernel_tnum_datasec = 0U;
 
-const uint_t _kernel_tnum_datasec = 1U;
-
-const DATASECINIB _kernel_datasecinib_table[1] = {
-	{ __start_data_shared, __end_data_shared, __start_idata_shared }
-};
+TOPPERS_EMPTY_LABEL(const DATASECINIB, _kernel_datasecinib_table);
 
 /*
  *  BSS Section Initialization Information

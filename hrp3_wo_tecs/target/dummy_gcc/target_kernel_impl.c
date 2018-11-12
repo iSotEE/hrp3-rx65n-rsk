@@ -35,7 +35,7 @@
  *  アの利用により直接的または間接的に生じたいかなる損害に関しても，そ
  *  の責任を負わない．
  * 
- *  $Id: target_kernel_impl.c 305 2018-03-27 13:16:31Z ertl-hiro $
+ *  $Id: target_kernel_impl.c 532 2018-11-11 04:46:48Z ertl-hiro $
  */
 
 /*
@@ -44,6 +44,7 @@
 
 #include "kernel_impl.h"
 #include "task.h"
+#include "svc_manage.h"
 #ifdef TOPPERS_SUPPORT_OVRHDR
 #include "overrun.h"
 #endif /* TOPPERS_SUPPORT_OVRHDR */
@@ -144,6 +145,53 @@ exc_handler_entry(void)
 }
 
 /*
+ *  ソフトウェア割込みによるサービスコールの出入口処理
+ */
+typedef ER_UINT	(*SVC)();				/* svc_table.cで定義 */
+extern const SVC svc_table[];			/* svc_table.cで定義 */
+extern const FN tmax_fncd;				/* kernel_cfg.cで定義 */
+extern const SVCINIB svcinib_table[];	/* kernel_cfg.cで定義 */
+
+
+ER_UINT
+svc_entry(intptr_t par1, intptr_t par2, intptr_t par3,
+								intptr_t par4, intptr_t par5, FN fncd)
+{
+	ER_UINT		ercd;
+
+	if (fncd <= 0) {
+		/*
+		 *  カーネルのサービスコールの場合
+		 */
+		if (fncd < TMIN_FNCD) {
+			ercd = E_RSFN;
+			goto error_exit;
+		}
+		ercd = (*(svc_table[-fncd]))(par1, par2, par3, par4, par5);
+	}
+	else {
+		/*
+		 *  拡張サービスコールの場合
+		 */
+		const SVCINIB	*p_svcinib;
+
+		if (fncd > tmax_fncd) {
+			ercd = E_RSFN;
+			goto error_exit;
+		}
+		p_svcinib = &svcinib_table[fncd - 1];
+		if (p_svcinib->svcrtn == NULL) {
+			ercd = E_RSFN;
+			goto error_exit;
+		}
+		ercd = (*(p_svcinib->svcrtn))(par1, par2, par3, par4, par5, 0);
+	}
+
+  error_exit:
+	return(ercd);
+}
+
+/*
  *  カーネルの終了処理の呼出し
  */
 void
@@ -151,7 +199,7 @@ call_exit_kernel(void)
 {
 	/* 非タスクコンテキストに切り換える */
 	/* exit_kernelに分岐する */
-	while (true);
+	while (true) ;
 }
 
 /*
@@ -182,7 +230,7 @@ target_initialize(void)
 void
 target_exit(void)
 {
-	while (true);
+	while (true) ;
 }
 
 /*

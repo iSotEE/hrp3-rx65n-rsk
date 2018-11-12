@@ -48,4 +48,5 @@ INCLUDE mpcore/MANIFEST
 INCLUDE rza1/MANIFEST
 
 INCLUDE ../../target/ct11mpcore_gcc/MANIFEST
+INCLUDE ../../target/test_hrt_ct11mpcore_gcc/MANIFEST
 INCLUDE ../../target/gr_peach_gcc/MANIFEST

@@ -37,7 +37,7 @@
  *  アの利用により直接的または間接的に生じたいかなる損害に関しても，そ
  *  の責任を負わない．
  * 
- *  $Id: core_kernel_impl.c 412 2018-07-25 09:38:09Z ertl-hiro $
+ *  $Id: core_kernel_impl.c 532 2018-11-11 04:46:48Z ertl-hiro $
  */
 
 /*
@@ -117,13 +117,10 @@ arm_mmu_initialize(void)
 #endif /* USE_ARM_MMU */
 
 /*
- *  FPU関連の操作
+ *  FPUの初期化
  */
 #ifdef USE_ARM_FPU
 
-/*
- *  FPUの初期化
- */
 void
 arm_fpu_initialize(void)
 {
@@ -193,7 +190,7 @@ core_terminate(void)
  *  ユーザタスクから呼び出すため，共有テキスト領域に配置する．
  */
 
-void call_ext_tsk(void) __attribute__((section(".text_shared")));
+void call_ext_tsk(void) __attribute__((section(".shared_code")));
 
 void
 call_ext_tsk(void)
@@ -220,7 +217,7 @@ call_ext_tsk(void)
 	  : "r1","r2","r3","r12","lr","memory","cc");
 
 	assert(0);
-	while (true);		/* コンパイラの警告の抑止 */
+	while (true) ;		/* コンパイラの警告の抑止 */
 }
 
 /*

@@ -5,7 +5,7 @@
  * 
  *  Copyright (C) 2000-2003 by Embedded and Real-Time Systems Laboratory
  *                              Toyohashi Univ. of Technology, JAPAN
- *  Copyright (C) 2004-2015 by Embedded and Real-Time Systems Laboratory
+ *  Copyright (C) 2004-2018 by Embedded and Real-Time Systems Laboratory
  *              Graduate School of Information Science, Nagoya Univ., JAPAN
  * 
  *  上記著作権者は，以下の(1)〜(4)の条件を満たす場合に限り，本ソフトウェ
@@ -37,7 +37,7 @@
  *  アの利用により直接的または間接的に生じたいかなる損害に関しても，そ
  *  の責任を負わない．
  * 
- *  $Id: core_svc.h 277 2018-03-12 13:51:14Z ertl-hiro $
+ *  $Id: core_svc.h 524 2018-11-04 13:01:46Z ertl-hiro $
  */
 
 /*
@@ -76,7 +76,7 @@
 } while (false)
 
 #define CAL_SVC_2M(TYPE, FNCD, TYPE1, PAR1, TYPE2, PAR2) do {	\
-	register intptr_t r0 asm("r0") = (intptr_t)(PAR1);			\
+	register TYPE1 r0 asm("r0") = (TYPE1)(PAR1);				\
 	register TYPE2 r1 asm("r1") = (TYPE2)(PAR2);				\
 	register FN r5 asm("r5") = FNCD;							\
 	Asm("svc %2"												\
@@ -88,7 +88,7 @@
 
 #define CAL_SVC_3M(TYPE, FNCD, TYPE1, PAR1,						\
 							TYPE2, PAR2, TYPE3, PAR3) do {		\
-	register intptr_t r0 asm("r0") = (intptr_t)(PAR1);			\
+	register TYPE1 r0 asm("r0") = (TYPE1)(PAR1);				\
 	register TYPE2 r1 asm("r1") = (TYPE2)(PAR2);				\
 	register TYPE3 r2 asm("r2") = (TYPE3)(PAR3);				\
 	register FN r5 asm("r5") = FNCD;							\
@@ -102,7 +102,7 @@
 
 #define CAL_SVC_4M(TYPE, FNCD, TYPE1, PAR1, TYPE2, PAR2,		\
 								TYPE3, PAR3, TYPE4, PAR4) do {	\
-	register intptr_t r0 asm("r0") = (intptr_t)(PAR1);			\
+	register TYPE1 r0 asm("r0") = (TYPE1)(PAR1);				\
 	register TYPE2 r1 asm("r1") = (TYPE2)(PAR2);				\
 	register TYPE3 r2 asm("r2") = (TYPE3)(PAR3);				\
 	register TYPE4 r3 asm("r3") = (TYPE4)(PAR4); 				\
@@ -117,18 +117,29 @@
 
 #define CAL_SVC_5M(TYPE, FNCD, TYPE1, PAR1, TYPE2, PAR2,		\
 					TYPE3, PAR3, TYPE4, PAR4, TYPE5, PAR5) do {	\
-	register intptr_t r0 asm("r0") = (intptr_t)(PAR1);			\
+	register TYPE1 r0 asm("r0") = (TYPE1)(PAR1);				\
 	register TYPE2 r1 asm("r1") = (TYPE2)(PAR2);				\
 	register TYPE3 r2 asm("r2") = (TYPE3)(PAR3);				\
 	register TYPE4 r3 asm("r3") = (TYPE4)(PAR4); 				\
 	register TYPE5 r4 asm("r4") = (TYPE5)(PAR5);				\
 	register FN r5 asm("r5") = FNCD;							\
-	Asm("svc %4"												\
-	  : "=r"(r0),"=r"(r1),"=r"(r2),"=r"(r3)						\
+	Asm("svc %5"												\
+	  : "=r"(r0),"=r"(r1),"=r"(r2),"=r"(r3),"=r"(r4)			\
 	  : "I"(SVC_SERVICE_CALL),"0"(r0),"1"(r1),"2"(r2),			\
 		"3"(r3),"r"(r4),"r"(r5)									\
 	  : "r12","lr","memory","cc");								\
 	return((TYPE) r0);											\
+} while (false)
+
+#define CAL_SVC_1M_SYSTIM(TYPE, FNCD, TYPE1, PAR1) do {					\
+	register intptr_t r0 asm("r0") = (intptr_t)((PAR1) & 0xffffffffU); 	\
+	register intptr_t r1 asm("r1") = (intptr_t)((PAR1) >> 32);			\
+	register FN r5 asm("r5") = FNCD;									\
+	Asm("svc %2"														\
+	  : "=r"(r0),"=r"(r1)												\
+	  : "I"(SVC_SERVICE_CALL),"0"(r0),"1"(r1),"r"(r5)					\
+	  : "r2","r3","r12","lr","memory","cc");							\
+	return((TYPE) r0);													\
 } while (false)
 
 /*

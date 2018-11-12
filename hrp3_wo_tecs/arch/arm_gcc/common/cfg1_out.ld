@@ -1,5 +1,5 @@
 /*
- *  $Id: cfg1_out.ld 73 2015-08-31 20:43:19Z ertl-hiro $
+ *  $Id: cfg1_out.ld 487 2018-10-23 14:48:52Z ertl-hiro $
  */
 
 OUTPUT_FORMAT("elf32-littlearm", "elf32-bigarm","elf32-littlearm") 
@@ -18,7 +18,6 @@ SECTIONS
 	}
 
 	.text : {
-		start.o(.text .text.*)
 		*(.text .text.*)
 		_end_text = .;
 	}

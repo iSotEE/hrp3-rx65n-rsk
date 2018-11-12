@@ -70,8 +70,8 @@ void *const _kernel_memtop_table[25] = {
 	__start_mo_RAM2_rwdata_DOM1 /* 0x02803000 */,
 	__aend_mo_RAM2_rwdata_DOM1 /* 0x02804000 */,
 	__start_mo_ROM3_text_kernel /* 0x03000000 */,
-	__start_mo_ROM3_rodata_kernel /* 0x03003000 */,
-	__aend_mo_ROM3_rodata_kernel /* 0x03004000 */,
+	__start_mo_ROM3_rodata_kernel /* 0x0300a000 */,
+	__aend_mo_ROM3_rodata_kernel /* 0x0300b000 */,
 	__start_mo_RAM3_rwdata_kernel /* 0x03800000 */,
 	__aend_mo_RAM3_rwdata_kernel /* 0x03806000 */
 };

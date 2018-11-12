@@ -342,7 +342,7 @@ extern void dispatch(void);
 /*
  *  非タスクコンテキストからのディスパッチ要求
  */
-#define request_dispatch()
+#define request_dispatch_retint()
 
 /*
  *  ディスパッチャの動作開始（core_support.src）

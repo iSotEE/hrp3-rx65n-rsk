@@ -1,7 +1,7 @@
 /* 
  *		全静的APIのテスト(2)
  * 
- *  $Id: cfg_all2.c 314 2018-04-02 21:22:49Z ertl-hiro $
+ *  $Id: cfg_all2.c 467 2018-10-07 14:05:30Z ertl-hiro $
  */
 
 #include "cfg_all2.h"
@@ -19,7 +19,6 @@ MPF_T	mpf_MPF2[20 * COUNT_MPF_T(200)]
  */
 volatile int	var1;
 volatile int	var2 __attribute__((section(".bss_DOM1_add2"),nocommon));
-volatile int	var3 __attribute__((section(".data_shared"),nocommon)) = 1;
 
 /*
  *  関数の定義

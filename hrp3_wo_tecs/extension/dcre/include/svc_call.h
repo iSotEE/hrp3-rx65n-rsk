@@ -76,7 +76,7 @@ extern ER _kernel_stp_cyc(ID cycid) throw();
 extern ER _kernel_sta_alm(ID almid, RELTIM almtim) throw();
 extern ER _kernel_stp_alm(ID almid) throw();
 #ifdef TOPPERS_SUPPORT_OVRHDR
-extern ER _kernel_sta_ovr(ID tskid, OVRTIM ovrtim) throw();
+extern ER _kernel_sta_ovr(ID tskid, PRCTIM ovrtim) throw();
 #endif /* TOPPERS_SUPPORT_OVRHDR */
 #ifdef TOPPERS_SUPPORT_OVRHDR
 extern ER _kernel_stp_ovr(ID tskid) throw();
@@ -135,45 +135,111 @@ extern ER _kernel_ref_mbf(ID mbfid, T_RMBF *pk_rmbf) throw();
 extern ER _kernel_ref_mpf(ID mpfid, T_RMPF *pk_rmpf) throw();
 extern ER _kernel_ref_cyc(ID cycid, T_RCYC *pk_rcyc) throw();
 extern ER _kernel_ref_alm(ID almid, T_RALM *pk_ralm) throw();
+#ifdef TOPPERS_SUPPORT_DYNAMIC_CRE
 extern ER_ID _kernel_acre_tsk(const T_CTSK *pk_ctsk) throw();
+#endif /* TOPPERS_SUPPORT_DYNAMIC_CRE */
+#ifdef TOPPERS_SUPPORT_DYNAMIC_CRE
 extern ER_ID _kernel_acre_sem(const T_CSEM *pk_csem) throw();
+#endif /* TOPPERS_SUPPORT_DYNAMIC_CRE */
+#ifdef TOPPERS_SUPPORT_DYNAMIC_CRE
 extern ER_ID _kernel_acre_flg(const T_CFLG *pk_cflg) throw();
+#endif /* TOPPERS_SUPPORT_DYNAMIC_CRE */
+#ifdef TOPPERS_SUPPORT_DYNAMIC_CRE
 extern ER_ID _kernel_acre_dtq(const T_CDTQ *pk_cdtq) throw();
+#endif /* TOPPERS_SUPPORT_DYNAMIC_CRE */
+#ifdef TOPPERS_SUPPORT_DYNAMIC_CRE
 extern ER_ID _kernel_acre_pdq(const T_CPDQ *pk_cpdq) throw();
+#endif /* TOPPERS_SUPPORT_DYNAMIC_CRE */
+#ifdef TOPPERS_SUPPORT_DYNAMIC_CRE
 extern ER_ID _kernel_acre_mtx(const T_CMTX *pk_cmtx) throw();
+#endif /* TOPPERS_SUPPORT_DYNAMIC_CRE */
+#ifdef TOPPERS_SUPPORT_DYNAMIC_CRE
 extern ER_ID _kernel_acre_mbf(const T_CMBF *pk_cmbf) throw();
+#endif /* TOPPERS_SUPPORT_DYNAMIC_CRE */
+#ifdef TOPPERS_SUPPORT_DYNAMIC_CRE
 extern ER_ID _kernel_acre_mpf(const T_CMPF *pk_cmpf) throw();
+#endif /* TOPPERS_SUPPORT_DYNAMIC_CRE */
+#ifdef TOPPERS_SUPPORT_DYNAMIC_CRE
 extern ER_ID _kernel_acre_cyc(const T_CCYC *pk_ccyc) throw();
+#endif /* TOPPERS_SUPPORT_DYNAMIC_CRE */
+#ifdef TOPPERS_SUPPORT_DYNAMIC_CRE
 extern ER_ID _kernel_acre_alm(const T_CALM *pk_calm) throw();
+#endif /* TOPPERS_SUPPORT_DYNAMIC_CRE */
+#ifdef TOPPERS_SUPPORT_DYNAMIC_CRE
 extern ER_ID _kernel_acre_isr(const T_CISR *pk_cisr) throw();
+#endif /* TOPPERS_SUPPORT_DYNAMIC_CRE */
+#ifdef TOPPERS_SUPPORT_DYNAMIC_CRE
 extern ER _kernel_del_tsk(ID tskid) throw();
+#endif /* TOPPERS_SUPPORT_DYNAMIC_CRE */
+#ifdef TOPPERS_SUPPORT_DYNAMIC_CRE
 extern ER _kernel_del_sem(ID semid) throw();
+#endif /* TOPPERS_SUPPORT_DYNAMIC_CRE */
+#ifdef TOPPERS_SUPPORT_DYNAMIC_CRE
 extern ER _kernel_del_flg(ID flgid) throw();
+#endif /* TOPPERS_SUPPORT_DYNAMIC_CRE */
+#ifdef TOPPERS_SUPPORT_DYNAMIC_CRE
 extern ER _kernel_del_dtq(ID dtqid) throw();
+#endif /* TOPPERS_SUPPORT_DYNAMIC_CRE */
+#ifdef TOPPERS_SUPPORT_DYNAMIC_CRE
 extern ER _kernel_del_pdq(ID pdqid) throw();
+#endif /* TOPPERS_SUPPORT_DYNAMIC_CRE */
+#ifdef TOPPERS_SUPPORT_DYNAMIC_CRE
 extern ER _kernel_del_mtx(ID mtxid) throw();
+#endif /* TOPPERS_SUPPORT_DYNAMIC_CRE */
+#ifdef TOPPERS_SUPPORT_DYNAMIC_CRE
 extern ER _kernel_del_mbf(ID mbfid) throw();
+#endif /* TOPPERS_SUPPORT_DYNAMIC_CRE */
+#ifdef TOPPERS_SUPPORT_DYNAMIC_CRE
 extern ER _kernel_del_mpf(ID mpfid) throw();
+#endif /* TOPPERS_SUPPORT_DYNAMIC_CRE */
+#ifdef TOPPERS_SUPPORT_DYNAMIC_CRE
 extern ER _kernel_del_cyc(ID cycid) throw();
+#endif /* TOPPERS_SUPPORT_DYNAMIC_CRE */
+#ifdef TOPPERS_SUPPORT_DYNAMIC_CRE
 extern ER _kernel_del_alm(ID almid) throw();
+#endif /* TOPPERS_SUPPORT_DYNAMIC_CRE */
+#ifdef TOPPERS_SUPPORT_DYNAMIC_CRE
 extern ER _kernel_del_isr(ID isrid) throw();
+#endif /* TOPPERS_SUPPORT_DYNAMIC_CRE */
+#ifdef TOPPERS_SUPPORT_DYNAMIC_CRE
 extern ER _kernel_sac_tsk(ID tskid, const ACVCT *p_acvct) throw();
+#endif /* TOPPERS_SUPPORT_DYNAMIC_CRE */
+#ifdef TOPPERS_SUPPORT_DYNAMIC_CRE
 extern ER _kernel_sac_sem(ID semid, const ACVCT *p_acvct) throw();
+#endif /* TOPPERS_SUPPORT_DYNAMIC_CRE */
+#ifdef TOPPERS_SUPPORT_DYNAMIC_CRE
 extern ER _kernel_sac_flg(ID flgid, const ACVCT *p_acvct) throw();
+#endif /* TOPPERS_SUPPORT_DYNAMIC_CRE */
+#ifdef TOPPERS_SUPPORT_DYNAMIC_CRE
 extern ER _kernel_sac_dtq(ID dtqid, const ACVCT *p_acvct) throw();
+#endif /* TOPPERS_SUPPORT_DYNAMIC_CRE */
+#ifdef TOPPERS_SUPPORT_DYNAMIC_CRE
 extern ER _kernel_sac_pdq(ID pdqid, const ACVCT *p_acvct) throw();
+#endif /* TOPPERS_SUPPORT_DYNAMIC_CRE */
+#ifdef TOPPERS_SUPPORT_DYNAMIC_CRE
 extern ER _kernel_sac_mtx(ID mtxid, const ACVCT *p_acvct) throw();
+#endif /* TOPPERS_SUPPORT_DYNAMIC_CRE */
+#ifdef TOPPERS_SUPPORT_DYNAMIC_CRE
 extern ER _kernel_sac_mbf(ID mbfid, const ACVCT *p_acvct) throw();
+#endif /* TOPPERS_SUPPORT_DYNAMIC_CRE */
+#ifdef TOPPERS_SUPPORT_DYNAMIC_CRE
 extern ER _kernel_sac_mpf(ID mpfid, const ACVCT *p_acvct) throw();
+#endif /* TOPPERS_SUPPORT_DYNAMIC_CRE */
+#ifdef TOPPERS_SUPPORT_DYNAMIC_CRE
 extern ER _kernel_sac_cyc(ID cycid, const ACVCT *p_acvct) throw();
+#endif /* TOPPERS_SUPPORT_DYNAMIC_CRE */
+#ifdef TOPPERS_SUPPORT_DYNAMIC_CRE
 extern ER _kernel_sac_alm(ID almid, const ACVCT *p_acvct) throw();
+#endif /* TOPPERS_SUPPORT_DYNAMIC_CRE */
+#ifdef TOPPERS_SUPPORT_DYNAMIC_CRE
 extern ER _kernel_sac_isr(ID isrid, const ACVCT *p_acvct) throw();
+#endif /* TOPPERS_SUPPORT_DYNAMIC_CRE */
 #ifdef TOPPERS_SUPPORT_SUBPRIO
 extern ER _kernel_chg_spr(ID tskid, uint_t subpri) throw();
 #endif /* TOPPERS_SUPPORT_SUBPRIO */
-extern ER _kernel_mrot_rdq(ID domid, PRI tskpri) throw();
-extern ER _kernel_mget_lod(ID domid, PRI tskpri, uint_t *p_load) throw();
-extern ER _kernel_mget_nth(ID domid, PRI tskpri, uint_t nth, ID *p_tskid) throw();
+extern ER _kernel_mrot_rdq(ID schedno, PRI tskpri) throw();
+extern ER _kernel_mget_lod(ID schedno, PRI tskpri, uint_t *p_load) throw();
+extern ER _kernel_mget_nth(ID schedno, PRI tskpri, uint_t nth, ID *p_tskid) throw();
 
 #endif /* TOPPERS_MACRO_ONLY */
 
@@ -309,39 +375,105 @@ extern ER _kernel_mget_nth(ID domid, PRI tskpri, uint_t nth, ID *p_tskid) throw(
 #define ref_mpf _kernel_ref_mpf
 #define ref_cyc _kernel_ref_cyc
 #define ref_alm _kernel_ref_alm
+#ifdef TOPPERS_SUPPORT_DYNAMIC_CRE
 #define acre_tsk _kernel_acre_tsk
+#endif /* TOPPERS_SUPPORT_DYNAMIC_CRE */
+#ifdef TOPPERS_SUPPORT_DYNAMIC_CRE
 #define acre_sem _kernel_acre_sem
+#endif /* TOPPERS_SUPPORT_DYNAMIC_CRE */
+#ifdef TOPPERS_SUPPORT_DYNAMIC_CRE
 #define acre_flg _kernel_acre_flg
+#endif /* TOPPERS_SUPPORT_DYNAMIC_CRE */
+#ifdef TOPPERS_SUPPORT_DYNAMIC_CRE
 #define acre_dtq _kernel_acre_dtq
+#endif /* TOPPERS_SUPPORT_DYNAMIC_CRE */
+#ifdef TOPPERS_SUPPORT_DYNAMIC_CRE
 #define acre_pdq _kernel_acre_pdq
+#endif /* TOPPERS_SUPPORT_DYNAMIC_CRE */
+#ifdef TOPPERS_SUPPORT_DYNAMIC_CRE
 #define acre_mtx _kernel_acre_mtx
+#endif /* TOPPERS_SUPPORT_DYNAMIC_CRE */
+#ifdef TOPPERS_SUPPORT_DYNAMIC_CRE
 #define acre_mbf _kernel_acre_mbf
+#endif /* TOPPERS_SUPPORT_DYNAMIC_CRE */
+#ifdef TOPPERS_SUPPORT_DYNAMIC_CRE
 #define acre_mpf _kernel_acre_mpf
+#endif /* TOPPERS_SUPPORT_DYNAMIC_CRE */
+#ifdef TOPPERS_SUPPORT_DYNAMIC_CRE
 #define acre_cyc _kernel_acre_cyc
+#endif /* TOPPERS_SUPPORT_DYNAMIC_CRE */
+#ifdef TOPPERS_SUPPORT_DYNAMIC_CRE
 #define acre_alm _kernel_acre_alm
+#endif /* TOPPERS_SUPPORT_DYNAMIC_CRE */
+#ifdef TOPPERS_SUPPORT_DYNAMIC_CRE
 #define acre_isr _kernel_acre_isr
+#endif /* TOPPERS_SUPPORT_DYNAMIC_CRE */
+#ifdef TOPPERS_SUPPORT_DYNAMIC_CRE
 #define del_tsk _kernel_del_tsk
+#endif /* TOPPERS_SUPPORT_DYNAMIC_CRE */
+#ifdef TOPPERS_SUPPORT_DYNAMIC_CRE
 #define del_sem _kernel_del_sem
+#endif /* TOPPERS_SUPPORT_DYNAMIC_CRE */
+#ifdef TOPPERS_SUPPORT_DYNAMIC_CRE
 #define del_flg _kernel_del_flg
+#endif /* TOPPERS_SUPPORT_DYNAMIC_CRE */
+#ifdef TOPPERS_SUPPORT_DYNAMIC_CRE
 #define del_dtq _kernel_del_dtq
+#endif /* TOPPERS_SUPPORT_DYNAMIC_CRE */
+#ifdef TOPPERS_SUPPORT_DYNAMIC_CRE
 #define del_pdq _kernel_del_pdq
+#endif /* TOPPERS_SUPPORT_DYNAMIC_CRE */
+#ifdef TOPPERS_SUPPORT_DYNAMIC_CRE
 #define del_mtx _kernel_del_mtx
+#endif /* TOPPERS_SUPPORT_DYNAMIC_CRE */
+#ifdef TOPPERS_SUPPORT_DYNAMIC_CRE
 #define del_mbf _kernel_del_mbf
+#endif /* TOPPERS_SUPPORT_DYNAMIC_CRE */
+#ifdef TOPPERS_SUPPORT_DYNAMIC_CRE
 #define del_mpf _kernel_del_mpf
+#endif /* TOPPERS_SUPPORT_DYNAMIC_CRE */
+#ifdef TOPPERS_SUPPORT_DYNAMIC_CRE
 #define del_cyc _kernel_del_cyc
+#endif /* TOPPERS_SUPPORT_DYNAMIC_CRE */
+#ifdef TOPPERS_SUPPORT_DYNAMIC_CRE
 #define del_alm _kernel_del_alm
+#endif /* TOPPERS_SUPPORT_DYNAMIC_CRE */
+#ifdef TOPPERS_SUPPORT_DYNAMIC_CRE
 #define del_isr _kernel_del_isr
+#endif /* TOPPERS_SUPPORT_DYNAMIC_CRE */
+#ifdef TOPPERS_SUPPORT_DYNAMIC_CRE
 #define sac_tsk _kernel_sac_tsk
+#endif /* TOPPERS_SUPPORT_DYNAMIC_CRE */
+#ifdef TOPPERS_SUPPORT_DYNAMIC_CRE
 #define sac_sem _kernel_sac_sem
+#endif /* TOPPERS_SUPPORT_DYNAMIC_CRE */
+#ifdef TOPPERS_SUPPORT_DYNAMIC_CRE
 #define sac_flg _kernel_sac_flg
+#endif /* TOPPERS_SUPPORT_DYNAMIC_CRE */
+#ifdef TOPPERS_SUPPORT_DYNAMIC_CRE
 #define sac_dtq _kernel_sac_dtq
+#endif /* TOPPERS_SUPPORT_DYNAMIC_CRE */
+#ifdef TOPPERS_SUPPORT_DYNAMIC_CRE
 #define sac_pdq _kernel_sac_pdq
+#endif /* TOPPERS_SUPPORT_DYNAMIC_CRE */
+#ifdef TOPPERS_SUPPORT_DYNAMIC_CRE
 #define sac_mtx _kernel_sac_mtx
+#endif /* TOPPERS_SUPPORT_DYNAMIC_CRE */
+#ifdef TOPPERS_SUPPORT_DYNAMIC_CRE
 #define sac_mbf _kernel_sac_mbf
+#endif /* TOPPERS_SUPPORT_DYNAMIC_CRE */
+#ifdef TOPPERS_SUPPORT_DYNAMIC_CRE
 #define sac_mpf _kernel_sac_mpf
+#endif /* TOPPERS_SUPPORT_DYNAMIC_CRE */
+#ifdef TOPPERS_SUPPORT_DYNAMIC_CRE
 #define sac_cyc _kernel_sac_cyc
+#endif /* TOPPERS_SUPPORT_DYNAMIC_CRE */
+#ifdef TOPPERS_SUPPORT_DYNAMIC_CRE
 #define sac_alm _kernel_sac_alm
+#endif /* TOPPERS_SUPPORT_DYNAMIC_CRE */
+#ifdef TOPPERS_SUPPORT_DYNAMIC_CRE
 #define sac_isr _kernel_sac_isr
+#endif /* TOPPERS_SUPPORT_DYNAMIC_CRE */
 #ifdef TOPPERS_SUPPORT_SUBPRIO
 #define chg_spr _kernel_chg_spr
 #endif /* TOPPERS_SUPPORT_SUBPRIO */

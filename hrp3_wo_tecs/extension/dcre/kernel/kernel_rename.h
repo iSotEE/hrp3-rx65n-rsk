@@ -38,7 +38,9 @@
 #define twdtimer_start				_kernel_twdtimer_start
 #define twdtimer_stop				_kernel_twdtimer_stop
 #define twdtimer_control			_kernel_twdtimer_control
+#define scyc_start					_kernel_scyc_start
 #define scyc_switch					_kernel_scyc_switch
+#define twd_start					_kernel_twd_start
 #define twd_switch					_kernel_twd_switch
 #define set_dspflg					_kernel_set_dspflg
 
@@ -106,6 +108,7 @@
 #define set_hrt_event				_kernel_set_hrt_event
 #define tmevtb_register				_kernel_tmevtb_register
 #define tmevtb_enqueue				_kernel_tmevtb_enqueue
+#define tmevtb_enqueue_reltim		_kernel_tmevtb_enqueue_reltim
 #define tmevtb_dequeue				_kernel_tmevtb_dequeue
 #define check_adjtim				_kernel_check_adjtim
 #define tmevt_lefttim				_kernel_tmevt_lefttim
@@ -284,8 +287,8 @@
 #define istksz						_kernel_istksz
 #define istk						_kernel_istk
 #define istkpt						_kernel_istkpt
-#define tmevt_heap					_kernel_tmevt_heap
-#define p_tmevt_heap_idle			_kernel_p_tmevt_heap_idle
+#define tmevt_heap_kernel			_kernel_tmevt_heap_kernel
+#define tmevt_heap_idle				_kernel_tmevt_heap_idle
 #define initialize_object			_kernel_initialize_object
 #define call_inirtn					_kernel_call_inirtn
 #define call_terrtn					_kernel_call_terrtn

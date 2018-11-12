@@ -35,7 +35,7 @@
  *  アの利用により直接的または間接的に生じたいかなる損害に関しても，そ
  *  の責任を負わない．
  * 
- *  $Id: domain.h 420 2018-07-29 03:50:35Z ertl-hiro $
+ *  $Id: domain.h 512 2018-10-27 17:31:50Z ertl-hiro $
  */
 
 /*
@@ -61,10 +61,10 @@ extern const RELTIM	system_cyctim;
 typedef struct domain_initialization_block DOMINIB;
 
 /*
- *  スケジューリングドメイン管理ブロック
+ *  スケジューリング単位管理ブロック
  *
- *  p_predtskは，そのスケジューリングドメインの中で優先順位が最も高いタ
- *  スクのTCBを指すポインタである．実行できるタスクがない場合はNULLにす
+ *  p_predtskは，そのスケジューリング単位の中で優先順位が最も高いタス
+ *  クのTCBを指すポインタである．実行できるタスクがない場合はNULLにす
  *  る．
  *
  *  ready_queueは，実行できる状態のタスクを管理するためのキューである．
@@ -81,48 +81,52 @@ typedef struct domain_initialization_block DOMINIB;
  *  に，逆に効率が落ちる可能性もある．優先度が16段階であることを仮定し
  *  ているため，uint16_t型としている．
  */
-typedef struct scheduing_domain_control_block {
+typedef struct scheduing_unit_control_block {
 	TCB			*p_predtsk;					/* 優先順位が最も高いタスク */
 	QUEUE		ready_queue[TNUM_TPRI];		/* レディキュー */
 	uint16_t	ready_primap;	/* レディキューサーチのためのビットマップ */
 } SCHEDCB;
 
 /*
- *  現在スケジューリングドメイン
+ *  現在スケジューリング単位
  *
- *  主に実行すべきスケジューリングドメイン．タイムウィンドウの実行中は，
- *  実行中のタイムウィンドウを割り当てられたユーザドメインに対応するス
- *  ケジューリングドメインに設定する．
+ *  主に実行すべきスケジューリング単位．タイムウィンドウの実行中は，実
+ *  行中のタイムウィンドウを割り当てられたユーザドメインに対応するスケ
+ *  ジューリング単位に設定する．
  */
 extern SCHEDCB	*p_twdsched;
 
 /*
- *  アイドル時スケジューリングドメイン
+ *  アイドル時スケジューリング単位
  *
- *  現在スケジューリングドメインとカーネルドメインに，実行できるタスク
- *  がない場合に，実行すべきスケジューリングドメイン．タイムウィンドウ
- *  の実行中は，アイドルドメインに対応するスケジューリングドメインに設
- *  定する．
+ *  現在スケジューリング単位とカーネルドメインに，実行できるタスクがな
+ *  い場合に，実行すべきスケジューリング単位．タイムウィンドウの実行中
+ *  は，アイドルドメインに対応するスケジューリング単位に設定する．
  */
 extern SCHEDCB	*p_idlesched;
 
 /*
- *  カーネルドメインに対応するスケジューリングドメイン管理ブロック
+ *  カーネルドメインに対応するスケジューリング単位管理ブロック
  */
 extern SCHEDCB	schedcb_kernel;
 
 /*
- *  スケジューリングドメイン管理ブロックの数（kernel_cfg.c）
+ *  スケジューリング単位管理ブロックの数（kernel_cfg.c）
+ *
+ *  タイムウィンドウを割り当てられたユーザドメインの数．
  */
 extern const uint_t	tnum_schedcb;
 
 /*
- *  スケジューリングドメイン管理ブロックのエリア（kernel_cfg.c）
+ *  スケジューリング単位管理ブロックのエリア（kernel_cfg.c）
+ *
+ *  タイムウィンドウを割り当てられたユーザドメインに対応するスケジュー
+ *  リング単位管理ブロック．
  */
 extern SCHEDCB	schedcb_table[];
 
 /*
- *  アイドルドメインに対応するスケジューリングドメイン管理ブロック
+ *  アイドルドメインに対応するスケジューリング単位管理ブロック
  */
 extern SCHEDCB	schedcb_idle;
 
@@ -149,12 +153,16 @@ struct system_operation_mode_initialization_block {
 /*
  *  現在のシステム動作モード
  *
- *  現在のシステム動作モードの初期化ブロックを指すポインタ．
+ *  現在のシステム動作モードの初期化ブロックを指すポインタ．システム周
+ *  期停止モードの場合は，NULLにする．
  */
 extern const SOMINIB	*p_cursom;
 
 /*
  *  次のシステム動作モード
+ *
+ *  現在のシステム動作モードがシステム周期停止モードの場合，この変数は
+ *  無効である．
  */
 extern const SOMINIB	*p_nxtsom;
 
@@ -164,14 +172,6 @@ extern const SOMINIB	*p_nxtsom;
 extern TMEVTB	scyc_tmevtb;
 
 /*
- *  システム周期切換え処理を実行したことを示すフラグ
- *
- *  この変数は，ユーザドメインに属するタイムイベントの処理中に，システ
- *  ム周期切換えが起こったことを知らせるためのものである．
- */
-extern bool_t	proc_scycswitch;
-
-/*
  *  システム周期切換え処理を保留していることを示すフラグ
  */
 extern bool_t	pending_scycswitch;
@@ -179,16 +179,10 @@ extern bool_t	pending_scycswitch;
 /*
  *  実行中のタイムウィンドウ
  *
- *  実行中のタイムウィンドウの初期化ブロックを指すポインタ．新しいシス
- *  テム周期の最初のタイムウィンドウへの切換えを要求している間と，アイ
- *  ドルウィンドウの実行中は，NULLにする．
+ *  実行中のタイムウィンドウの初期化ブロックを指すポインタ．システム周
+ *  期停止モードの間と，アイドルウィンドウの実行中は，NULLにする．
  */
 extern const TWDINIB	*p_runtwd;
-
-/*
- *  システム周期の最初のタイムウィンドウへの切換えを要求
- */
-extern bool_t	newscyc_twdswitch;
 
 /*
  *  タイムウィンドウ切換え処理を保留していることを示すフラグ
@@ -225,7 +219,7 @@ extern PRCTIM	left_twdtim;
 extern const ID		tmax_somid;
 
 /*
- *  初期システム動作モードのID（kernel_cfg.c）
+ *  初期システム動作モード（kernel_cfg.c）
  *
  *  初期システム動作モードが設定されていない時は，NULLにする．
  */
@@ -254,7 +248,7 @@ extern const SOMINIB	sominib_table[];
  */
 struct domain_initialization_block {
 	ACPTN		domptn;			/* 保護ドメインのビットパターン */
-	SCHEDCB		*p_schedcb;		/* スケジューリングドメイン管理ブロック */
+	SCHEDCB		*p_schedcb;		/* スケジューリング単位管理ブロック */
 	TMEVTN		*p_tmevt_heap;	/* タイムイベントヒープ */
 	uint_t		minpriority;	/* 設定できるタスク優先度の最小値 */
 #ifdef USE_DOMINICTXB
@@ -326,12 +320,22 @@ extern void		twdtimer_stop(void);
 extern void		twdtimer_control(void);
 
 /*
+ *  システム周期の実行開始
+ */
+extern void		scyc_start(void);
+
+/*
  *  システム周期切換え処理
  */
 extern void		scyc_switch(void);
 
 /*
- *  タイムウィンドウ周期切換え処理
+ *  タイムウィンドウの実行開始
+ */
+extern void		twd_start(void);
+
+/*
+ *  タイムウィンドウ切換え処理
  */
 extern void		twd_switch(void);
 

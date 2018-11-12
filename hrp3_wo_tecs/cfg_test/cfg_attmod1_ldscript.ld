@@ -17,14 +17,14 @@ PROVIDE(software_term_hook = 0);
 
 SECTIONS {
 	.discard (NOLOAD) : {
-		start.o(.discard) test_attmod3.o(.discard) kernel_cfg.o(.discard) kernel_mem.o(.discard) test_attmod1.o(.discard) test_attmod2.o(.discard) cfg_attmod1.o(.discard) -lkernel(.discard) -lc(.discard) -lgcc(.discard) 
+		start.o(.discard) test_attmod3.o(.discard) kernel_cfg.o(.discard) kernel_mem.o(.discard) test_attmod1.o(.discard) test_attmod2.o(.discard) cfg_attmod1.o(.discard) libkernel.a(.discard) libc.a(.discard) libgcc.a(.discard) 
 	}
 
 	.text_DOM2 0x1000000 : ALIGN(4) {
 		__start_mp_text_DOM2 = .;
 		__start_mo_text_DOM2 = .;
 		__start_text_DOM2 = .;
-		test_attmod2.o(.text .text.*) *(.text_DOM2) 
+		test_attmod2.o(.text .text.*) 
 		__end_text_DOM2 = .;
 		__end_mo_text_DOM2 = .;
 		__aend_mo_text_DOM2 = ALIGN(4K);
@@ -35,7 +35,7 @@ SECTIONS {
 		__start_mp_rodata_DOM2 = .;
 		__start_mo_rodata_DOM2 = .;
 		__start_rodata_DOM2 = .;
-		test_attmod2.o(.rodata .rodata.*) *(.rodata_DOM2) 
+		test_attmod2.o(.rodata .rodata.*) 
 		__end_rodata_DOM2 = .;
 		__end_mo_rodata_DOM2 = .;
 		__aend_mo_rodata_DOM2 = ALIGN(4K);
@@ -46,7 +46,7 @@ SECTIONS {
 		__start_mp_text_shared = .;
 		__start_mo_text_shared = .;
 		__start_text_shared = .;
-		cfg_attmod1.o(.text .text.*) -lc(.text .text.*) -lgcc(.text .text.*) *(.text_shared) 
+		cfg_attmod1.o(.text .text.*) libc.a(.text .text.*) libgcc.a(.text .text.*) 
 		__end_text_shared = .;
 		__end_mo_text_shared = .;
 		__aend_mo_text_shared = ALIGN(4K);
@@ -57,7 +57,7 @@ SECTIONS {
 		__start_mp_rodata_shared = .;
 		__start_mo_rodata_shared = .;
 		__start_rodata_shared = .;
-		cfg_attmod1.o(.rodata .rodata.*) -lc(.rodata .rodata.*) -lgcc(.rodata .rodata.*) *(.rodata_shared) 
+		cfg_attmod1.o(.rodata .rodata.*) libc.a(.rodata .rodata.*) libgcc.a(.rodata .rodata.*) 
 	} > ROM
 
 	.preinit_array ALIGN(4) : {
@@ -120,20 +120,20 @@ SECTIONS {
 		__start_mp_rwdata_DOM2 = .;
 		__start_mo_rwdata_DOM2 = .;
 		__start_data_DOM2 = .;
-		test_attmod2.o(.data .data.*) *(.data_DOM2) 
+		test_attmod2.o(.data .data.*) 
 		__end_data_DOM2 = .;
 	} > RAM AT > ROM
 	__start_idata_DOM2 = LOADADDR(.data_DOM2);
 
 	.bss_DOM2 ALIGN(4) (NOLOAD) : ALIGN(4) {
 		__start_bss_DOM2 = .;
-		test_attmod2.o(.bss .bss.* COMMON) *(.bss_DOM2) 
+		test_attmod2.o(.bss .bss.* COMMON) 
 		__end_bss_DOM2 = .;
 	} > RAM
 
 	.noinit_DOM2 ALIGN(4) (NOLOAD) : ALIGN(4) {
 		__start_noinit_DOM2 = .;
-		test_attmod2.o(.noinit) *(.noinit_DOM2) 
+		test_attmod2.o(.noinit) 
 		__end_noinit_DOM2 = .;
 		__end_mo_rwdata_DOM2 = .;
 		__aend_mo_rwdata_DOM2 = ALIGN(4K);
@@ -144,20 +144,20 @@ SECTIONS {
 		__start_mp_rwdata_shared = .;
 		__start_mo_rwdata_shared = .;
 		__start_data_shared = .;
-		cfg_attmod1.o(.data .data.*) -lc(.data .data.*) -lgcc(.data .data.*) *(.data_shared) 
+		cfg_attmod1.o(.data .data.*) libc.a(.data .data.*) libgcc.a(.data .data.*) 
 		__end_data_shared = .;
 	} > RAM AT > ROM
 	__start_idata_shared = LOADADDR(.data_shared);
 
 	.bss_shared ALIGN(4) (NOLOAD) : ALIGN(4) {
 		__start_bss_shared = .;
-		cfg_attmod1.o(.bss .bss.* COMMON) -lc(.bss .bss.* COMMON) -lgcc(.bss .bss.* COMMON) *(.bss_shared) 
+		cfg_attmod1.o(.bss .bss.* COMMON) libc.a(.bss .bss.* COMMON) libgcc.a(.bss .bss.* COMMON) 
 		__end_bss_shared = .;
 	} > RAM
 
 	.noinit_shared ALIGN(4) (NOLOAD) : ALIGN(4) {
 		__start_noinit_shared = .;
-		cfg_attmod1.o(.noinit) -lc(.noinit) -lgcc(.noinit) *(.noinit_shared) 
+		cfg_attmod1.o(.noinit) libc.a(.noinit) libgcc.a(.noinit) 
 		__end_noinit_shared = .;
 		__end_mo_rwdata_shared = .;
 		__aend_mo_rwdata_shared = ALIGN(4K);
@@ -168,7 +168,7 @@ SECTIONS {
 		__start_mp_ROM2_text_DOM1 = .;
 		__start_mo_ROM2_text_DOM1 = .;
 		__start_ROM2_text_DOM1 = .;
-		test_attmod1.o(.text .text.*) *(.text_DOM1) 
+		test_attmod1.o(.text .text.*) 
 		__end_ROM2_text_DOM1 = .;
 		__end_mo_ROM2_text_DOM1 = .;
 		__aend_mo_ROM2_text_DOM1 = ALIGN(4K);
@@ -179,7 +179,7 @@ SECTIONS {
 		__start_mp_ROM2_rodata_DOM1 = .;
 		__start_mo_ROM2_rodata_DOM1 = .;
 		__start_ROM2_rodata_DOM1 = .;
-		test_attmod1.o(.rodata .rodata.*) *(.rodata_DOM1) 
+		test_attmod1.o(.rodata .rodata.*) 
 		__end_ROM2_rodata_DOM1 = .;
 		__end_mo_ROM2_rodata_DOM1 = .;
 		__aend_mo_ROM2_rodata_DOM1 = ALIGN(4K);
@@ -211,20 +211,20 @@ SECTIONS {
 		__start_mp_RAM2_rwdata_DOM1 = .;
 		__start_mo_RAM2_rwdata_DOM1 = .;
 		__start_RAM2_data_DOM1 = .;
-		test_attmod1.o(.data .data.*) *(.data_DOM1) 
+		test_attmod1.o(.data .data.*) 
 		__end_RAM2_data_DOM1 = .;
 	} > RAM2 AT > ROM
 	__start_RAM2_idata_DOM1 = LOADADDR(.RAM2_data_DOM1);
 
 	.RAM2_bss_DOM1 ALIGN(4) (NOLOAD) : ALIGN(4) {
 		__start_RAM2_bss_DOM1 = .;
-		test_attmod1.o(.bss .bss.* COMMON) *(.bss_DOM1) 
+		test_attmod1.o(.bss .bss.* COMMON) 
 		__end_RAM2_bss_DOM1 = .;
 	} > RAM2
 
 	.RAM2_noinit_DOM1 ALIGN(4) (NOLOAD) : ALIGN(4) {
 		__start_RAM2_noinit_DOM1 = .;
-		test_attmod1.o(.noinit) *(.noinit_DOM1) 
+		test_attmod1.o(.noinit) 
 		__end_RAM2_noinit_DOM1 = .;
 		__end_mo_RAM2_rwdata_DOM1 = .;
 		__aend_mo_RAM2_rwdata_DOM1 = ALIGN(4K);
@@ -235,7 +235,7 @@ SECTIONS {
 		__start_mp_ROM3_text_kernel = .;
 		__start_mo_ROM3_text_kernel = .;
 		__start_ROM3_text_kernel = .;
-		start.o(.text .text.*) test_attmod3.o(.text .text.*) kernel_cfg.o(.text .text.*) kernel_mem.o(.text .text.*) -lkernel(.text .text.*) *(.text_kernel) 
+		start.o(.text .text.*) test_attmod3.o(.text .text.*) kernel_cfg.o(.text .text.*) kernel_mem.o(.text .text.*) libkernel.a(.text .text.*) 
 		__end_ROM3_text_kernel = .;
 		__end_mo_ROM3_text_kernel = .;
 		__aend_mo_ROM3_text_kernel = ALIGN(4K);
@@ -246,7 +246,7 @@ SECTIONS {
 		__start_mp_ROM3_rodata_kernel = .;
 		__start_mo_ROM3_rodata_kernel = .;
 		__start_ROM3_rodata_kernel = .;
-		start.o(.rodata .rodata.*) test_attmod3.o(.rodata .rodata.*) kernel_cfg.o(.rodata .rodata.*) kernel_mem.o(.rodata .rodata.*) -lkernel(.rodata .rodata.*) *(.rodata_kernel) 
+		start.o(.rodata .rodata.*) test_attmod3.o(.rodata .rodata.*) kernel_cfg.o(.rodata .rodata.*) kernel_mem.o(.rodata .rodata.*) libkernel.a(.rodata .rodata.*) 
 		__end_ROM3_rodata_kernel = .;
 		__end_mo_ROM3_rodata_kernel = .;
 		__aend_mo_ROM3_rodata_kernel = ALIGN(4K);
@@ -257,33 +257,25 @@ SECTIONS {
 		__start_mp_RAM3_rwdata_kernel = .;
 		__start_mo_RAM3_rwdata_kernel = .;
 		__start_RAM3_data_kernel = .;
-		start.o(.data .data.*) test_attmod3.o(.data .data.*) kernel_cfg.o(.data .data.*) kernel_mem.o(.data .data.*) -lkernel(.data .data.*) *(.data_kernel) 
+		start.o(.data .data.*) test_attmod3.o(.data .data.*) kernel_cfg.o(.data .data.*) kernel_mem.o(.data .data.*) libkernel.a(.data .data.*) 
 		__end_RAM3_data_kernel = .;
 	} > RAM3 AT > ROM
 	__start_RAM3_idata_kernel = LOADADDR(.RAM3_data_kernel);
 
 	.RAM3_bss_kernel ALIGN(4) (NOLOAD) : ALIGN(4) {
 		__start_RAM3_bss_kernel = .;
-		start.o(.bss .bss.* COMMON) test_attmod3.o(.bss .bss.* COMMON) kernel_cfg.o(.bss .bss.* COMMON) kernel_mem.o(.bss .bss.* COMMON) -lkernel(.bss .bss.* COMMON) *(.bss_kernel) 
+		start.o(.bss .bss.* COMMON) test_attmod3.o(.bss .bss.* COMMON) kernel_cfg.o(.bss .bss.* COMMON) kernel_mem.o(.bss .bss.* COMMON) libkernel.a(.bss .bss.* COMMON) 
 		__end_RAM3_bss_kernel = .;
 	} > RAM3
 
 	.RAM3_noinit_kernel ALIGN(4) (NOLOAD) : ALIGN(4) {
 		__start_RAM3_noinit_kernel = .;
-		start.o(.noinit) test_attmod3.o(.noinit) kernel_cfg.o(.noinit) kernel_mem.o(.noinit) -lkernel(.noinit) *(.noinit_kernel) 
+		start.o(.noinit) test_attmod3.o(.noinit) kernel_cfg.o(.noinit) kernel_mem.o(.noinit) libkernel.a(.noinit) *(.system_stack) 
 		__end_RAM3_noinit_kernel = .;
 		__end_mo_RAM3_rwdata_kernel = .;
 		__aend_mo_RAM3_rwdata_kernel = ALIGN(4K);
 		__aend_mp_RAM3_rwdata_kernel = ALIGN(4K);
 	} > RAM3
-
-	/DISCARD/ : {
-		*(.text .text.*)
-		*(.rodata .rodata.*)
-		*(.data .data.*)
-		*(.bss .bss.* COMMON)
-		*(.noinit)
-	}
 
 	/DISCARD/ : {
 		*(.rel.dyn)
@@ -320,4 +312,8 @@ SECTIONS {
 	.debug_funcnames 0 : { *(.debug_funcnames) }
 	.debug_typenames 0 : { *(.debug_typenames) }
 	.debug_varnames  0 : { *(.debug_varnames) }
+
+	/DISCARD/ : {
+		*(*)
+	}
 }

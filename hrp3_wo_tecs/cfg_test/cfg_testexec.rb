@@ -36,7 +36,7 @@
 #  アの利用により直接的または間接的に生じたいかなる損害に関しても，そ
 #  の責任を負わない．
 # 
-#  $Id: cfg_testexec.rb 431 2018-08-06 02:41:10Z ertl-hiro $
+#  $Id: cfg_testexec.rb 465 2018-09-30 11:03:02Z ertl-hiro $
 # 
 
 Encoding.default_external = 'utf-8'
@@ -62,6 +62,7 @@ PASS4_TEST_SPEC = {
 
 PASS2_TEST_SPEC = {
   # パス2でエラーになるテスト
+  "pass2_dom1" => { },
 }
 
 PASS1_TEST_SPEC = {

@@ -37,7 +37,7 @@
  *  アの利用により直接的または間接的に生じたいかなる損害に関しても，そ
  *  の責任を負わない．
  * 
- *  $Id: semaphore.c 81 2015-12-31 12:44:23Z ertl-hiro $
+ *  $Id: semaphore.c 520 2018-11-01 12:41:13Z ertl-hiro $
  */
 
 /*
@@ -382,7 +382,7 @@ sig_sem(ID semid)
 				dispatch();
 			}
 			else {
-				request_dispatch();
+				request_dispatch_retint();
 			}
 		}
 		ercd = E_OK;
@@ -435,8 +435,8 @@ wai_sem(ID semid)
 		ercd = E_OK;
 	}
 	else {
-		p_runtsk->tstat = TS_WAITING_SEM;
-		wobj_make_wait((WOBJCB *) p_semcb, (WINFO_WOBJ *) &winfo_sem);
+		wobj_make_wait((WOBJCB *) p_semcb, TS_WAITING_SEM,
+				 							(WINFO_WOBJ *) &winfo_sem);
 		dispatch();
 		ercd = winfo_sem.winfo.wercd;
 	}
@@ -525,9 +525,8 @@ twai_sem(ID semid, TMO tmout)
 		ercd = E_TMOUT;
 	}
 	else {
-		p_runtsk->tstat = TS_WAITING_SEM;
-		wobj_make_wait_tmout((WOBJCB *) p_semcb, (WINFO_WOBJ *) &winfo_sem,
-														&tmevtb, tmout);
+		wobj_make_wait_tmout((WOBJCB *) p_semcb, TS_WAITING_SEM,
+								(WINFO_WOBJ *) &winfo_sem, &tmevtb, tmout);
 		dispatch();
 		ercd = winfo_sem.winfo.wercd;
 	}

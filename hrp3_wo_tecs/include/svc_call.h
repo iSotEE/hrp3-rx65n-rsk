@@ -138,9 +138,9 @@ extern ER _kernel_ref_alm(ID almid, T_RALM *pk_ralm) throw();
 #ifdef TOPPERS_SUPPORT_SUBPRIO
 extern ER _kernel_chg_spr(ID tskid, uint_t subpri) throw();
 #endif /* TOPPERS_SUPPORT_SUBPRIO */
-extern ER _kernel_mrot_rdq(ID domid, PRI tskpri) throw();
-extern ER _kernel_mget_lod(ID domid, PRI tskpri, uint_t *p_load) throw();
-extern ER _kernel_mget_nth(ID domid, PRI tskpri, uint_t nth, ID *p_tskid) throw();
+extern ER _kernel_mrot_rdq(ID schedno, PRI tskpri) throw();
+extern ER _kernel_mget_lod(ID schedno, PRI tskpri, uint_t *p_load) throw();
+extern ER _kernel_mget_nth(ID schedno, PRI tskpri, uint_t nth, ID *p_tskid) throw();
 
 #endif /* TOPPERS_MACRO_ONLY */
 

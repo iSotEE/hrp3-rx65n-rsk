@@ -37,7 +37,7 @@
 #   アの利用により直接的または間接的に生じたいかなる損害に関しても，そ
 #   の責任を負わない．
 # 
-#   $Id: interrupt.trb 239 2018-01-04 09:07:20Z ertl-hiro $
+#   $Id: interrupt.trb 502 2018-10-27 08:05:10Z ertl-hiro $
 # 
 
 #
@@ -138,8 +138,8 @@ end
 $cfgData[:DEF_INH].each do |key, params|
   # カーネルドメインの囲みの中に記述されていない場合（E_RSATR）［NGKI3070］
   if !params.has_key?(:domain) || params[:domain] != $TDOM_KERNEL
-    error_ercd("E_RSATR", params, "interrupt handler `%inhno' " \
-						"must belong to the kernel domain in %apiname")
+    error_ercd("E_RSATR", params, "%apiname of `%inhno' " \
+								"must be within the kernel domain")
   end
 
   # inhnoが割込みハンドラ番号として正しくない場合（E_PAR）［NGKI3055］
@@ -211,8 +211,8 @@ end
 $cfgData[:CRE_ISR].sort.each do |key, params|
   # カーネルドメインの囲みの中に記述されていない場合（E_RSATR）［NGKI3000］
   if !params.has_key?(:domain) || params[:domain] != $TDOM_KERNEL
-    error_ercd("E_RSATR", params, "interrupt service routine `%isrid' " \
-						"must belong to the kernel domain in %apiname")
+    error_ercd("E_RSATR", params, "%apiname of `%isrid' " \
+								"must be within the kernel domain")
   end
 
   #	isratrが無効の場合（E_RSATR）［NGKI2998］

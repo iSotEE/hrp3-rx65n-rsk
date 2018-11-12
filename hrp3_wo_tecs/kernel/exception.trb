@@ -37,7 +37,7 @@
 #   アの利用により直接的または間接的に生じたいかなる損害に関しても，そ
 #   の責任を負わない．
 # 
-#   $Id: exception.trb 239 2018-01-04 09:07:20Z ertl-hiro $
+#   $Id: exception.trb 461 2018-09-24 11:43:34Z ertl-hiro $
 # 
 
 #
@@ -55,8 +55,8 @@ $kernelCfgC.comment_header("CPU Exception Management Functions")
 $cfgData[:DEF_EXC].each do |key, params|
   # カーネルドメインの囲みの中に記述されていない場合（E_RSATR）［NGKI3143］
   if !params.has_key?(:domain) || params[:domain] != $TDOM_KERNEL
-    error_ercd("E_RSATR", params, "CPU exception handler `%excno' " \
-						"in %apiname must belong to the kernel domain")
+    error_ercd("E_RSATR", params, "%apiname of `%excno' " \
+								"must be within the kernel domain")
   end
 
   # excnoがCPU例外ハンドラ番号として正しくない場合（E_PAR）［NGKI3134］

@@ -34,7 +34,7 @@
  *  アの利用により直接的または間接的に生じたいかなる損害に関しても，そ
  *  の責任を負わない．
  * 
- *  $Id: mpcore.h 451 2018-09-03 09:40:27Z ertl-hiro $
+ *  $Id: mpcore.h 532 2018-11-11 04:46:48Z ertl-hiro $
  */
 
 /*
@@ -237,7 +237,7 @@ mpcore_gtc_get_count(void)
 		prev_count_u = count_u;
 		count_l = sil_rew_mem(MPCORE_GTC_COUNT_L);
 		count_u = sil_rew_mem(MPCORE_GTC_COUNT_U);
-	} while(count_u != prev_count_u);
+	} while (count_u != prev_count_u);
 	return((((uint64_t) count_u) << 32) | ((uint64_t) count_l));
 }
 

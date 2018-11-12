@@ -36,7 +36,7 @@
 #   アの利用により直接的または間接的に生じたいかなる損害に関しても，そ
 #   の責任を負わない．
 #
-#   $Id: kernel_lib.trb 366 2018-04-15 02:00:48Z ertl-hiro $
+#   $Id: kernel_lib.trb 502 2018-10-27 08:05:10Z ertl-hiro $
 #
 
 #
@@ -48,15 +48,6 @@
 #
 $pointerLimit = (1 << ($sizeof_void_ptr * 8))
 $pointerMax = $pointerLimit - 1
-
-#
-#  保護ドメイン毎の標準セクションのセクション名の生成［NGKI0116］
-#
-unless defined? StandardSecnameDomain()
-  def StandardSecnameDomain(secname, domlabel)
-    return("#{secname}_#{domlabel}")
-  end
-end
 
 #
 #  データセクションのLMAからVMAへのコピー
@@ -146,8 +137,7 @@ def GenerateDominib(genFile)
   # 保護ドメインのID番号を保持する変数
   if $USE_EXTERNAL_ID
     $udomainList.each do |key|
-      domid = $domData[key][:domid]
-      genFile.add("const ID #{domid}_id = #{domid.val};")
+      genFile.add("const ID #{$domData[key][:domid]}_id = #{key};")
     end
     genFile.add()
   end
@@ -168,9 +158,8 @@ def GenerateDominib(genFile)
 
   # カーネルドメインの保護ドメイン初期化ブロックの生成
   params = $domData[$TDOM_KERNEL]
-  genFile.append("const DOMINIB _kernel_dominib_kernel = { " \
-						"TACP_KERNEL, &_kernel_schedcb_kernel, " \
-						"&(_kernel_tmevt_heap[0]), " \
+  genFile.append("const DOMINIB _kernel_dominib_kernel = { TACP_KERNEL, " \
+						"&(#{params[:schedcb]}), #{params[:tmevtHeap]}, " \
 						"INT_PRIORITY(#{params[:mintpri]}), ")
   if $USE_DOMINICTXB
     genFile.append("#{$kernelDominictxb}, ")
@@ -188,16 +177,11 @@ def GenerateDominib(genFile)
       params = $domData[key]
       genFile.add(",") if index > 0
 
-      genFile.append("\t{ TACP(#{params[:domid]}), ")
-      if params.has_key?(:schedcb)
-        genFile.append("&(_kernel_schedcb_table[#{params[:schedcb]}]), ")
+      genFile.append("\t{ TACP(#{params[:domid]}), &(#{params[:schedcb]}), ")
+      if params[:tmevtCount] > 0
+        genFile.append("#{params[:tmevtHeap]}, ")
       else
-        genFile.append("&_kernel_schedcb_idle, ")
-      end
-      if $cfgData[:DEF_SCY].size == 0
-        genFile.append("&(_kernel_tmevt_heap[0]), ")
-      else
-        genFile.append("&(_kernel_tmevt_heap[#{params[:tmevtHeap]}]), ")
+        genFile.append("NULL, ")
       end
       genFile.append("INT_PRIORITY(#{params[:mintpri]}), ")
       if $USE_DOMINICTXB

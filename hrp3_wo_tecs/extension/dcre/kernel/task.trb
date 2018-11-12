@@ -37,7 +37,7 @@
 #   アの利用により直接的または間接的に生じたいかなる損害に関しても，そ
 #   の責任を負わない．
 # 
-#   $Id: task.trb 292 2018-03-23 05:48:42Z ertl-hiro $
+#   $Id: task.trb 502 2018-10-27 08:05:10Z ertl-hiro $
 # 
 
 #
@@ -46,17 +46,7 @@
 
 class TaskObject < KernelObject
   def initialize()
-    super("tsk", "task", "t")
-  end
-
-  def prepareAid(key, params)
-    # 保護ドメインの囲みの中に記述されていない場合（E_RSATR）［NGKI3979］
-    if !params.has_key?(:domain) || params[:domain] == $TDOM_NONE
-      error_ercd("E_RSATR", params, \
-						"%apiname must belong to a protection domain")
-      # 以降のエラーの抑止
-      params[:domain] = $TDOM_KERNEL
-    end
+    super("tsk", "task", true, "t")
   end
 
   def checkMinSystemStksz(sstksz, params)
@@ -75,14 +65,6 @@ class TaskObject < KernelObject
       params[:stk] ||= NumStr.new(0, "NULL")
     end
     params[:sstk] ||= "NULL"
-
-    # 保護ドメインの囲みの中に記述されていない場合（E_RSATR）［NGKI1030］
-    if !params.has_key?(:domain) || params[:domain] == $TDOM_NONE
-      error_ercd("E_RSATR", params, "task `%tskid' " \
-						"in %apiname must belong to a protection domain")
-      # 以降のエラーの抑止
-      params[:domain] = $TDOM_KERNEL
-    end
 
     # tskatrが無効の場合（E_RSATR）［NGKI1028］
     #（TA_ACT，TA_NOACTQUE，TARGET_TSKATR以外のビットがセットされている場合）
@@ -260,7 +242,7 @@ class TaskObject < KernelObject
       params2[:domain] = params[:domain]
       if params[:stk] == "NULL" || params[:stk] == 0
         params2[:linker] = true
-        params2[:memreg] = $domData[params[:domain]][:stdram]
+        params2[:memreg] = $standardMemreg[params[:domain]][:stdram]
         params2[:secname] = ustkSecname
         params2[:stkorder] = params[:tskid]
       else
@@ -281,6 +263,11 @@ class TaskObject < KernelObject
       else
         $ustackListUser.push($lastMOKey)
       end
+    end
+
+    # ターゲット依存の処理
+    if defined? TargetTaskPrepare()
+      TargetTaskPrepare(key, params)
     end
   end
 
@@ -324,38 +311,54 @@ $kernelCfgC.add2("};")
 # タック領域のみであり，アプリケーションが指定したものは対象としない．
 #
 if $USE_REDZONE && $ustackListLinker.size > 0
-  module RedZone
+  #
+  #  対象となるメモリリージョンとユーザスタック領域の特定
+  #
+  # ustackListMemreg[memreg]：コンフィギュレータが割り付けるユーザス
+  #							  タック領域のメモリリージョン毎のリスト
+  #
+  ustackListMemreg = Hash.new {|hash, memreg| hash[memreg] = []}
+  $ustackListLinker.each do |key|
+    ustackListMemreg[$memObj[key][:memreg]].push(key)
+  end
+
+  #
+  #  メモリリージョン毎の配置順序の決定
+  #
+  ustackListMemreg.keys.sort.each do |memreg|
     #
     #  ドメイン毎のユーザスタック領域のリストの作成と数のカウント
     #
-    # @totalNumUstack：ユーザスタック領域の数の合計
-    # @domainUstackList[domid]：ドメイン毎のユーザスタック領域のリスト
-    # @maxNumUstack：ドメイン毎のユーザスタック領域の数の最大値
-    # @maxUstackDomain：ユーザスタック領域の数が最大であるドメイン
+    # totalNumUstack：ユーザスタック領域の数の合計
+    # ustackListDomain[domid]：ドメイン毎のユーザスタック領域のリスト
+    # maxNumUstack：ドメイン毎のユーザスタック領域の数の最大値
+    # maxUstackDomain：ユーザスタック領域の数が最大であるドメイン
     #
-    @domainUstackList = Hash.new {|hash, key| hash[key] = []}
-    $ustackListLinker.each do |key|
-      @domainUstackList[$memObj[key][:domain]].push(key)
-    end
-    @totalNumUstack = $ustackListLinker.size
+    totalNumUstack = ustackListMemreg[memreg].size
 
-    @maxNumUstack = 0
-    $udomainList.each do |domid|
-      if @maxNumUstack < @domainUstackList[domid].size
-        @maxNumUstack = @domainUstackList[domid].size
-        @maxUstackDomain = domid
+    ustackListDomain = Hash.new {|hash, key| hash[key] = []}
+    ustackListMemreg[memreg].each do |key|
+      ustackListDomain[$memObj[key][:domain]].push(key)
+    end
+
+    maxNumUstack = 0
+    maxUstackDomain = 0			# 変数のスコープを広げるための定義
+    ustackListDomain.each do |domid, list|
+      if maxNumUstack < list.size
+        maxNumUstack = list.size
+        maxUstackDomain = domid
       end
     end
 
     #
     #  ダミースタック領域の追加
     #
-    num_dummy = @maxNumUstack * 2 - 1 - @totalNumUstack
+    num_dummy = maxNumUstack * 2 - 1 - totalNumUstack
     if num_dummy > 0
       1.upto(num_dummy).each do |dummy|
         # ダミータスク名
-        dummy_name = "TOPPERS_DUMMY#{dummy}"
-
+        dummy_name = "TOPPERS_#{$cfgData[:ATT_REG][memreg][:regname]}" \
+														+ "_DUMMY#{dummy}"
         # ダミースタック領域の確保
         ustkName = "_kernel_ustack_#{dummy_name}"
         ustkSecname = SecnameUserStack(dummy_name)
@@ -368,7 +371,7 @@ if $USE_REDZONE && $ustackListLinker.size > 0
         params2[:size] = $TARGET_DUMMY_STKSZ
         params2[:linker] = true
         params2[:domain] = $TDOM_NONE
-        params2[:memreg] = $domData[$TDOM_NONE][:stdram]
+        params2[:memreg] = memreg
         params2[:secname] = ustkSecname
         params2[:mematr] = $targetMematrUstack || $mematrNoinitSec
         params2[:acptn1] = $acptnKernel
@@ -376,34 +379,29 @@ if $USE_REDZONE && $ustackListLinker.size > 0
         params2[:acptn4] = $acptnKernel
         $memObj[$lastMOKey += 1] = params2
 
-        @domainUstackList[$TDOM_NONE].push($lastMOKey)
+        ustackListDomain[$TDOM_NONE].push($lastMOKey)
+        ustackListMemreg[memreg].push($lastMOKey)
         $ustackListLinker.push($lastMOKey)
       end
-      @totalNumUstack += num_dummy
-    end
-
-    #
-    #  配置順序の決定
-    #
-
-    # 配置順序の割り当て関数
-    def self.AssignStkOrder(domid)
-      $memObj[@domainUstackList[domid].shift][:stkorder] = (@stkorder += 1)
-      @totalNumUstack -= 1
-      if domid == @maxUstackDomain
-        @maxNumUstack -= 1
-      end
+      totalNumUstack += num_dummy
     end
 
     # 配置順序を順に割り当てる
-    @stkorder = 0
-    while @stkorder < $ustackListLinker.size
-      @domainUstackList.each_key do |domid|
-        if @domainUstackList[domid].size > 0
-          if domid != @maxUstackDomain && @maxNumUstack * 2 > @totalNumUstack
-            AssignStkOrder(@maxUstackDomain)
+    stkorder = 0
+    while stkorder < ustackListMemreg[memreg].size
+      ustackListDomain.keys.sort.each do |domid|
+        if ustackListDomain[domid].size > 0
+          if domid != maxUstackDomain && maxNumUstack * 2 > totalNumUstack
+            $memObj[ustackListDomain[maxUstackDomain].shift][:stkorder] = \
+															(stkorder += 1)
+            totalNumUstack -= 1
+            maxNumUstack -= 1
           end
-          AssignStkOrder(domid)
+          $memObj[ustackListDomain[domid].shift][:stkorder] = (stkorder += 1)
+          totalNumUstack -= 1
+          if domid == maxUstackDomain
+            maxNumUstack -= 1
+          end
         end
       end
     end

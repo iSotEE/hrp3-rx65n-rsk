@@ -37,7 +37,7 @@
 #   アの利用により直接的または間接的に生じたいかなる損害に関しても，そ
 #   の責任を負わない．
 # 
-#   $Id: mutex.trb 104 2016-02-26 09:47:37Z ertl-hiro $
+#   $Id: mutex.trb 461 2018-09-24 11:43:34Z ertl-hiro $
 # 
 
 #
@@ -50,9 +50,6 @@ class MutexObject < KernelObject
   end
 
   def prepare(key, params)
-    # 保護ドメインの囲みの中に記述されていない場合は無所属とする
-    params[:domain] ||= $TDOM_NONE
-
     # mtxatrが無効の場合（E_RSATR）［NGKI2025］
     # （TA_NULL，TA_TPRI，TA_CEILINGのいずれでもない場合）
     if !(params[:mtxatr] == $TA_NULL || params[:mtxatr] == $TA_TPRI \

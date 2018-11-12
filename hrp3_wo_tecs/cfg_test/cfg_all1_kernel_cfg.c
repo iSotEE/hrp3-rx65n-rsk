@@ -18,12 +18,19 @@
 #include "cfg_all1.h"
 
 /*
+ *  Time Event Management
+ */
+
+TMEVTN	_kernel_tmevt_heap_kernel[1 + TNUM_TSKID + TNUM_CYCID + TNUM_ALMID];
+TOPPERS_EMPTY_LABEL(TMEVTN, _kernel_tmevt_heap_idle);
+
+/*
  *  Task Management Functions
  */
 
 const ID _kernel_tmax_tskid = (TMIN_TSKID + TNUM_TSKID - 1);
 
-static STK_T _kernel_sstack_TASK1[COUNT_STK_T(STACK_SIZE)] __attribute__((section(".noinit_kernel"),nocommon));
+static STK_T _kernel_sstack_TASK1[COUNT_STK_T(STACK_SIZE)] __attribute__((section(".system_stack"),nocommon));
 const TINIB _kernel_tinib_table[TNUM_TSKID] = {
 	{ (TDOM_KERNEL), (TA_ACT), (intptr_t)(1), (TASK)(task1), INT_PRIORITY(MID_PRIORITY), ROUND_STK_T(STACK_SIZE), _kernel_sstack_TASK1, 0, NULL, { TACP_KERNEL, TACP_KERNEL, TACP_SHARED, TACP_KERNEL } },
 	{ (TDOM_KERNEL), (TA_NULL), (intptr_t)(2), (TASK)(task2), INT_PRIORITY(HIGH_PRIORITY), STACK_SIZE, (void *)(stack_TASK2), 0, NULL, { TACP_SHARED, TACP_KERNEL, TACP_KERNEL, TACP_SHARED } }
@@ -247,16 +254,16 @@ _kernel_nfyhdr_CYC10(intptr_t exinf)
 }
 
 const CYCINIB _kernel_cycinib_table[TNUM_CYCID] = {
-	{ &(_kernel_tmevt_heap[0]), (TA_NULL), (intptr_t)(1), (NFYHDR)(cyclic1_handler), (1000), (1000), { TACP_KERNEL, TACP_KERNEL, TACP_SHARED, TACP_KERNEL } },
-	{ &(_kernel_tmevt_heap[0]), (TA_STA), (intptr_t)(&var1), _kernel_nfyhdr_CYC2, (1000), (1000), { TACP_SHARED, TACP_KERNEL, TACP_KERNEL, TACP_SHARED } },
-	{ &(_kernel_tmevt_heap[0]), (TA_NULL), (intptr_t)(&var2), _kernel_nfyhdr_CYC3, (1000), (1000), { TACP_KERNEL, TACP_KERNEL, TACP_SHARED, TACP_KERNEL } },
-	{ &(_kernel_tmevt_heap[0]), (TA_NULL), (intptr_t)(TASK1), _kernel_nfyhdr_CYC4, (1000), (1000), { TACP_KERNEL, TACP_KERNEL, TACP_SHARED, TACP_KERNEL } },
-	{ &(_kernel_tmevt_heap[0]), (TA_NULL), (intptr_t)(TASK1), _kernel_nfyhdr_CYC5, (1000), (1000), { TACP_KERNEL, TACP_KERNEL, TACP_SHARED, TACP_KERNEL } },
-	{ &(_kernel_tmevt_heap[0]), (TA_NULL), (intptr_t)(SEM1), _kernel_nfyhdr_CYC6, (1000), (1000), { TACP_KERNEL, TACP_KERNEL, TACP_SHARED, TACP_KERNEL } },
-	{ &(_kernel_tmevt_heap[0]), (TA_NULL), (intptr_t)(FLG1), _kernel_nfyhdr_CYC7, (1000), (1000), { TACP_KERNEL, TACP_KERNEL, TACP_SHARED, TACP_KERNEL } },
-	{ &(_kernel_tmevt_heap[0]), (TA_NULL), (intptr_t)(DTQ1), _kernel_nfyhdr_CYC8, (1000), (1000), { TACP_KERNEL, TACP_KERNEL, TACP_SHARED, TACP_KERNEL } },
-	{ &(_kernel_tmevt_heap[0]), (TA_NULL), (intptr_t)(TASK1), _kernel_nfyhdr_CYC9, (1000), (1000), { TACP_KERNEL, TACP_KERNEL, TACP_SHARED, TACP_KERNEL } },
-	{ &(_kernel_tmevt_heap[0]), (TA_NULL), (intptr_t)(TASK1), _kernel_nfyhdr_CYC10, (1000), (1000), { TACP_KERNEL, TACP_KERNEL, TACP_SHARED, TACP_KERNEL } }
+	{ _kernel_tmevt_heap_kernel, (TA_NULL), (intptr_t)(1), (NFYHDR)(cyclic1_handler), (1000), (1000), { TACP_KERNEL, TACP_KERNEL, TACP_SHARED, TACP_KERNEL } },
+	{ _kernel_tmevt_heap_kernel, (TA_STA), (intptr_t)(&var1), _kernel_nfyhdr_CYC2, (1000), (1000), { TACP_SHARED, TACP_KERNEL, TACP_KERNEL, TACP_SHARED } },
+	{ _kernel_tmevt_heap_kernel, (TA_NULL), (intptr_t)(&var2), _kernel_nfyhdr_CYC3, (1000), (1000), { TACP_KERNEL, TACP_KERNEL, TACP_SHARED, TACP_KERNEL } },
+	{ _kernel_tmevt_heap_kernel, (TA_NULL), (intptr_t)(TASK1), _kernel_nfyhdr_CYC4, (1000), (1000), { TACP_KERNEL, TACP_KERNEL, TACP_SHARED, TACP_KERNEL } },
+	{ _kernel_tmevt_heap_kernel, (TA_NULL), (intptr_t)(TASK1), _kernel_nfyhdr_CYC5, (1000), (1000), { TACP_KERNEL, TACP_KERNEL, TACP_SHARED, TACP_KERNEL } },
+	{ _kernel_tmevt_heap_kernel, (TA_NULL), (intptr_t)(SEM1), _kernel_nfyhdr_CYC6, (1000), (1000), { TACP_KERNEL, TACP_KERNEL, TACP_SHARED, TACP_KERNEL } },
+	{ _kernel_tmevt_heap_kernel, (TA_NULL), (intptr_t)(FLG1), _kernel_nfyhdr_CYC7, (1000), (1000), { TACP_KERNEL, TACP_KERNEL, TACP_SHARED, TACP_KERNEL } },
+	{ _kernel_tmevt_heap_kernel, (TA_NULL), (intptr_t)(DTQ1), _kernel_nfyhdr_CYC8, (1000), (1000), { TACP_KERNEL, TACP_KERNEL, TACP_SHARED, TACP_KERNEL } },
+	{ _kernel_tmevt_heap_kernel, (TA_NULL), (intptr_t)(TASK1), _kernel_nfyhdr_CYC9, (1000), (1000), { TACP_KERNEL, TACP_KERNEL, TACP_SHARED, TACP_KERNEL } },
+	{ _kernel_tmevt_heap_kernel, (TA_NULL), (intptr_t)(TASK1), _kernel_nfyhdr_CYC10, (1000), (1000), { TACP_KERNEL, TACP_KERNEL, TACP_SHARED, TACP_KERNEL } }
 };
 
 CYCCB _kernel_cyccb_table[TNUM_CYCID];
@@ -375,16 +382,16 @@ _kernel_nfyhdr_ALM10(intptr_t exinf)
 }
 
 const ALMINIB _kernel_alminib_table[TNUM_ALMID] = {
-	{ &(_kernel_tmevt_heap[0]), (TA_NULL), (intptr_t)(1), (NFYHDR)(alarm1_handler), { TACP_KERNEL, TACP_KERNEL, TACP_SHARED, TACP_KERNEL } },
-	{ &(_kernel_tmevt_heap[0]), (TA_NULL), (intptr_t)(&var1), _kernel_nfyhdr_ALM2, { TACP_SHARED, TACP_KERNEL, TACP_KERNEL, TACP_SHARED } },
-	{ &(_kernel_tmevt_heap[0]), (TA_NULL), (intptr_t)(&var2), _kernel_nfyhdr_ALM3, { TACP_KERNEL, TACP_KERNEL, TACP_SHARED, TACP_KERNEL } },
-	{ &(_kernel_tmevt_heap[0]), (TA_NULL), (intptr_t)(TASK1), _kernel_nfyhdr_ALM4, { TACP_KERNEL, TACP_KERNEL, TACP_SHARED, TACP_KERNEL } },
-	{ &(_kernel_tmevt_heap[0]), (TA_NULL), (intptr_t)(TASK1), _kernel_nfyhdr_ALM5, { TACP_KERNEL, TACP_KERNEL, TACP_SHARED, TACP_KERNEL } },
-	{ &(_kernel_tmevt_heap[0]), (TA_NULL), (intptr_t)(SEM1), _kernel_nfyhdr_ALM6, { TACP_KERNEL, TACP_KERNEL, TACP_SHARED, TACP_KERNEL } },
-	{ &(_kernel_tmevt_heap[0]), (TA_NULL), (intptr_t)(FLG1), _kernel_nfyhdr_ALM7, { TACP_KERNEL, TACP_KERNEL, TACP_SHARED, TACP_KERNEL } },
-	{ &(_kernel_tmevt_heap[0]), (TA_NULL), (intptr_t)(DTQ1), _kernel_nfyhdr_ALM8, { TACP_KERNEL, TACP_KERNEL, TACP_SHARED, TACP_KERNEL } },
-	{ &(_kernel_tmevt_heap[0]), (TA_NULL), (intptr_t)(TASK1), _kernel_nfyhdr_ALM9, { TACP_KERNEL, TACP_KERNEL, TACP_SHARED, TACP_KERNEL } },
-	{ &(_kernel_tmevt_heap[0]), (TA_NULL), (intptr_t)(TASK1), _kernel_nfyhdr_ALM10, { TACP_KERNEL, TACP_KERNEL, TACP_SHARED, TACP_KERNEL } }
+	{ _kernel_tmevt_heap_kernel, (TA_NULL), (intptr_t)(1), (NFYHDR)(alarm1_handler), { TACP_KERNEL, TACP_KERNEL, TACP_SHARED, TACP_KERNEL } },
+	{ _kernel_tmevt_heap_kernel, (TA_NULL), (intptr_t)(&var1), _kernel_nfyhdr_ALM2, { TACP_SHARED, TACP_KERNEL, TACP_KERNEL, TACP_SHARED } },
+	{ _kernel_tmevt_heap_kernel, (TA_NULL), (intptr_t)(&var2), _kernel_nfyhdr_ALM3, { TACP_KERNEL, TACP_KERNEL, TACP_SHARED, TACP_KERNEL } },
+	{ _kernel_tmevt_heap_kernel, (TA_NULL), (intptr_t)(TASK1), _kernel_nfyhdr_ALM4, { TACP_KERNEL, TACP_KERNEL, TACP_SHARED, TACP_KERNEL } },
+	{ _kernel_tmevt_heap_kernel, (TA_NULL), (intptr_t)(TASK1), _kernel_nfyhdr_ALM5, { TACP_KERNEL, TACP_KERNEL, TACP_SHARED, TACP_KERNEL } },
+	{ _kernel_tmevt_heap_kernel, (TA_NULL), (intptr_t)(SEM1), _kernel_nfyhdr_ALM6, { TACP_KERNEL, TACP_KERNEL, TACP_SHARED, TACP_KERNEL } },
+	{ _kernel_tmevt_heap_kernel, (TA_NULL), (intptr_t)(FLG1), _kernel_nfyhdr_ALM7, { TACP_KERNEL, TACP_KERNEL, TACP_SHARED, TACP_KERNEL } },
+	{ _kernel_tmevt_heap_kernel, (TA_NULL), (intptr_t)(DTQ1), _kernel_nfyhdr_ALM8, { TACP_KERNEL, TACP_KERNEL, TACP_SHARED, TACP_KERNEL } },
+	{ _kernel_tmevt_heap_kernel, (TA_NULL), (intptr_t)(TASK1), _kernel_nfyhdr_ALM9, { TACP_KERNEL, TACP_KERNEL, TACP_SHARED, TACP_KERNEL } },
+	{ _kernel_tmevt_heap_kernel, (TA_NULL), (intptr_t)(TASK1), _kernel_nfyhdr_ALM10, { TACP_KERNEL, TACP_KERNEL, TACP_SHARED, TACP_KERNEL } }
 };
 
 ALMCB _kernel_almcb_table[TNUM_ALMID];
@@ -496,13 +503,6 @@ STK_T *const _kernel_istkpt = TOPPERS_ISTKPT((void *)(istack), (10000));
 #endif /* TOPPERS_ISTKPT */
 
 /*
- *  Time Event Management
- */
-
-TMEVTN	_kernel_tmevt_heap[1 + TNUM_TSKID + TNUM_CYCID + TNUM_ALMID];
-TMEVTN	*const _kernel_p_tmevt_heap_idle = NULL;
-
-/*
  *  Module Initialization Function
  */
 
@@ -567,7 +567,7 @@ TOPPERS_EMPTY_LABEL(const SOMINIB, _kernel_sominib_table);
 
 const ID _kernel_tmax_domid = (TMIN_DOMID + TNUM_DOMID - 1);
 
-const DOMINIB _kernel_dominib_kernel = { TACP_KERNEL, &_kernel_schedcb_kernel, &(_kernel_tmevt_heap[0]), INT_PRIORITY(3), { TACP_SHARED, TACP_KERNEL, TACP_KERNEL, TACP_SHARED } };
+const DOMINIB _kernel_dominib_kernel = { TACP_KERNEL, &(_kernel_schedcb_kernel), _kernel_tmevt_heap_kernel, INT_PRIORITY(3), { TACP_SHARED, TACP_KERNEL, TACP_KERNEL, TACP_SHARED } };
 
 TOPPERS_EMPTY_LABEL(const DOMINIB, _kernel_dominib_table);
 

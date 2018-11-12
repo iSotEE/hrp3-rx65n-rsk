@@ -37,7 +37,7 @@
  *  アの利用により直接的または間接的に生じたいかなる損害に関しても，そ
  *  の責任を負わない．
  * 
- *  $Id: task_manage.c 80 2015-12-31 12:38:09Z ertl-hiro $
+ *  $Id: task_manage.c 520 2018-11-01 12:41:13Z ertl-hiro $
  */
 
 /*
@@ -230,6 +230,9 @@ acre_tsk(const T_CTSK *pk_ctsk)
 												/*［NGKI1057］［NGKI1066］*/
 	}
 	CHECK_ACPTN(p_dominib->acvct.acptn1);		/*［NGKI3966］*/
+	if (INT_PRIORITY(itskpri) < p_dominib->minpriority) {
+		CHECK_ACPTN(p_dominib->acvct.acptn2);	/*［NGKI5123］*/
+	}
 
 	lock_cpu();
 	if (queue_empty(&(p_dominib->p_domcb->free_tcb))) {
@@ -415,7 +418,7 @@ act_tsk(ID tskid)
 				dispatch();
 			}
 			else {
-				request_dispatch();
+				request_dispatch_retint();
 			}
 		}
 		ercd = E_OK;

@@ -5,7 +5,7 @@
  * 
  *  Copyright (C) 2000-2003 by Embedded and Real-Time Systems Laboratory
  *                              Toyohashi Univ. of Technology, JAPAN
- *  Copyright (C) 2005-2015 by Embedded and Real-Time Systems Laboratory
+ *  Copyright (C) 2005-2018 by Embedded and Real-Time Systems Laboratory
  *              Graduate School of Information Science, Nagoya Univ., JAPAN
  * 
  *  上記著作権者は，以下の(1)〜(4)の条件を満たす場合に限り，本ソフトウェ
@@ -37,7 +37,7 @@
  *  アの利用により直接的または間接的に生じたいかなる損害に関しても，そ
  *  の責任を負わない．
  * 
- *  $Id: eventflag.c 378 2018-04-19 09:53:29Z ertl-hiro $
+ *  $Id: eventflag.c 520 2018-11-01 12:41:13Z ertl-hiro $
  */
 
 /*
@@ -203,7 +203,7 @@ set_flg(ID flgid, FLGPTN setptn)
 			dispatch();
 		}
 		else {
-			request_dispatch();
+			request_dispatch_retint();
 		}
 	}
 	ercd = E_OK;
@@ -280,8 +280,8 @@ wai_flg(ID flgid, FLGPTN waiptn, MODE wfmode, FLGPTN *p_flgptn)
 	else {
 		winfo_flg.waiptn = waiptn;
 		winfo_flg.wfmode = wfmode;
-		p_runtsk->tstat = TS_WAITING_FLG;
-		wobj_make_wait((WOBJCB *) p_flgcb, (WINFO_WOBJ *) &winfo_flg);
+		wobj_make_wait((WOBJCB *) p_flgcb, TS_WAITING_FLG,
+											(WINFO_WOBJ *) &winfo_flg);
 		dispatch();
 		ercd = winfo_flg.winfo.wercd;
 		if (ercd == E_OK) {
@@ -377,9 +377,8 @@ twai_flg(ID flgid, FLGPTN waiptn, MODE wfmode, FLGPTN *p_flgptn, TMO tmout)
 	else {
 		winfo_flg.waiptn = waiptn;
 		winfo_flg.wfmode = wfmode;
-		p_runtsk->tstat = TS_WAITING_FLG;
-		wobj_make_wait_tmout((WOBJCB *) p_flgcb, (WINFO_WOBJ *) &winfo_flg,
-														&tmevtb, tmout);
+		wobj_make_wait_tmout((WOBJCB *) p_flgcb, TS_WAITING_FLG,
+								(WINFO_WOBJ *) &winfo_flg, &tmevtb, tmout);
 		dispatch();
 		ercd = winfo_flg.winfo.wercd;
 		if (ercd == E_OK) {

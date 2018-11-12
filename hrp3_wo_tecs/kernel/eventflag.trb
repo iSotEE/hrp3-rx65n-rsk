@@ -37,7 +37,7 @@
 #   アの利用により直接的または間接的に生じたいかなる損害に関しても，そ
 #   の責任を負わない．
 # 
-#   $Id: eventflag.trb 104 2016-02-26 09:47:37Z ertl-hiro $
+#   $Id: eventflag.trb 461 2018-09-24 11:43:34Z ertl-hiro $
 # 
 
 #
@@ -50,9 +50,6 @@ class EventflagObject < KernelObject
   end
 
   def prepare(key, params)
-    # 保護ドメインの囲みの中に記述されていない場合は無所属とする
-    params[:domain] ||= $TDOM_NONE
-
     # flgatrが無効の場合（E_RSATR）［NGKI1562］
     #（TA_TPRI，TA_WMUL，TA_CLR以外のビットがセットされている場合）
     if (params[:flgatr] & ~($TA_TPRI|$TA_WMUL|$TA_CLR)) != 0

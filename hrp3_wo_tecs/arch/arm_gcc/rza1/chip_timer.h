@@ -37,7 +37,7 @@
  *  アの利用により直接的または間接的に生じたいかなる損害に関しても，そ
  *  の責任を負わない．
  * 
- *  $Id: chip_timer.h 448 2018-08-25 14:38:00Z ertl-hiro $
+ *  $Id: chip_timer.h 510 2018-10-27 16:30:45Z ertl-hiro $
  */
 
 /*
@@ -58,9 +58,6 @@
 
 /*
  *  タイマ割込みハンドラ登録のための定数
- *
- *  高分解能タイマ割込みは，タイムウィンドウ割込みよりも高い優先度とし
- *  なければならない（同優先度も不可）．
  */
 #define INHNO_TIMER		INTNO_OSTM0			/* 割込みハンドラ番号 */
 #define INTNO_TIMER		INTNO_OSTM0			/* 割込み番号 */
@@ -71,12 +68,12 @@
  *  タイムウィンドウタイマ／オーバランタイマ割込みハンドラ登録のための
  *  定数
  *
- *  タイムウィンドウ割込みは，最低優先度とすることを原則とする．高分解
- *  能タイマ割込みより低い優先度としなければならない（同優先度も不可）．
+ *  タイムウィンドウタイマ割込みの優先度は，高分解能タイマ割込みと同じ
+ *  にしなければならない．
  */
 #define INHNO_TOTIMER		INTNO_OSTM1			/* 割込みハンドラ番号 */
 #define INTNO_TOTIMER		INTNO_OSTM1			/* 割込み番号 */
-#define INTPRI_TOTIMER		TMAX_INTPRI			/* 割込み優先度 */
+#define INTPRI_TOTIMER		INTPRI_TIMER		/* 割込み優先度 */
 #define INTATR_TOTIMER		TA_EDGE				/* 割込み属性 */
 
 /*
@@ -240,16 +237,6 @@ target_totimer_stop(void)
 
 #define	target_twdtimer_stop	target_totimer_stop
 #define	target_ovrtimer_stop	target_totimer_stop
-
-/*
- *  タイムウィンドウタイマ割込みの要求
- */
-Inline void
-target_twdtimer_raise_int(void)
-{
-	raise_int(INTNO_OSTM1);
-	data_sync_barrier();
-}
 
 /*
  *  タイムウィンドウタイマ／オーバランタイマの現在値の読出し

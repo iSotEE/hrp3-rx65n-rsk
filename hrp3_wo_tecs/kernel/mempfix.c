@@ -5,7 +5,7 @@
  * 
  *  Copyright (C) 2000-2003 by Embedded and Real-Time Systems Laboratory
  *                              Toyohashi Univ. of Technology, JAPAN
- *  Copyright (C) 2005-2015 by Embedded and Real-Time Systems Laboratory
+ *  Copyright (C) 2005-2018 by Embedded and Real-Time Systems Laboratory
  *              Graduate School of Information Science, Nagoya Univ., JAPAN
  * 
  *  上記著作権者は，以下の(1)〜(4)の条件を満たす場合に限り，本ソフトウェ
@@ -37,7 +37,7 @@
  *  アの利用により直接的または間接的に生じたいかなる損害に関しても，そ
  *  の責任を負わない．
  * 
- *  $Id: mempfix.c 378 2018-04-19 09:53:29Z ertl-hiro $
+ *  $Id: mempfix.c 477 2018-10-18 13:32:54Z ertl-hiro $
  */
 
 /*
@@ -196,8 +196,8 @@ get_mpf(ID mpfid, void **p_blk)
 		ercd = E_OK;
 	}
 	else {
-		p_runtsk->tstat = TS_WAITING_MPF;
-		wobj_make_wait((WOBJCB *) p_mpfcb, (WINFO_WOBJ *) &winfo_mpf);
+		wobj_make_wait((WOBJCB *) p_mpfcb, TS_WAITING_MPF,
+											(WINFO_WOBJ *) &winfo_mpf);
 		dispatch();
 		ercd = winfo_mpf.winfo.wercd;
 		if (ercd == E_OK) {
@@ -281,9 +281,8 @@ tget_mpf(ID mpfid, void **p_blk, TMO tmout)
 		ercd = E_TMOUT;
 	}
 	else {
-		p_runtsk->tstat = TS_WAITING_MPF;
-		wobj_make_wait_tmout((WOBJCB *) p_mpfcb, (WINFO_WOBJ *) &winfo_mpf,
-														&tmevtb, tmout);
+		wobj_make_wait_tmout((WOBJCB *) p_mpfcb, TS_WAITING_MPF,
+								(WINFO_WOBJ *) &winfo_mpf, &tmevtb, tmout);
 		dispatch();
 		ercd = winfo_mpf.winfo.wercd;
 		if (ercd == E_OK) {

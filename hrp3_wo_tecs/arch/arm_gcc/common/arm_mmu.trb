@@ -36,7 +36,7 @@
 #   アの利用により直接的または間接的に生じたいかなる損害に関しても，そ
 #   の責任を負わない．
 # 
-#   $Id: arm_mmu.trb 374 2018-04-16 06:26:07Z ertl-hiro $
+#   $Id: arm_mmu.trb 471 2018-10-14 16:28:42Z ertl-hiro $
 # 
 
 #
@@ -237,7 +237,11 @@ def GenerateEntry(dscrxx, domain, params)
     if (params[:accatr] & $TA_SORDER) != 0
       $kernelMemC.append("#{armvx}_MMU_#{dscrxx}_TEX000|ARM_MMU_#{dscr}_CB00|")
     elsif (params[:accatr] & $TA_IODEV) != 0
-      $kernelMemC.append("#{armvx}_MMU_#{dscrxx}_TEX000|ARM_MMU_#{dscr}_CB01|")
+      if (params[:accatr] & $TA_NONSHARED) == 0
+        $kernelMemC.append("#{armvx}_MMU_#{dscrxx}_TEX000|ARM_MMU_#{dscr}_CB01|")
+      else
+        $kernelMemC.append("#{armvx}_MMU_#{dscrxx}_TEX010|ARM_MMU_#{dscr}_CB00|")
+      end
     elsif (params[:accatr] & $TA_UNCACHE) != 0
       $kernelMemC.append("#{armvx}_MMU_#{dscrxx}_TEX001|ARM_MMU_#{dscr}_CB00|")
     elsif (params[:accatr] & $TA_WTHROUGH) != 0

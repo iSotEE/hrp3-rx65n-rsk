@@ -24,7 +24,9 @@ initialize_domain
 twdtimer_start
 twdtimer_stop
 twdtimer_control
+scyc_start
 scyc_switch
+twd_start
 twd_switch
 set_dspflg
 
@@ -80,6 +82,7 @@ update_current_evttim
 set_hrt_event
 tmevtb_register
 tmevtb_enqueue
+tmevtb_enqueue_reltim
 tmevtb_dequeue
 check_adjtim
 tmevt_lefttim
@@ -200,8 +203,8 @@ sysstat_acvct
 istksz
 istk
 istkpt
-tmevt_heap
-p_tmevt_heap_idle
+tmevt_heap_kernel
+tmevt_heap_idle
 initialize_object
 call_inirtn
 call_terrtn

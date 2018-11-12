@@ -5,7 +5,7 @@
  * 
  *  Copyright (C) 2000-2003 by Embedded and Real-Time Systems Laboratory
  *                              Toyohashi Univ. of Technology, JAPAN
- *  Copyright (C) 2005-2016 by Embedded and Real-Time Systems Laboratory
+ *  Copyright (C) 2005-2018 by Embedded and Real-Time Systems Laboratory
  *              Graduate School of Information Science, Nagoya Univ., JAPAN
  * 
  *  上記著作権者は，以下の(1)〜(4)の条件を満たす場合に限り，本ソフトウェ
@@ -37,7 +37,7 @@
  *  アの利用により直接的または間接的に生じたいかなる損害に関しても，そ
  *  の責任を負わない．
  * 
- *  $Id: time_event.c 161 2016-03-14 09:47:48Z ertl-hiro $
+ *  $Id: time_event.c 531 2018-11-11 04:42:51Z ertl-hiro $
  */
 
 /*
@@ -90,9 +90,9 @@
 /*
  *  カーネルドメインのタイムイベントヒープに関する定義
  */
-#define p_top_tmevtn_kernel			p_top_tmevtn(p_tmevt_heap_kernel)
-#define top_evttim_kernel			top_evttim(p_tmevt_heap_kernel)
-#define p_last_tmevtn_kernel		p_last_tmevtn(p_tmevt_heap_kernel)
+#define p_top_tmevtn_kernel			p_top_tmevtn(tmevt_heap_kernel)
+#define top_evttim_kernel			top_evttim(tmevt_heap_kernel)
+#define p_last_tmevtn_kernel		p_last_tmevtn(tmevt_heap_kernel)
 
 /*
  *  イベント時刻の前後関係の判定［ASPD1009］
@@ -153,10 +153,15 @@ initialize_tmevt(void)
 	systim_offset = 0U;								/*［ASPD1044］*/
 	in_signal_time = false;							/*［ASPD1033］*/
 
-	p_last_tmevtn_kernel = p_tmevt_heap_kernel;
+	p_last_tmevtn_kernel = tmevt_heap_kernel;
+	if (system_cyctim != 0U) {
+		p_last_tmevtn(tmevt_heap_idle) = tmevt_heap_idle;
+	}
 	for (i = 0; i < tnum_udom; i++) {
 		p_tmevt_heap = dominib_table[i].p_tmevt_heap;
-		p_last_tmevtn(p_tmevt_heap) = p_tmevt_heap;
+		if (p_tmevt_heap != tmevt_heap_idle) {
+			p_last_tmevtn(p_tmevt_heap) = p_tmevt_heap;
+		}
 	}
 }
 
@@ -459,13 +464,36 @@ tmevtb_register(TMEVTB *p_tmevtb, TMEVTN *p_tmevt_heap)
 #endif /* TOPPERS_tmereg */
 
 /*
- *  相対時間指定によるタイムイベントの登録
- *  
+ *  タイムイベントの登録
  */
 #ifdef TOPPERS_tmeenq
 
 void
-tmevtb_enqueue(TMEVTB *p_tmevtb, RELTIM time, TMEVTN *p_tmevt_heap)
+tmevtb_enqueue(TMEVTB *p_tmevtb, TMEVTN *p_tmevt_heap)
+{
+	/*
+	 *  タイムイベントブロックをヒープに挿入する．
+	 */
+	tmevtb_insert(p_tmevtb, p_tmevt_heap);
+
+	/*
+	 *  高分解能タイマ割込みの発生タイミングを設定する．
+	 */
+	if (p_tmevt_heap == tmevt_heap_kernel && !in_signal_time
+				&& p_tmevtb->p_tmevtn == p_top_tmevtn(p_tmevt_heap)) {
+		set_hrt_event();
+	}
+}
+
+#endif /* TOPPERS_tmeenq */
+
+/*
+ *  相対時間指定によるタイムイベントの登録
+ */
+#ifdef TOPPERS_tmeenqrel
+
+void
+tmevtb_enqueue_reltim(TMEVTB *p_tmevtb, RELTIM time, TMEVTN *p_tmevt_heap)
 {
 	/*
 	 *  現在のイベント時刻とタイムイベントの発生時刻を求める［ASPD1026］．
@@ -482,13 +510,13 @@ tmevtb_enqueue(TMEVTB *p_tmevtb, RELTIM time, TMEVTN *p_tmevt_heap)
 	 *  高分解能タイマ割込みの発生タイミングを設定する［ASPD1031］
 	 *  ［ASPD1034］．
 	 */
-	if (p_tmevt_heap == p_tmevt_heap_kernel && !in_signal_time
+	if (p_tmevt_heap == tmevt_heap_kernel && !in_signal_time
 				&& p_tmevtb->p_tmevtn == p_top_tmevtn(p_tmevt_heap)) {
 		set_hrt_event();
 	}
 }
 
-#endif /* TOPPERS_tmeenq */
+#endif /* TOPPERS_tmeenqrel */
 
 /*
  *  タイムイベントの登録解除
@@ -509,7 +537,7 @@ tmevtb_dequeue(TMEVTB *p_tmevtb, TMEVTN *p_tmevt_heap)
 	/*
 	 *  高分解能タイマ割込みの発生タイミングを設定する［ASPD1040］．
 	 */
-	if (p_tmevt_heap == p_tmevt_heap_kernel && !in_signal_time
+	if (p_tmevt_heap == tmevt_heap_kernel && !in_signal_time
 						&& p_tmevtn == p_top_tmevtn(p_tmevt_heap)) {
 		update_current_evttim();
 		set_hrt_event();
@@ -611,6 +639,9 @@ signal_time(void)
 {
 	TMEVTB	*p_tmevtb;
 	bool_t	callflag;
+#ifndef TOPPERS_OMIT_SYSLOG
+	uint_t	nocall = 0;
+#endif /* TOPPERS_OMIT_SYSLOG */
 
 	assert(sense_context());
 	assert(!sense_lock());
@@ -636,11 +667,23 @@ signal_time(void)
 		 */
 		while (p_last_tmevtn_kernel >= p_top_tmevtn_kernel
 					&& EVTTIM_LE(top_evttim_kernel, current_evttim)) {
-			p_tmevtb = tmevtb_delete_top(p_tmevt_heap_kernel);
+			p_tmevtb = tmevtb_delete_top(tmevt_heap_kernel);
 			(*(p_tmevtb->callback))(p_tmevtb->arg);
 			callflag = true;
+#ifndef TOPPERS_OMIT_SYSLOG
+			nocall += 1;
+#endif /* TOPPERS_OMIT_SYSLOG */
 		}
 	} while (callflag);								/*［ASPD1020］*/
+
+#ifndef TOPPERS_OMIT_SYSLOG
+	/*
+	 *  タイムイベントが処理されなかった場合．
+	 */
+	if (nocall == 0) {
+		syslog_0(LOG_NOTICE, "no time event is processed in hrt interrupt.");
+	}
+#endif /* TOPPERS_OMIT_SYSLOG */
 
 	/*
 	 *  高分解能タイマ割込みの発生タイミングを設定する［ASPD1025］．

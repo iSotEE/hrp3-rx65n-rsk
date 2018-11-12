@@ -37,7 +37,7 @@
  *  アの利用により直接的または間接的に生じたいかなる損害に関しても，そ
  *  の責任を負わない．
  * 
- *  $Id: cyclic.c 39 2015-08-16 06:14:41Z ertl-hiro $
+ *  $Id: cyclic.c 502 2018-10-27 08:05:10Z ertl-hiro $
  */
 
 /*
@@ -269,8 +269,9 @@ acre_cyc(const T_CCYC *pk_ccyc)
 
 		if ((p_cyccb->p_cycinib->cycatr & TA_STA) != 0U) {
 			p_cyccb->cycsta = true;
-			tmevtb_enqueue(&(p_cyccb->tmevtb), p_cyccb->p_cycinib->cycphs,
-											p_cyccb->p_cycinib->p_tmevt_heap);
+			tmevtb_enqueue_reltim(&(p_cyccb->tmevtb),
+									p_cyccb->p_cycinib->cycphs,
+									p_cyccb->p_cycinib->p_tmevt_heap);
 		}
 		else {
 			p_cyccb->cycsta = false;
@@ -414,7 +415,7 @@ sta_cyc(ID cycid)
 	/*
 	 *  初回の起動のためのタイムイベントを登録する［ASPD1036］．
 	 */
-	tmevtb_enqueue(&(p_cyccb->tmevtb), p_cyccb->p_cycinib->cycphs,
+	tmevtb_enqueue_reltim(&(p_cyccb->tmevtb), p_cyccb->p_cycinib->cycphs,
 									p_cyccb->p_cycinib->p_tmevt_heap);
 	ercd = E_OK;
 	unlock_cpu();
@@ -519,6 +520,10 @@ call_cyclic(CYCCB *p_cyccb)
 {
 	/*
 	 *  次回の起動のためのタイムイベントを登録する［ASPD1037］．
+	 *
+	 *  tmevtb_enqueueを用いるのが素直であるが，この関数は高分解能タイ
+	 *  マ割込みの処理中でのみ呼び出されるため，tmevtb_registerを用い
+	 *  ている．
 	 */
 	p_cyccb->tmevtb.evttim += p_cyccb->p_cycinib->cyctim;	/*［ASPD1038］*/
 	tmevtb_register(&(p_cyccb->tmevtb), p_cyccb->p_cycinib->p_tmevt_heap);

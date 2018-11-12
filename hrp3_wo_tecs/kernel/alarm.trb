@@ -37,7 +37,7 @@
 #   アの利用により直接的または間接的に生じたいかなる損害に関しても，そ
 #   の責任を負わない．
 # 
-#   $Id: alarm.trb 401 2018-05-17 16:53:25Z ertl-hiro $
+#   $Id: alarm.trb 479 2018-10-18 16:40:46Z ertl-hiro $
 # 
 
 #
@@ -46,18 +46,10 @@
 
 class AlarmObject < KernelObject
   def initialize()
-    super("alm", "alarm")
+    super("alm", "alarm", true)
   end
 
   def prepare(key, params)
-    # 保護ドメインの囲みの中に記述されていない場合（E_RSATR）［NGKI3742］
-    if !params.has_key?(:domain) || params[:domain] == $TDOM_NONE
-      error_ercd("E_RSATR", params, "alarm handler `%almid' " \
-						"in %apiname must belong to a protection domain")
-      # 以降のエラーの抑止
-      params[:domain] = $TDOM_KERNEL
-    end
-
     # almatrが無効の場合（E_RSATR）［NGKI2491］
     #（TA_STA以外のビットがセットされている場合）
     if (params[:almatr] & ~($TA_STA)) != 0
@@ -69,14 +61,7 @@ class AlarmObject < KernelObject
   end
 
   def generateInib(key, params)
-    if $cfgData[:DEF_SCY].size == 0 || params[:domain] == $TDOM_KERNEL
-      tmevtHeap = "&(_kernel_tmevt_heap[0])"
-    else
-      params2 = $domData[params[:domain]]
-      tmevtHeap = "&(_kernel_tmevt_heap[#{params2[:tmevtHeap]}])"
-    end
-
-    return("#{tmevtHeap}, (#{params[:almatr]}), " \
+    return("#{$domData[params[:domain]][:tmevtHeap]}, (#{params[:almatr]}), " \
 				"(intptr_t)(#{params[:par1]}), #{params[:nfyhdr]}, " \
 				"#{GenerateAcvct(params)}")
   end

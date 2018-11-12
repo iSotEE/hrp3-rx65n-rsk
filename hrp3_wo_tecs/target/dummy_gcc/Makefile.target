@@ -1,7 +1,7 @@
 #
 #		Makefile のターゲット依存部（ダミーターゲット用）
 #
-#  $Id: Makefile.target 333 2018-04-08 00:32:41Z ertl-hiro $
+#  $Id: Makefile.target 496 2018-10-24 18:05:56Z ertl-hiro $
 # 
 
 #
@@ -58,10 +58,11 @@ TARGET_OFFSET_TRB = $(TARGETDIR)/target_offset.trb
 #
 #  START_OBJSをstart.oに設定し，LDFLAGSに-nostdlibを追加する．
 #
-START_OBJS = start.o
+START_OBJS := start.o
+START_OBJS := $(addprefix $(OBJDIR)/, $(START_OBJS))
 
-$(START_OBJS): %.o: %.c
-	$(CC) -c -MD -MP -MF $(DEPDIR)/$*.d $(CFLAGS) $(KERNEL_CFLAGS) $<
+$(START_OBJS): $(OBJDIR)/%.o: %.c
+	$(CC) -c -o $@ -MD -MP -MF $(DEPDIR)/$*.d $(CFLAGS) $(KERNEL_CFLAGS) $<
 
 LDFLAGS := -nostdlib $(LDFLAGS)
 

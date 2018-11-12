@@ -37,7 +37,7 @@
  *  アの利用により直接的または間接的に生じたいかなる損害に関しても，そ
  *  の責任を負わない．
  * 
- *  $Id: pridataq.c 81 2015-12-31 12:44:23Z ertl-hiro $
+ *  $Id: pridataq.c 520 2018-11-01 12:41:13Z ertl-hiro $
  */
 
 /*
@@ -569,8 +569,8 @@ snd_pdq(ID pdqid, intptr_t data, PRI datapri)
 	else {
 		winfo_spdq.data = data;
 		winfo_spdq.datapri = datapri;
-		p_runtsk->tstat = TS_WAITING_SPDQ;
-		wobj_make_wait((WOBJCB *) p_pdqcb, (WINFO_WOBJ *) &winfo_spdq);
+		wobj_make_wait((WOBJCB *) p_pdqcb, TS_WAITING_SPDQ,
+											(WINFO_WOBJ *) &winfo_spdq);
 		dispatch();
 		ercd = winfo_spdq.winfo.wercd;
 	}
@@ -616,7 +616,7 @@ psnd_pdq(ID pdqid, intptr_t data, PRI datapri)
 				dispatch();
 			}
 			else {
-				request_dispatch();
+				request_dispatch_retint();
 			}
 		}
 		ercd = E_OK;
@@ -678,9 +678,8 @@ tsnd_pdq(ID pdqid, intptr_t data, PRI datapri, TMO tmout)
 	else {
 		winfo_spdq.data = data;
 		winfo_spdq.datapri = datapri;
-		p_runtsk->tstat = TS_WAITING_SPDQ;
-		wobj_make_wait_tmout((WOBJCB *) p_pdqcb, (WINFO_WOBJ *) &winfo_spdq,
-														&tmevtb, tmout);
+		wobj_make_wait_tmout((WOBJCB *) p_pdqcb, TS_WAITING_SPDQ,
+								(WINFO_WOBJ *) &winfo_spdq, &tmevtb, tmout);
 		dispatch();
 		ercd = winfo_spdq.winfo.wercd;
 	}
@@ -729,8 +728,7 @@ rcv_pdq(ID pdqid, intptr_t *p_data, PRI *p_datapri)
 		ercd = E_OK;
 	}
 	else {
-		p_runtsk->tstat = TS_WAITING_RPDQ;
-		make_wait(&(winfo_rpdq.winfo));
+		make_wait(TS_WAITING_RPDQ, &(winfo_rpdq.winfo));
 		queue_insert_prev(&(p_pdqcb->rwait_queue), &(p_runtsk->task_queue));
 		winfo_rpdq.p_pdqcb = p_pdqcb;
 		LOG_TSKSTAT(p_runtsk);
@@ -834,8 +832,7 @@ trcv_pdq(ID pdqid, intptr_t *p_data, PRI *p_datapri, TMO tmout)
 		ercd = E_TMOUT;
 	}
 	else {
-		p_runtsk->tstat = TS_WAITING_RPDQ;
-		make_wait_tmout(&(winfo_rpdq.winfo), &tmevtb, tmout);
+		make_wait_tmout(TS_WAITING_RPDQ, &(winfo_rpdq.winfo), &tmevtb, tmout);
 		queue_insert_prev(&(p_pdqcb->rwait_queue), &(p_runtsk->task_queue));
 		winfo_rpdq.p_pdqcb = p_pdqcb;
 		LOG_TSKSTAT(p_runtsk);

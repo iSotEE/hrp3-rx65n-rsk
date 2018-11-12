@@ -37,7 +37,7 @@
  *  アの利用により直接的または間接的に生じたいかなる損害に関しても，そ
  *  の責任を負わない．
  * 
- *  $Id: core_kernel_impl.h 412 2018-07-25 09:38:09Z ertl-hiro $
+ *  $Id: core_kernel_impl.h 520 2018-11-01 12:41:13Z ertl-hiro $
  */
 
 /*
@@ -64,6 +64,17 @@
  *  ターゲット依存のメモリオブジェクト属性（エラーチェック用）
  */
 #define TARGET_MEMATR		(TA_SORDER|TA_WTHROUGH|TA_NONSHARED)
+
+/*
+ *  ターゲット依存のメモリオブジェクトアクセス属性
+ */
+#define TARGET_ACCATR		(TA_SORDER|TA_WTHROUGH|TA_NONSHARED)
+
+/*
+ *  ターゲット依存のメモリオブジェクト属性
+ */
+#define TARGET_MEMATR_SSTACK	(TA_NOINITSEC|TA_NONSHARED)
+#define TARGET_MEMATR_USTACK	(TA_NOINITSEC|TA_NONSHARED)
 
 /*
  *  エラーチェック方法の指定
@@ -308,7 +319,7 @@ extern void dispatch(void);
 /*
  *  非タスクコンテキストからのディスパッチ要求
  */
-#define request_dispatch()
+#define request_dispatch_retint()
 
 /*
  *  ディスパッチャの動作開始（core_support.S）
@@ -507,15 +518,10 @@ extern void arm_mmu_initialize(void);
 #ifndef TOPPERS_MACRO_ONLY
 
 /*
- *  FPU関連の操作
- */
-#ifdef USE_ARM_FPU
-
-/*
  *  FPUの初期化
  */
+#ifdef USE_ARM_FPU
 extern void arm_fpu_initialize(void);
-
 #endif /* USE_ARM_FPU */
 
 /*

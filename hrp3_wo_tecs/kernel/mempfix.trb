@@ -37,7 +37,7 @@
 #   アの利用により直接的または間接的に生じたいかなる損害に関しても，そ
 #   の責任を負わない．
 # 
-#   $Id: mempfix.trb 436 2018-08-12 09:10:12Z ertl-hiro $
+#   $Id: mempfix.trb 461 2018-09-24 11:43:34Z ertl-hiro $
 # 
 
 #
@@ -53,9 +53,6 @@ class MempfixObject < KernelObject
     # パラメータが省略された時のデフォルト値の設定
     params[:mpf] ||= "NULL"
     params[:mpfmb] ||= "NULL"
-
-    # 保護ドメインの囲みの中に記述されていない場合は無所属とする
-    params[:domain] ||= $TDOM_NONE
 
     # mpfatrが無効の場合（E_RSATR）［NGKI2225］
     #（TA_TPRI以外のビットがセットされている場合）

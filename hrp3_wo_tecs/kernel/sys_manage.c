@@ -37,7 +37,7 @@
  *  アの利用により直接的または間接的に生じたいかなる損害に関しても，そ
  *  の責任を負わない．
  * 
- *  $Id: sys_manage.c 295 2018-03-24 09:36:27Z ertl-hiro $
+ *  $Id: sys_manage.c 520 2018-11-01 12:41:13Z ertl-hiro $
  */
 
 /*
@@ -61,20 +61,12 @@
 #endif /* LOG_ROT_RDQ_LEAVE */
 
 #ifndef LOG_MROT_RDQ_ENTER
-#define LOG_MROT_RDQ_ENTER(domid, tskpri)
+#define LOG_MROT_RDQ_ENTER(schedno, tskpri)
 #endif /* LOG_MROT_RDQ_ENTER */
 
 #ifndef LOG_MROT_RDQ_LEAVE
 #define LOG_MROT_RDQ_LEAVE(ercd)
 #endif /* LOG_MROT_RDQ_LEAVE */
-
-#ifndef LOG_GET_DID_ENTER
-#define LOG_GET_DID_ENTER(p_domid)
-#endif /* LOG_GET_DID_ENTER */
-
-#ifndef LOG_GET_DID_LEAVE
-#define LOG_GET_DID_LEAVE(ercd, domid)
-#endif /* LOG_GET_DID_LEAVE */
 
 #ifndef LOG_GET_TID_ENTER
 #define LOG_GET_TID_ENTER(p_tskid)
@@ -83,6 +75,14 @@
 #ifndef LOG_GET_TID_LEAVE
 #define LOG_GET_TID_LEAVE(ercd, p_tskid)
 #endif /* LOG_GET_TID_LEAVE */
+
+#ifndef LOG_GET_DID_ENTER
+#define LOG_GET_DID_ENTER(p_domid)
+#endif /* LOG_GET_DID_ENTER */
+
+#ifndef LOG_GET_DID_LEAVE
+#define LOG_GET_DID_LEAVE(ercd, p_domid)
+#endif /* LOG_GET_DID_LEAVE */
 
 #ifndef LOG_GET_LOD_ENTER
 #define LOG_GET_LOD_ENTER(tskpri, p_load)
@@ -93,7 +93,7 @@
 #endif /* LOG_GET_LOD_LEAVE */
 
 #ifndef LOG_MGET_LOD_ENTER
-#define LOG_MGET_LOD_ENTER(domid, tskpri, p_load)
+#define LOG_MGET_LOD_ENTER(schedno, tskpri, p_load)
 #endif /* LOG_MGET_LOD_ENTER */
 
 #ifndef LOG_MGET_LOD_LEAVE
@@ -109,7 +109,7 @@
 #endif /* LOG_GET_NTH_LEAVE */
 
 #ifndef LOG_MGET_NTH_ENTER
-#define LOG_MGET_NTH_ENTER(domid, tskpri, nth, p_tskid)
+#define LOG_MGET_NTH_ENTER(schedno, tskpri, nth, p_tskid)
 #endif /* LOG_MGET_NTH_ENTER */
 
 #ifndef LOG_MGET_NTH_LEAVE
@@ -219,7 +219,7 @@ rot_rdq(PRI tskpri)
 			dispatch();
 		}
 		else {
-			request_dispatch();
+			request_dispatch_retint();
 		}
 	}
 	ercd = E_OK;
@@ -238,18 +238,18 @@ rot_rdq(PRI tskpri)
 #ifdef TOPPERS_mrot_rdq
 
 ER
-mrot_rdq(ID domid, PRI tskpri)
+mrot_rdq(ID schedno, PRI tskpri)
 {
 	const DOMINIB	*p_dominib;
 	uint_t			pri;
 	ER				ercd;
 
-	LOG_MROT_RDQ_ENTER(domid, tskpri);
+	LOG_MROT_RDQ_ENTER(schedno, tskpri);
 	CHECK_UNL();								/*［NGKI2695］*/
-	if (domid == TDOM_KERNEL) {
+	if (schedno == TDOM_KERNEL) {
 		p_dominib = &dominib_kernel;
 	}
-	else if (domid == TDOM_SELF) {
+	else if (schedno == TDOM_SELF) {
 		if (sense_context()) {
 			p_dominib = &dominib_kernel;
 		}
@@ -258,8 +258,8 @@ mrot_rdq(ID domid, PRI tskpri)
 		}
 	}
 	else {
-		CHECK_ID(VALID_DOMID(domid));			/*［NGKI2696］*/
-		p_dominib = get_dominib(domid);
+		CHECK_ID(VALID_DOMID(schedno));			/*［NGKI2696］*/
+		p_dominib = get_dominib(schedno);
 	}
 	if (tskpri == TPRI_SELF) {
 		pri = p_runtsk->bpriority;
@@ -277,7 +277,7 @@ mrot_rdq(ID domid, PRI tskpri)
 			dispatch();
 		}
 		else {
-			request_dispatch();
+			request_dispatch_retint();
 		}
 	}
 	ercd = E_OK;
@@ -336,7 +336,7 @@ get_did(ID *p_domid)
 	unlock_cpu();
 
   error_exit:
-	LOG_GET_DID_LEAVE(ercd, *p_domid);
+	LOG_GET_DID_LEAVE(ercd, p_domid);
 	return(ercd);
 }
 
@@ -390,24 +390,24 @@ get_lod(PRI tskpri, uint_t *p_load)
 #ifdef TOPPERS_mget_lod
 
 ER
-mget_lod(ID domid, PRI tskpri, uint_t *p_load)
+mget_lod(ID schedno, PRI tskpri, uint_t *p_load)
 {
 	const DOMINIB	*p_dominib;
 	uint_t			pri, load;
 	QUEUE			*p_queue, *p_entry;
 	ER				ercd;
 
-	LOG_MGET_LOD_ENTER(domid, p_tskid, p_load);
+	LOG_MGET_LOD_ENTER(schedno, p_tskid, p_load);
 	CHECK_TSKCTX_UNL();							/*［NGKI3633］［NGKI3634］*/
-	if (domid == TDOM_KERNEL) {
+	if (schedno == TDOM_KERNEL) {
 		p_dominib = &dominib_kernel;
 	}
-	else if (domid == TDOM_SELF) {
+	else if (schedno == TDOM_SELF) {
 		p_dominib = p_runtsk->p_dominib;
 	}
 	else {
-		CHECK_ID(VALID_DOMID(domid));			/*［NGKI3635］*/
-		p_dominib = get_dominib(domid);
+		CHECK_ID(VALID_DOMID(schedno));			/*［NGKI3635］*/
+		p_dominib = get_dominib(schedno);
 	}
 	if (tskpri == TPRI_SELF) {
 		pri = p_runtsk->bpriority;				/*［NGKI3640］*/
@@ -490,7 +490,7 @@ get_nth(PRI tskpri, uint_t nth, ID *p_tskid)
 #ifdef TOPPERS_mget_nth
 
 ER
-mget_nth(ID domid, PRI tskpri, uint_t nth, ID *p_tskid)
+mget_nth(ID schedno, PRI tskpri, uint_t nth, ID *p_tskid)
 {
 	const DOMINIB	*p_dominib;
 	uint_t			pri;
@@ -498,17 +498,17 @@ mget_nth(ID domid, PRI tskpri, uint_t nth, ID *p_tskid)
 	ID				tskid;
 	ER				ercd;
 
-	LOG_MGET_NTH_ENTER(domid, p_tskid, nth, p_tskid);
+	LOG_MGET_NTH_ENTER(schedno, p_tskid, nth, p_tskid);
 	CHECK_TSKCTX_UNL();							/*［NGKI3652］［NGKI3653］*/
-	if (domid == TDOM_KERNEL) {
+	if (schedno == TDOM_KERNEL) {
 		p_dominib = &dominib_kernel;
 	}
-	else if (domid == TDOM_SELF) {
+	else if (schedno == TDOM_SELF) {
 		p_dominib = p_runtsk->p_dominib;
 	}
 	else {
-		CHECK_ID(VALID_DOMID(domid));			/*［NGKI3654］*/
-		p_dominib = get_dominib(domid);
+		CHECK_ID(VALID_DOMID(schedno));			/*［NGKI3654］*/
+		p_dominib = get_dominib(schedno);
 	}
 	if (tskpri == TPRI_SELF) {
 		pri = p_runtsk->bpriority;				/*［NGKI3660］*/

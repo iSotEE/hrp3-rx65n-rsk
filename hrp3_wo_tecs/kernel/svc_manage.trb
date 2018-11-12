@@ -36,7 +36,7 @@
 #   アの利用により直接的または間接的に生じたいかなる損害に関しても，そ
 #   の責任を負わない．
 # 
-#   $Id: svc_manage.trb 239 2018-01-04 09:07:20Z ertl-hiro $
+#   $Id: svc_manage.trb 461 2018-09-24 11:43:34Z ertl-hiro $
 # 
 
 #
@@ -70,8 +70,8 @@ $svcList = {}
 $cfgData[:DEF_SVC].each do |key, params|
   # カーネルドメインの囲みの中に記述されていない場合（E_RSATR）［NGKI3183］
   if !params.has_key?(:domain) || params[:domain] != $TDOM_KERNEL
-    error_ercd("E_RSATR", params, "extended service call `%fncd' " \
-						"in %apiname must belong to the kernel domain")
+    error_ercd("E_RSATR", params, "%apiname of `%fncd' " \
+								"must be within the kernel domain")
   end
 
   # fncdが0以下の場合（E_PAR）［NGKI3173］

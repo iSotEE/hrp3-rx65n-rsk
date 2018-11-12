@@ -37,7 +37,7 @@
  *  アの利用により直接的または間接的に生じたいかなる損害に関しても，そ
  *  の責任を負わない．
  * 
- *  $Id: task_manage.c 80 2015-12-31 12:38:09Z ertl-hiro $
+ *  $Id: task_manage.c 520 2018-11-01 12:41:13Z ertl-hiro $
  */
 
 /*
@@ -131,7 +131,7 @@ act_tsk(ID tskid)
 				dispatch();
 			}
 			else {
-				request_dispatch();
+				request_dispatch_retint();
 			}
 		}
 		ercd = E_OK;

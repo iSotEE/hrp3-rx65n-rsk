@@ -18,12 +18,19 @@
 #include "cfg_attsec.h"
 
 /*
+ *  Time Event Management
+ */
+
+TMEVTN	_kernel_tmevt_heap_kernel[1 + TNUM_TSKID + TNUM_CYCID + TNUM_ALMID];
+TOPPERS_EMPTY_LABEL(TMEVTN, _kernel_tmevt_heap_idle);
+
+/*
  *  Task Management Functions
  */
 
 const ID _kernel_tmax_tskid = (TMIN_TSKID + TNUM_TSKID - 1);
 
-static STK_T _kernel_sstack_TASK1[COUNT_STK_T(STACK_SIZE)] __attribute__((section(".noinit_kernel"),nocommon));
+static STK_T _kernel_sstack_TASK1[COUNT_STK_T(STACK_SIZE)] __attribute__((section(".system_stack"),nocommon));
 const TINIB _kernel_tinib_table[TNUM_TSKID] = {
 	{ (TDOM_KERNEL), (TA_ACT), (intptr_t)(1), (TASK)(task1), INT_PRIORITY(MID_PRIORITY), ROUND_STK_T(STACK_SIZE), _kernel_sstack_TASK1, 0, NULL, { TACP_KERNEL, TACP_KERNEL, TACP_KERNEL, TACP_KERNEL } }
 };
@@ -173,20 +180,13 @@ const ACVCT _kernel_sysstat_acvct = { TACP_KERNEL, TACP_KERNEL, TACP_KERNEL, TAC
  *  Stack Area for Non-task Context
  */
 
-static STK_T _kernel_istack[COUNT_STK_T(DEFAULT_ISTKSZ)] __attribute__((section(".noinit_kernel"),nocommon));
+static STK_T _kernel_istack[COUNT_STK_T(DEFAULT_ISTKSZ)] __attribute__((section(".system_stack"),nocommon));
 const size_t _kernel_istksz = ROUND_STK_T(DEFAULT_ISTKSZ);
 STK_T *const _kernel_istk = _kernel_istack;
 
 #ifdef TOPPERS_ISTKPT
 STK_T *const _kernel_istkpt = TOPPERS_ISTKPT(_kernel_istack, ROUND_STK_T(DEFAULT_ISTKSZ));
 #endif /* TOPPERS_ISTKPT */
-
-/*
- *  Time Event Management
- */
-
-TMEVTN	_kernel_tmevt_heap[1 + TNUM_TSKID + TNUM_CYCID + TNUM_ALMID];
-TMEVTN	*const _kernel_p_tmevt_heap_idle = NULL;
 
 /*
  *  Module Initialization Function
@@ -240,7 +240,7 @@ TOPPERS_EMPTY_LABEL(const SOMINIB, _kernel_sominib_table);
 
 const ID _kernel_tmax_domid = (TMIN_DOMID + TNUM_DOMID - 1);
 
-const DOMINIB _kernel_dominib_kernel = { TACP_KERNEL, &_kernel_schedcb_kernel, &(_kernel_tmevt_heap[0]), INT_PRIORITY(TMIN_TPRI + 1), { TACP_KERNEL, TACP_KERNEL, TACP_KERNEL, TACP_KERNEL } };
+const DOMINIB _kernel_dominib_kernel = { TACP_KERNEL, &(_kernel_schedcb_kernel), _kernel_tmevt_heap_kernel, INT_PRIORITY(TMIN_TPRI + 1), { TACP_KERNEL, TACP_KERNEL, TACP_KERNEL, TACP_KERNEL } };
 
 TOPPERS_EMPTY_LABEL(const DOMINIB, _kernel_dominib_table);
 

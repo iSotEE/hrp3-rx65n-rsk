@@ -1,7 +1,7 @@
 /* 
  *		ATT_SECのテスト(3)
  *
- *  $Id: cfg_attsec3.c 367 2018-04-15 02:01:28Z ertl-hiro $
+ *  $Id: cfg_attsec3.c 467 2018-10-07 14:05:30Z ertl-hiro $
  */
 
 #include "cfg_attsec.h"
@@ -10,8 +10,6 @@
  *  関数の定義
  */
 void	task1(intptr_t exinf) { }
-
-volatile int	var __attribute__((section(".data_shared"),nocommon)) = 0;
 
 volatile int	var01 __attribute__((section(".kernel_add01"),nocommon)) = 1;
 volatile int	var02 __attribute__((section(".kernel_add02"),nocommon)) = 2;

@@ -37,7 +37,7 @@
  *  アの利用により直接的または間接的に生じたいかなる損害に関しても，そ
  *  の責任を負わない．
  * 
- *  $Id: mempfix.c 81 2015-12-31 12:44:23Z ertl-hiro $
+ *  $Id: mempfix.c 502 2018-10-27 08:05:10Z ertl-hiro $
  */
 
 /*
@@ -457,8 +457,8 @@ get_mpf(ID mpfid, void **p_blk)
 		ercd = E_OK;
 	}
 	else {
-		p_runtsk->tstat = TS_WAITING_MPF;
-		wobj_make_wait((WOBJCB *) p_mpfcb, (WINFO_WOBJ *) &winfo_mpf);
+		wobj_make_wait((WOBJCB *) p_mpfcb, TS_WAITING_MPF,
+											(WINFO_WOBJ *) &winfo_mpf);
 		dispatch();
 		ercd = winfo_mpf.winfo.wercd;
 		if (ercd == E_OK) {
@@ -552,9 +552,8 @@ tget_mpf(ID mpfid, void **p_blk, TMO tmout)
 		ercd = E_TMOUT;
 	}
 	else {
-		p_runtsk->tstat = TS_WAITING_MPF;
-		wobj_make_wait_tmout((WOBJCB *) p_mpfcb, (WINFO_WOBJ *) &winfo_mpf,
-														&tmevtb, tmout);
+		wobj_make_wait_tmout((WOBJCB *) p_mpfcb, TS_WAITING_MPF,
+								(WINFO_WOBJ *) &winfo_mpf, &tmevtb, tmout);
 		dispatch();
 		ercd = winfo_mpf.winfo.wercd;
 		if (ercd == E_OK) {

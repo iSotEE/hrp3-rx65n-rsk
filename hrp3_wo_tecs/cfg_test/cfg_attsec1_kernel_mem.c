@@ -33,9 +33,9 @@ const uint_t _kernel_tnum_meminib = 7U;
 void *const _kernel_memtop_table[7] = {
 	0,
 	__start_mo_text_kernel /* 0x01000000 */,
-	__start_mo_rodata_kernel /* 0x01003000 */,
-	__start_mo_text_kernel_S_S /* 0x01004000 */,
-	__aend_mo_text_kernel_S_S /* 0x01005000 */,
+	__start_mo_rodata_kernel /* 0x0100a000 */,
+	__start_mo_text_kernel_S_S /* 0x0100b000 */,
+	__aend_mo_text_kernel_S_S /* 0x0100c000 */,
 	__start_mo_rwdata_kernel /* 0x01800000 */,
 	__aend_mo_rwdata_kernel_0_0_S /* 0x01803000 */
 };

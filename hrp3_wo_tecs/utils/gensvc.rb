@@ -6,7 +6,7 @@
 # 
 #  Copyright (C) 2001 by Embedded and Real-Time Systems Laboratory
 #                              Toyohashi Univ. of Technology, JAPAN
-#  Copyright (C) 2005-2017 by Embedded and Real-Time Systems Laboratory
+#  Copyright (C) 2005-2018 by Embedded and Real-Time Systems Laboratory
 #              Graduate School of Information Science, Nagoya Univ., JAPAN
 # 
 #  上記著作権者は，以下の(1)〜(4)の条件を満たす場合に限り，本ソフトウェ
@@ -38,11 +38,11 @@
 #  アの利用により直接的または間接的に生じたいかなる損害に関しても，そ
 #  の責任を負わない．
 # 
-#  $Id: gensvc.rb 237 2017-11-04 16:23:20Z ertl-hiro $
+#  $Id: gensvc.rb 524 2018-11-04 13:01:46Z ertl-hiro $
 # 
 
 #
-#		サービスコールインタフェース生成プログラム
+#		サービスコールインタフェース生成プログラム（HRP3カーネル用）
 #
 #  サービスコール定義ファイル（svc.def）を読み込んで，以下のファイルを
 #  生成する．
@@ -59,15 +59,40 @@ require "optparse"
 
 #  オプションの定義
 #
-#  -H			HEW用のファイルを生成する
+#  -kernel <KERNEL>		カーネル名
+#  -H					HEW用のファイルを生成する
+
+#
+#  グローバル変数の初期化
+#
+$flag_regexp = Regexp.new("[SP]")		# デフォルトはHRP3カーネル
 
 #
 #  オプションの処理
 #
-opt = OptionParser.new
+OptionParser.new do |opt|
+  opt.on("-k KERNEL", "--kernel KERNEL", "kernel profile name") do |val|
+    $kernel = val
+  end
+  opt.on("-H", "--HEW", "generate files for HEW") do
+    $genHew = true
+  end
+  opt.parse!(ARGV)
+end
 
-opt.on("-H") {|val| $genHew = true }
-opt.parse!(ARGV)
+#
+#  カーネルオプションの処理
+#
+case $kernel
+when /^asp/
+	$flag_regexp = Regexp.new("[S]")
+when /^hrp/
+	$flag_regexp = Regexp.new("[SP]")
+when /^fmp/
+	$flag_regexp = Regexp.new("[SM]")
+when /^hrmp/
+	$flag_regexp = Regexp.new("[SPM]")
+end
 
 #
 #  グローバル変数の初期化
@@ -169,11 +194,18 @@ while line = $inFile.gets do
     cond = ""
   end
 
+  # 呼び出すマクロのサフィックスの解析
+  if !(flags.sub!(/\<([^<]+)\>/, "").nil?)
+    suffix = "_" + $1
+  else
+    suffix = ""
+  end
+
   # ハッシュの初期化
   svc = $svcTable[fncd] = {}
 
   # サービスコール以外のスキップ
-  if /^[SP]/ !~ flags
+  if $flag_regexp !~ flags
     if /^L/ =~ flags
       # サービスコール以外の機能（Lフラグ）の処理
       svc[:label] = proto
@@ -194,6 +226,7 @@ while line = $inFile.gets do
   # サービスコール情報の登録
   svc[:flags] = flags
   svc[:cond] = cond
+  svc[:suffix] = suffix
 
   # サービスコール定義の解析
   if /^(\w+)[ \t]+(([a-z_]+)\((.*)\))$/ =~ proto
@@ -361,7 +394,7 @@ $svcTable.each do |fncd, svc|
   # 関数本体の生成
   outFile.puts("{")
 
-  outFile.print("\tCAL_SVC_#{svc[:args].size}M(")
+  outFile.print("\tCAL_SVC_#{svc[:args].size}M#{svc[:suffix]}(")
   outFile.print("#{svc[:type]}, TFN_#{svc[:name].upcase}")
   svc[:args].each do |arg|
     if /^([\w* ]+) +([a-z_]+)$/ =~ arg

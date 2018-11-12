@@ -34,7 +34,9 @@
 #undef twdtimer_start
 #undef twdtimer_stop
 #undef twdtimer_control
+#undef scyc_start
 #undef scyc_switch
+#undef twd_start
 #undef twd_switch
 #undef set_dspflg
 
@@ -100,6 +102,7 @@
 #undef set_hrt_event
 #undef tmevtb_register
 #undef tmevtb_enqueue
+#undef tmevtb_enqueue_reltim
 #undef tmevtb_dequeue
 #undef check_adjtim
 #undef tmevt_lefttim
@@ -248,8 +251,8 @@
 #undef istksz
 #undef istk
 #undef istkpt
-#undef tmevt_heap
-#undef p_tmevt_heap_idle
+#undef tmevt_heap_kernel
+#undef tmevt_heap_idle
 #undef initialize_object
 #undef call_inirtn
 #undef call_terrtn

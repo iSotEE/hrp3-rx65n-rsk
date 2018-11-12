@@ -3,7 +3,7 @@
  *      Toyohashi Open Platform for Embedded Real-Time Systems/
  *      High Reliable system Profile Kernel
  *
- *  Copyright (C) 2006-2017 by Embedded and Real-Time Systems Laboratory
+ *  Copyright (C) 2006-2018 by Embedded and Real-Time Systems Laboratory
  *              Graduate School of Information Science, Nagoya Univ., JAPAN
  * 
  *  上記著作権者は，以下の(1)〜(4)の条件を満たす場合に限り，本ソフトウェ
@@ -35,7 +35,7 @@
  *  アの利用により直接的または間接的に生じたいかなる損害に関しても，そ
  *  の責任を負わない．
  * 
- *  $Id: target_kernel.h 285 2018-03-21 02:55:49Z ertl-hiro $
+ *  $Id: target_kernel.h 533 2018-11-11 05:11:47Z ertl-hiro $
  */
 
 /*
@@ -59,6 +59,13 @@
  *  オーバランハンドラのサポートの可否
  */
 #define TOPPERS_TARGET_SUPPORT_OVRHDR
+
+/*
+ *  スプリアス割込みへの対策
+ */
+#ifdef TOPPERS_USE_QEMU
+#define MPCORE_TMR_CLEAR_INT()		clear_int(MPCORE_IRQNO_TMR)
+#endif /* TOPPERS_USE_QEMU */
 
 /*
  *  チップで共通な定義

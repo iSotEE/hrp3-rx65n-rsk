@@ -5,7 +5,7 @@
  * 
  *  Copyright (C) 2000-2003 by Embedded and Real-Time Systems Laboratory
  *                              Toyohashi Univ. of Technology, JAPAN
- *  Copyright (C) 2005-2015 by Embedded and Real-Time Systems Laboratory
+ *  Copyright (C) 2005-2018 by Embedded and Real-Time Systems Laboratory
  *              Graduate School of Information Science, Nagoya Univ., JAPAN
  * 
  *  上記著作権者は，以下の(1)〜(4)の条件を満たす場合に限り，本ソフトウェ
@@ -37,7 +37,7 @@
  *  アの利用により直接的または間接的に生じたいかなる損害に関しても，そ
  *  の責任を負わない．
  * 
- *  $Id: pridataq.c 378 2018-04-19 09:53:29Z ertl-hiro $
+ *  $Id: pridataq.c 520 2018-11-01 12:41:13Z ertl-hiro $
  */
 
 /*
@@ -311,8 +311,8 @@ snd_pdq(ID pdqid, intptr_t data, PRI datapri)
 	else {
 		winfo_spdq.data = data;
 		winfo_spdq.datapri = datapri;
-		p_runtsk->tstat = TS_WAITING_SPDQ;
-		wobj_make_wait((WOBJCB *) p_pdqcb, (WINFO_WOBJ *) &winfo_spdq);
+		wobj_make_wait((WOBJCB *) p_pdqcb, TS_WAITING_SPDQ,
+											(WINFO_WOBJ *) &winfo_spdq);
 		dispatch();
 		ercd = winfo_spdq.winfo.wercd;
 	}
@@ -350,7 +350,7 @@ psnd_pdq(ID pdqid, intptr_t data, PRI datapri)
 				dispatch();
 			}
 			else {
-				request_dispatch();
+				request_dispatch_retint();
 			}
 		}
 		ercd = E_OK;
@@ -404,9 +404,8 @@ tsnd_pdq(ID pdqid, intptr_t data, PRI datapri, TMO tmout)
 	else {
 		winfo_spdq.data = data;
 		winfo_spdq.datapri = datapri;
-		p_runtsk->tstat = TS_WAITING_SPDQ;
-		wobj_make_wait_tmout((WOBJCB *) p_pdqcb, (WINFO_WOBJ *) &winfo_spdq,
-														&tmevtb, tmout);
+		wobj_make_wait_tmout((WOBJCB *) p_pdqcb, TS_WAITING_SPDQ,
+								(WINFO_WOBJ *) &winfo_spdq, &tmevtb, tmout);
 		dispatch();
 		ercd = winfo_spdq.winfo.wercd;
 	}
@@ -450,8 +449,7 @@ rcv_pdq(ID pdqid, intptr_t *p_data, PRI *p_datapri)
 		ercd = E_OK;
 	}
 	else {
-		p_runtsk->tstat = TS_WAITING_RPDQ;
-		make_wait(&(winfo_rpdq.winfo));
+		make_wait(TS_WAITING_RPDQ, &(winfo_rpdq.winfo));
 		queue_insert_prev(&(p_pdqcb->rwait_queue), &(p_runtsk->task_queue));
 		winfo_rpdq.p_pdqcb = p_pdqcb;
 		LOG_TSKSTAT(p_runtsk);
@@ -545,8 +543,7 @@ trcv_pdq(ID pdqid, intptr_t *p_data, PRI *p_datapri, TMO tmout)
 		ercd = E_TMOUT;
 	}
 	else {
-		p_runtsk->tstat = TS_WAITING_RPDQ;
-		make_wait_tmout(&(winfo_rpdq.winfo), &tmevtb, tmout);
+		make_wait_tmout(TS_WAITING_RPDQ, &(winfo_rpdq.winfo), &tmevtb, tmout);
 		queue_insert_prev(&(p_pdqcb->rwait_queue), &(p_runtsk->task_queue));
 		winfo_rpdq.p_pdqcb = p_pdqcb;
 		LOG_TSKSTAT(p_runtsk);

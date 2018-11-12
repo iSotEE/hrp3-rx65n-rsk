@@ -34,7 +34,7 @@
  *  アの利用により直接的または間接的に生じたいかなる損害に関しても，そ
  *  の責任を負わない．
  * 
- *  $Id: target_stddef.h 3 2015-08-08 15:11:16Z ertl-hiro $
+ *  $Id: target_stddef.h 532 2018-11-11 04:46:48Z ertl-hiro $
  */
 
 /*
@@ -83,7 +83,7 @@ TOPPERS_assert_abort(void)
 	Asm("mov r0, #24\n\t"
 		"svc 0x00123456");
 #endif
-	while (1) ;
+	while (1) ;					/* trueの定義前なので，1と記述する */
 }
 
 #endif /* TOPPERS_MACRO_ONLY */

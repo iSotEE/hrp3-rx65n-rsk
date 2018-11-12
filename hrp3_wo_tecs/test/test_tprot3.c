@@ -2,7 +2,7 @@
  *  TOPPERS Software
  *      Toyohashi Open Platform for Embedded Real-Time Systems
  * 
- *  Copyright (C) 2015-2016 by Embedded and Real-Time Systems Laboratory
+ *  Copyright (C) 2015-2018 by Embedded and Real-Time Systems Laboratory
  *              Graduate School of Information Science, Nagoya Univ., JAPAN
  * 
  *  上記著作権者は，以下の(1)〜(4)の条件を満たす場合に限り，本ソフトウェ
@@ -34,7 +34,7 @@
  *  アの利用により直接的または間接的に生じたいかなる損害に関しても，そ
  *  の責任を負わない．
  * 
- *  $Id: test_tprot3.c 200 2016-04-10 16:01:06Z ertl-hiro $
+ *  $Id: test_tprot3.c 504 2018-10-27 14:00:56Z ertl-hiro $
  */
 
 /* 
@@ -63,11 +63,13 @@
  *	DOM3: タイムウィンドウを割り当てない
  *	SOM1: 初期モード，遷移先システム動作モード: SOM1，DOM2→DOM1→アイドル
  *	SOM2: 遷移先システム動作モード: SOM3，DOM1→DOM2→アイドル
- *	SOM3: 遷移先システム動作モード: SOM2，DOM1→アイドル
+ *	SOM3: 遷移先システム動作モード: SOM4，DOM1→アイドル
+ *	SOM4: 遷移先システム動作モード: SOM2，アイドル
  *	TASK1: DOM1，中優先度，TA_ACT属性
  *	TASK2: DOM2，中優先度，TA_ACT属性
  *	TASK3: DOM3，中優先度，TA_ACT属性
  *	TASK4: カーネルドメイン，低優先度，TA_ACT属性
+ *	CYC1: カーネルドメイン，システム周期毎にtask[123]_flagをセット
  *
  * 【テストシーケンス】
  *
@@ -82,14 +84,11 @@
  *	2:	DO(WAIT(task1_flag))
  *	// アイドルウィンドウ
  *	== TASK3 ==
- *	3:	DO(SET(task1_flag))
- *		DO(SET(task2_flag))
- *		DO(WAIT(task3_flag))
+ *	3:	DO(WAIT(task3_flag))
  *	// システム動作モード：SOM1										... (A-1)
  *	// タイムウィンドウ for DOM2
  *	== TASK2 ==
- *	4:	DO(SET(task3_flag))
- *		chg_som(SOM2)												... (B-1-1)
+ *	4:	chg_som(SOM2)												... (B-1-1)
  *		get_som(&somid)
  *		assert(somid == SOM1)
  *		DO(WAIT(task2_flag))
@@ -98,74 +97,64 @@
  *	5:	DO(WAIT(task1_flag))
  *	// アイドルウィンドウ
  *	== TASK3 ==
- *	6:	DO(SET(task1_flag))
- *		DO(SET(task2_flag))
- *		DO(WAIT(task3_flag))
+ *	6:	DO(WAIT(task3_flag))
  *	// システム動作モード：SOM2										... (B-1-2)
  *	// タイムウィンドウ for DOM1
  *	== TASK1 ==
  *	7:	get_som(&somid)
  *		assert(somid == SOM2)
- *		DO(SET(task3_flag))
  *		DO(WAIT(task1_flag))
  *	// タイムウィンドウ for DOM2
  *	== TASK2 ==
  *	8:	DO(WAIT(task2_flag))
  *	// アイドルウィンドウ
  *	== TASK3 ==
- *	9:	DO(SET(task1_flag))
- *		DO(SET(task2_flag))
- *		DO(WAIT(task3_flag))
+ *	9:	DO(WAIT(task3_flag))
  *	// システム動作モード：SOM3										... (A-2)
  *	// タイムウィンドウ for DOM1
  *	== TASK1 ==
  *	10:	get_som(&somid)
  *		assert(somid == SOM3)
- *		DO(SET(task3_flag))
  *		DO(WAIT(task1_flag))
  *	// アイドルウィンドウ
  *	== TASK3 ==
- *	11:	DO(SET(task1_flag))
- *		DO(WAIT(task3_flag))
+ *	11:	DO(WAIT(task3_flag))
+ *	// システム動作モード：SOM4										... (A-2)
+ *	== TASK3 ==
+ *	12:	DO(WAIT(task3_flag))
  *	// システム動作モード：SOM2										... (A-2)
  *	// タイムウィンドウ for DOM1
  *	== TASK1 ==
- *	12:	get_som(&somid)
+ *	13:	get_som(&somid)
  *		assert(somid == SOM2)
- *		DO(SET(task3_flag))
  *		DO(WAIT(task1_flag))
  *	== TASK2 ==
- *	13:	DO(WAIT(task2_flag))
+ *	14:	DO(WAIT(task2_flag))
  *	// アイドルウィンドウ
  *	== TASK3 ==
- *	14:	DO(SET(task1_flag))
- *		DO(SET(task2_flag))
- *		chg_som(TSOM_STP)											... (B-2-1)
+ *	15:	chg_som(TSOM_STP)											... (B-2-1)
  *		get_som(&somid)
  *		assert(somid == SOM2)
- *	15:	DO(WAIT(task3_flag))
+ *	16:	DO(WAIT(task3_flag))
  *	// システム動作モード：TSOM_STP									... (B-2-2)
  *	== TASK4 ==
- *	16:	get_som(&somid)
+ *	17:	get_som(&somid)
  *		assert(somid == TSOM_STP)
- *		DO(SET(task3_flag))
  *		dly_tsk(TEST_TIME_PROC) ... TASK4が実行再開するまで
  *	// 実行すべきタスクがない
  *	== TASK4 ==
- *	17:	chg_som(SOM1)												... (C)
+ *	18:	chg_som(SOM1)												... (C)
  *	// システム動作モード：SOM1
  *	// タイムウィンドウ for DOM2
  *	== TASK2 ==
- *	18:	get_som(&somid)
+ *	19:	get_som(&somid)
  *		assert(somid == SOM1)
  *		DO(WAIT(task2_flag))
  *	// タイムウィンドウ for DOM1
  *	== TASK1 ==
- *	19:	DO(WAIT(task1_flag))
+ *	20:	DO(WAIT(task1_flag))
  *	// アイドルウィンドウ
  *	== TASK3 ==
- *	20:	DO(SET(task1_flag))
- *		DO(SET(task2_flag))
  *	21:	END
  */
 
@@ -181,6 +170,14 @@ volatile bool_t	task3_flag;
 
 #define WAIT(flag)	do { (flag) = false; while (!(flag)); } while (false)
 #define SET(flag)	do { (flag) = true; } while (false)
+
+void
+cyclic1_handler(intptr_t exinf)
+{
+	SET(task1_flag);
+	SET(task2_flag);
+	SET(task3_flag);
+}
 
 /* DO NOT DELETE THIS LINE -- gentest depends on it. */
 
@@ -202,8 +199,6 @@ task1(intptr_t exinf)
 
 	check_assert(somid == SOM2);
 
-	SET(task3_flag);
-
 	WAIT(task1_flag);
 
 	check_point(10);
@@ -212,21 +207,17 @@ task1(intptr_t exinf)
 
 	check_assert(somid == SOM3);
 
-	SET(task3_flag);
-
 	WAIT(task1_flag);
 
-	check_point(12);
+	check_point(13);
 	ercd = get_som(&somid);
 	check_ercd(ercd, E_OK);
 
 	check_assert(somid == SOM2);
 
-	SET(task3_flag);
-
 	WAIT(task1_flag);
 
-	check_point(19);
+	check_point(20);
 	WAIT(task1_flag);
 
 	check_point(0);
@@ -249,8 +240,6 @@ task2(intptr_t exinf)
 	WAIT(task2_flag);
 
 	check_point(4);
-	SET(task3_flag);
-
 	ercd = chg_som(SOM2);
 	check_ercd(ercd, E_OK);
 
@@ -264,10 +253,10 @@ task2(intptr_t exinf)
 	check_point(8);
 	WAIT(task2_flag);
 
-	check_point(13);
+	check_point(14);
 	WAIT(task2_flag);
 
-	check_point(18);
+	check_point(19);
 	ercd = get_som(&somid);
 	check_ercd(ercd, E_OK);
 
@@ -285,36 +274,21 @@ task3(intptr_t exinf)
 	ID		somid;
 
 	check_point(3);
-	SET(task1_flag);
-
-	SET(task2_flag);
-
 	WAIT(task3_flag);
 
 	check_point(6);
-	SET(task1_flag);
-
-	SET(task2_flag);
-
 	WAIT(task3_flag);
 
 	check_point(9);
-	SET(task1_flag);
-
-	SET(task2_flag);
-
 	WAIT(task3_flag);
 
 	check_point(11);
-	SET(task1_flag);
-
 	WAIT(task3_flag);
 
-	check_point(14);
-	SET(task1_flag);
+	check_point(12);
+	WAIT(task3_flag);
 
-	SET(task2_flag);
-
+	check_point(15);
 	ercd = chg_som(TSOM_STP);
 	check_ercd(ercd, E_OK);
 
@@ -323,13 +297,8 @@ task3(intptr_t exinf)
 
 	check_assert(somid == SOM2);
 
-	check_point(15);
+	check_point(16);
 	WAIT(task3_flag);
-
-	check_point(20);
-	SET(task1_flag);
-
-	SET(task2_flag);
 
 	check_finish(21);
 	check_point(0);
@@ -341,18 +310,16 @@ task4(intptr_t exinf)
 	ER_UINT	ercd;
 	ID		somid;
 
-	check_point(16);
+	check_point(17);
 	ercd = get_som(&somid);
 	check_ercd(ercd, E_OK);
 
 	check_assert(somid == TSOM_STP);
 
-	SET(task3_flag);
-
 	ercd = dly_tsk(TEST_TIME_PROC);
 	check_ercd(ercd, E_OK);
 
-	check_point(17);
+	check_point(18);
 	ercd = chg_som(SOM1);
 	check_ercd(ercd, E_OK);
 

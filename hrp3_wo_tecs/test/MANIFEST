@@ -36,6 +36,9 @@ perf5.h
 perf_pf.cdl
 tBitKernel.c
 tBitMutex.c
+test_calsvc.c
+test_calsvc.cfg
+test_calsvc.h
 test_cpuexc.h
 test_cpuexc.txt
 test_cpuexc1.c
@@ -82,6 +85,9 @@ test_int1.h
 test_lmtdom1.c
 test_lmtdom1.cfg
 test_lmtdom1.h
+test_lmtdom2.c
+test_lmtdom2.cfg
+test_lmtdom2.h
 test_messagebuf1.c
 test_messagebuf1.cfg
 test_messagebuf1.h
@@ -170,6 +176,9 @@ test_tprot3.h
 test_tprot4.c
 test_tprot4.cfg
 test_tprot4.h
+test_tprot5.c
+test_tprot5.cfg
+test_tprot5.h
 test_twdnfy.c
 test_twdnfy.cfg
 test_twdnfy.h

@@ -5,7 +5,7 @@
  * 
  *  Copyright (C) 2000-2003 by Embedded and Real-Time Systems Laboratory
  *                              Toyohashi Univ. of Technology, JAPAN
- *  Copyright (C) 2005-2016 by Embedded and Real-Time Systems Laboratory
+ *  Copyright (C) 2005-2018 by Embedded and Real-Time Systems Laboratory
  *              Graduate School of Information Science, Nagoya Univ., JAPAN
  * 
  *  上記著作権者は，以下の(1)〜(4)の条件を満たす場合に限り，本ソフトウェ
@@ -37,7 +37,7 @@
  *  アの利用により直接的または間接的に生じたいかなる損害に関しても，そ
  *  の責任を負わない．
  * 
- *  $Id: task.h 409 2018-05-31 08:13:31Z ertl-hiro $
+ *  $Id: task.h 514 2018-10-31 05:07:37Z ertl-hiro $
  */
 
 /*
@@ -237,7 +237,7 @@ struct task_control_block {
 	QUEUE			task_queue;		/* タスクキュー */
 	const TINIB		*p_tinib;		/* 初期化ブロックへのポインタ */
 	const DOMINIB	*p_dominib;		/* 保護ドメイン初期化ブロック */
-	SCHEDCB			*p_schedcb;		/* スケジューリングドメイン管理ブロック */
+	SCHEDCB			*p_schedcb;		/* スケジューリング単位管理ブロック */
 
 #ifdef UINT8_MAX
 	uint8_t			tstat;			/* タスク状態（内部表現）*/
@@ -390,9 +390,8 @@ update_schedtsk(void)
 /*
  *  実行できる状態への遷移
  *
- *  p_tcbで指定されるタスクをレディキューに挿入する．レディキューに挿入
- *  したタスクの優先度が，実行すべきタスクの優先度よりも高い場合は，実
- *  行すべきタスクを更新する．
+ *  p_tcbで指定されるタスクをレディキューに挿入する．また，必要な場合
+ *  には，実行すべきタスクを更新する．
  */
 extern void	make_runnable(TCB *p_tcb);
 
@@ -424,19 +423,20 @@ extern void	make_active(TCB *p_tcb);
 /*
  *  タスクの優先度の変更
  *
- *  p_tcbで指定されるタスクの優先度をnewpri（内部表現）に変更する．また，
- *  必要な場合には，実行すべきタスクを更新する．
+ *  p_tcbで指定されるタスクの優先度をnewpri（内部表現）に変更する．ま
+ *  た，必要な場合には，実行すべきタスクを更新する．
  *
- *  p_tcbで指定されるタスクの優先順位は，優先度が同じタスクの中で，
- *  mtxmodeがfalseの時は最低，mtxmodeがtrueの時は最高とする．
+ *  p_tcbで指定されるタスクが実行できる状態である場合，その優先順位は，
+ *  優先度が同じタスクの中で，mtxmodeがfalseの時は最低，mtxmodeがtrue
+ *  の時は最高とする．
  */
 extern void	change_priority(TCB *p_tcb, uint_t newpri, bool_t mtxmode);
 
 /*
  *  レディキューの回転
  *
- *  レディキュー中の，優先度priのタスクキューを回転させる．また，必要な
- *  場合には，実行すべきタスクを更新する．
+ *  レディキュー中の，優先度priのタスクキューを回転させる．また，必要
+ *  な場合には，実行すべきタスクを更新する．
  */
 extern void	rotate_ready_queue(uint_t pri, SCHEDCB *p_schedcb);
 

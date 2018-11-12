@@ -34,7 +34,7 @@
  *  アの利用により直接的または間接的に生じたいかなる損害に関しても，そ
  *  の責任を負わない．
  * 
- *  $Id: target_stddef.h 305 2018-03-27 13:16:31Z ertl-hiro $
+ *  $Id: target_stddef.h 532 2018-11-11 04:46:48Z ertl-hiro $
  */
 
 /*
@@ -77,7 +77,7 @@
 Inline void
 TOPPERS_assert_abort(void)
 {
-	while (1);
+	while (1) ;					/* trueの定義前なので，1と記述する */
 }
 
 #endif /* TOPPERS_MACRO_ONLY */

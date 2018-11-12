@@ -1,7 +1,7 @@
 #
 #		Makefileのコア依存部（ARM用）
 #
-#  $Id: Makefile.core 333 2018-04-08 00:32:41Z ertl-hiro $
+#  $Id: Makefile.core 491 2018-10-23 16:14:06Z ertl-hiro $
 #
 
 #
@@ -63,9 +63,10 @@ CFG1_OUT_LDSCRIPT = $(COREDIR)/cfg1_out.ld
 #
 #  START_OBJSをstart.oに設定し，LDFLAGSに-nostdlibを追加する．
 #
-START_OBJS = start.o
+START_OBJS := start.o
+START_OBJS := $(addprefix $(OBJDIR)/, $(START_OBJS))
 
-$(START_OBJS): %.o: %.S
-	$(CC) -c -MD -MP -MF $(DEPDIR)/$*.d $(CFLAGS) $(KERNEL_CFLAGS) $<
+$(START_OBJS): $(OBJDIR)/%.o: %.S
+	$(CC) -c -o $@ -MD -MP -MF $(DEPDIR)/$*.d $(CFLAGS) $(KERNEL_CFLAGS) $<
 
 LDFLAGS := -nostdlib $(LDFLAGS)

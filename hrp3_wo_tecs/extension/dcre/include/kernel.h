@@ -37,7 +37,7 @@
  *  アの利用により直接的または間接的に生じたいかなる損害に関しても，そ
  *  の責任を負わない．
  * 
- *  $Id: kernel.h 368 2018-04-15 02:31:25Z ertl-hiro $
+ *  $Id: kernel.h 502 2018-10-27 08:05:10Z ertl-hiro $
  */
 
 /*
@@ -412,7 +412,7 @@ typedef struct t_rmem {
 #define ista_alm(almid, almtim)				sta_alm(almid, almtim)
 #define istp_alm(almid)						stp_alm(almid)
 #define irot_rdq(tskpri)					rot_rdq(tskpri)
-#define imrot_rdq(tskpri)					mrot_rdq(domid, tskpri)
+#define imrot_rdq(schedno, tskpri)			mrot_rdq(schedno, tskpri)
 #define iget_did(p_domid)					get_did(p_domid)
 #define iget_tid(p_tskid)					get_tid(p_tskid)
 #define iloc_cpu()							loc_cpu()
@@ -549,20 +549,17 @@ typedef struct t_rmem {
 #define TALM_STA		UINT_C(0x02)	/* アラーム通知が動作している */
 
 /*
- *  保護ドメインID
+ *  保護ドメインID［NGKI0513］
  */
-#define TDOM_SELF		0				/* 自タスクの属する保護ドメイン */
-#define TDOM_KERNEL		(-1)			/* カーネルドメイン */
-#define TDOM_NONE		(-2)			/* 無所属（保護ドメインに属さない）*/
+#define TDOM_SELF		0			/* 自タスクの属する保護ドメイン */
+#define TDOM_KERNEL		(-1)		/* カーネルドメイン */
+#define TDOM_NONE		(-2)		/* 無所属（保護ドメインに属さない）*/
 
 /*
- *  システム動作モードID
+ *  その他の定数の定義［NGKI0514］
  */
-#define TSOM_STP		(-1)			/* システム周期の停止 */
+#define TSOM_STP		(-1)		/* システム周期の停止 */
 
-/*
- *  その他の定数の定義
- */
 #define TSK_SELF		0			/* 自タスク指定 */
 #define TSK_NONE		0			/* 該当するタスクがない */
 
@@ -570,6 +567,11 @@ typedef struct t_rmem {
 #define TPRI_INI		0			/* タスクの起動時優先度 */
 
 #define TIPM_ENAALL		0			/* 割込み優先度マスク全解除 */
+
+/*
+ *  スケジューリング単位番号を構成するマクロ［NGKI0634］
+ */
+#define SCHEDNO(prcid, domid)	(domid)
 
 /*
  *  構成定数とマクロ
@@ -590,7 +592,7 @@ typedef struct t_rmem {
  */
 #define TKERNEL_MAKER	UINT_C(0x0118)	/* カーネルのメーカーコード */
 #define TKERNEL_PRID	UINT_C(0x0006)	/* カーネルの識別番号 */
-#define TKERNEL_SPVER	UINT_C(0xf632)	/* カーネル仕様のバージョン番号 */
+#define TKERNEL_SPVER	UINT_C(0xf633)	/* カーネル仕様のバージョン番号 */
 #define TKERNEL_PRVER	UINT_C(0x3010)	/* カーネルのバージョン番号 */
 
 /*

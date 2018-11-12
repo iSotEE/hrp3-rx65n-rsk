@@ -1,7 +1,7 @@
 /* 
  *		全静的APIのテスト(1)
  * 
- *  $Id: cfg_all1.c 315 2018-04-03 08:07:38Z ertl-hiro $
+ *  $Id: cfg_all1.c 467 2018-10-07 14:05:30Z ertl-hiro $
  */
 
 #include "cfg_all1.h"
@@ -21,7 +21,6 @@ STK_T	istack[COUNT_STK_T(10000)]
  */
 volatile int	var1;
 volatile int	var2 __attribute__((section(".bss_kernel_add2"),nocommon));
-volatile int	var3 __attribute__((section(".data_shared"),nocommon)) = 1;
 
 /*
  *  関数の定義

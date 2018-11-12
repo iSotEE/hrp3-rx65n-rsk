@@ -18,21 +18,28 @@
 #include "cfg_attmod1.h"
 
 /*
+ *  Time Event Management
+ */
+
+TMEVTN	_kernel_tmevt_heap_kernel[1 + TNUM_TSKID + TNUM_CYCID + TNUM_ALMID];
+TOPPERS_EMPTY_LABEL(TMEVTN, _kernel_tmevt_heap_idle);
+
+/*
  *  Task Management Functions
  */
 
 const ID _kernel_tmax_tskid = (TMIN_TSKID + TNUM_TSKID - 1);
 
-static STK_T _kernel_sstack_TASK1[COUNT_STK_T(DEFAULT_SSTKSZ)] __attribute__((section(".noinit_kernel"),nocommon));
+static STK_T _kernel_sstack_TASK1[COUNT_STK_T(DEFAULT_SSTKSZ)] __attribute__((section(".system_stack"),nocommon));
 static STK_T _kernel_ustack_TASK1[COUNT_STK_T(4096)] __attribute__((section(".ustack_TASK1"),nocommon));
-static STK_T _kernel_sstack_TASK1_0[COUNT_STK_T(DEFAULT_SSTKSZ)] __attribute__((section(".noinit_kernel"),nocommon));
+static STK_T _kernel_sstack_TASK1_0[COUNT_STK_T(DEFAULT_SSTKSZ)] __attribute__((section(".system_stack"),nocommon));
 static STK_T _kernel_ustack_TASK1_0[COUNT_STK_T(4096)] __attribute__((section(".ustack_TASK1_0"),nocommon));
-static STK_T _kernel_sstack_TASK2[COUNT_STK_T(DEFAULT_SSTKSZ)] __attribute__((section(".noinit_kernel"),nocommon));
+static STK_T _kernel_sstack_TASK2[COUNT_STK_T(DEFAULT_SSTKSZ)] __attribute__((section(".system_stack"),nocommon));
 static STK_T _kernel_ustack_TASK2[COUNT_STK_T(4096)] __attribute__((section(".ustack_TASK2"),nocommon));
-static STK_T _kernel_sstack_TASK2_0[COUNT_STK_T(DEFAULT_SSTKSZ)] __attribute__((section(".noinit_kernel"),nocommon));
+static STK_T _kernel_sstack_TASK2_0[COUNT_STK_T(DEFAULT_SSTKSZ)] __attribute__((section(".system_stack"),nocommon));
 static STK_T _kernel_ustack_TASK2_0[COUNT_STK_T(4096)] __attribute__((section(".ustack_TASK2_0"),nocommon));
-static STK_T _kernel_sstack_TASK3[COUNT_STK_T(STACK_SIZE)] __attribute__((section(".noinit_kernel"),nocommon));
-static STK_T _kernel_sstack_TASK3_0[COUNT_STK_T(STACK_SIZE)] __attribute__((section(".noinit_kernel"),nocommon));
+static STK_T _kernel_sstack_TASK3[COUNT_STK_T(STACK_SIZE)] __attribute__((section(".system_stack"),nocommon));
+static STK_T _kernel_sstack_TASK3_0[COUNT_STK_T(STACK_SIZE)] __attribute__((section(".system_stack"),nocommon));
 const TINIB _kernel_tinib_table[TNUM_TSKID] = {
 	{ (DOM1), (TA_NULL), (intptr_t)(1), (TASK)(task1_1), INT_PRIORITY(MID_PRIORITY), ROUND_STK_T(DEFAULT_SSTKSZ), _kernel_sstack_TASK1, ROUND_STK_T(4096), _kernel_ustack_TASK1, { TACP(DOM1), TACP(DOM1), TACP(DOM1), TACP(DOM1) } },
 	{ (DOM1), (TA_NULL), (intptr_t)(1), (TASK)(task0_1), INT_PRIORITY(MID_PRIORITY), ROUND_STK_T(DEFAULT_SSTKSZ), _kernel_sstack_TASK1_0, ROUND_STK_T(4096), _kernel_ustack_TASK1_0, { TACP(DOM1), TACP(DOM1), TACP(DOM1), TACP(DOM1) } },
@@ -189,20 +196,13 @@ const ACVCT _kernel_sysstat_acvct = { TACP_KERNEL, TACP_KERNEL, TACP_KERNEL, TAC
  *  Stack Area for Non-task Context
  */
 
-static STK_T _kernel_istack[COUNT_STK_T(DEFAULT_ISTKSZ)] __attribute__((section(".noinit_kernel"),nocommon));
+static STK_T _kernel_istack[COUNT_STK_T(DEFAULT_ISTKSZ)] __attribute__((section(".system_stack"),nocommon));
 const size_t _kernel_istksz = ROUND_STK_T(DEFAULT_ISTKSZ);
 STK_T *const _kernel_istk = _kernel_istack;
 
 #ifdef TOPPERS_ISTKPT
 STK_T *const _kernel_istkpt = TOPPERS_ISTKPT(_kernel_istack, ROUND_STK_T(DEFAULT_ISTKSZ));
 #endif /* TOPPERS_ISTKPT */
-
-/*
- *  Time Event Management
- */
-
-TMEVTN	_kernel_tmevt_heap[1 + TNUM_TSKID + TNUM_CYCID + TNUM_ALMID];
-TMEVTN	*const _kernel_p_tmevt_heap_idle = NULL;
 
 /*
  *  Module Initialization Function
@@ -256,10 +256,10 @@ TOPPERS_EMPTY_LABEL(const SOMINIB, _kernel_sominib_table);
 
 const ID _kernel_tmax_domid = (TMIN_DOMID + TNUM_DOMID - 1);
 
-const DOMINIB _kernel_dominib_kernel = { TACP_KERNEL, &_kernel_schedcb_kernel, &(_kernel_tmevt_heap[0]), INT_PRIORITY(TMIN_TPRI + 1), { TACP_KERNEL, TACP_KERNEL, TACP_KERNEL, TACP_KERNEL } };
+const DOMINIB _kernel_dominib_kernel = { TACP_KERNEL, &(_kernel_schedcb_kernel), _kernel_tmevt_heap_kernel, INT_PRIORITY(TMIN_TPRI + 1), { TACP_KERNEL, TACP_KERNEL, TACP_KERNEL, TACP_KERNEL } };
 
 const DOMINIB _kernel_dominib_table[TNUM_DOMID] = {
-	{ TACP(DOM1), &_kernel_schedcb_idle, &(_kernel_tmevt_heap[0]), INT_PRIORITY(TMIN_TPRI + 1), { TACP(DOM1), TACP_KERNEL, TACP_KERNEL, TACP(DOM1) } },
-	{ TACP(DOM2), &_kernel_schedcb_idle, &(_kernel_tmevt_heap[0]), INT_PRIORITY(TMIN_TPRI + 1), { TACP(DOM2), TACP_KERNEL, TACP_KERNEL, TACP(DOM2) } }
+	{ TACP(DOM1), &(_kernel_schedcb_idle), _kernel_tmevt_heap_kernel, INT_PRIORITY(TMIN_TPRI + 1), { TACP(DOM1), TACP_KERNEL, TACP_KERNEL, TACP(DOM1) } },
+	{ TACP(DOM2), &(_kernel_schedcb_idle), _kernel_tmevt_heap_kernel, INT_PRIORITY(TMIN_TPRI + 1), { TACP(DOM2), TACP_KERNEL, TACP_KERNEL, TACP(DOM2) } }
 };
 

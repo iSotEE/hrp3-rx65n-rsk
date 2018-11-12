@@ -260,7 +260,7 @@ trcv_pdq(ID pdqid, intptr_t *p_data, PRI *p_datapri, TMO tmout)
 Inline ER
 set_tim(SYSTIM systim)
 {
-	CAL_SVC_1M(ER, TFN_SET_TIM, SYSTIM, systim);
+	CAL_SVC_1M_SYSTIM(ER, TFN_SET_TIM, SYSTIM, systim);
 }
 
 Inline ER
@@ -407,9 +407,9 @@ stp_alm(ID almid)
 
 #ifdef TOPPERS_SUPPORT_OVRHDR
 Inline ER
-sta_ovr(ID tskid, OVRTIM ovrtim)
+sta_ovr(ID tskid, PRCTIM ovrtim)
 {
-	CAL_SVC_2M(ER, TFN_STA_OVR, ID, tskid, OVRTIM, ovrtim);
+	CAL_SVC_2M(ER, TFN_STA_OVR, ID, tskid, PRCTIM, ovrtim);
 }
 #endif /* TOPPERS_SUPPORT_OVRHDR */
 
@@ -695,203 +695,269 @@ ref_alm(ID almid, T_RALM *pk_ralm)
 	CAL_SVC_2M(ER, TFN_REF_ALM, ID, almid, T_RALM *, pk_ralm);
 }
 
+#ifdef TOPPERS_SUPPORT_DYNAMIC_CRE
 Inline ER_ID
 acre_tsk(const T_CTSK *pk_ctsk)
 {
 	CAL_SVC_1M(ER_ID, TFN_ACRE_TSK, const T_CTSK *, pk_ctsk);
 }
+#endif /* TOPPERS_SUPPORT_DYNAMIC_CRE */
 
+#ifdef TOPPERS_SUPPORT_DYNAMIC_CRE
 Inline ER_ID
 acre_sem(const T_CSEM *pk_csem)
 {
 	CAL_SVC_1M(ER_ID, TFN_ACRE_SEM, const T_CSEM *, pk_csem);
 }
+#endif /* TOPPERS_SUPPORT_DYNAMIC_CRE */
 
+#ifdef TOPPERS_SUPPORT_DYNAMIC_CRE
 Inline ER_ID
 acre_flg(const T_CFLG *pk_cflg)
 {
 	CAL_SVC_1M(ER_ID, TFN_ACRE_FLG, const T_CFLG *, pk_cflg);
 }
+#endif /* TOPPERS_SUPPORT_DYNAMIC_CRE */
 
+#ifdef TOPPERS_SUPPORT_DYNAMIC_CRE
 Inline ER_ID
 acre_dtq(const T_CDTQ *pk_cdtq)
 {
 	CAL_SVC_1M(ER_ID, TFN_ACRE_DTQ, const T_CDTQ *, pk_cdtq);
 }
+#endif /* TOPPERS_SUPPORT_DYNAMIC_CRE */
 
+#ifdef TOPPERS_SUPPORT_DYNAMIC_CRE
 Inline ER_ID
 acre_pdq(const T_CPDQ *pk_cpdq)
 {
 	CAL_SVC_1M(ER_ID, TFN_ACRE_PDQ, const T_CPDQ *, pk_cpdq);
 }
+#endif /* TOPPERS_SUPPORT_DYNAMIC_CRE */
 
+#ifdef TOPPERS_SUPPORT_DYNAMIC_CRE
 Inline ER_ID
 acre_mtx(const T_CMTX *pk_cmtx)
 {
 	CAL_SVC_1M(ER_ID, TFN_ACRE_MTX, const T_CMTX *, pk_cmtx);
 }
+#endif /* TOPPERS_SUPPORT_DYNAMIC_CRE */
 
+#ifdef TOPPERS_SUPPORT_DYNAMIC_CRE
 Inline ER_ID
 acre_mbf(const T_CMBF *pk_cmbf)
 {
 	CAL_SVC_1M(ER_ID, TFN_ACRE_MBF, const T_CMBF *, pk_cmbf);
 }
+#endif /* TOPPERS_SUPPORT_DYNAMIC_CRE */
 
+#ifdef TOPPERS_SUPPORT_DYNAMIC_CRE
 Inline ER_ID
 acre_mpf(const T_CMPF *pk_cmpf)
 {
 	CAL_SVC_1M(ER_ID, TFN_ACRE_MPF, const T_CMPF *, pk_cmpf);
 }
+#endif /* TOPPERS_SUPPORT_DYNAMIC_CRE */
 
+#ifdef TOPPERS_SUPPORT_DYNAMIC_CRE
 Inline ER_ID
 acre_cyc(const T_CCYC *pk_ccyc)
 {
 	CAL_SVC_1M(ER_ID, TFN_ACRE_CYC, const T_CCYC *, pk_ccyc);
 }
+#endif /* TOPPERS_SUPPORT_DYNAMIC_CRE */
 
+#ifdef TOPPERS_SUPPORT_DYNAMIC_CRE
 Inline ER_ID
 acre_alm(const T_CALM *pk_calm)
 {
 	CAL_SVC_1M(ER_ID, TFN_ACRE_ALM, const T_CALM *, pk_calm);
 }
+#endif /* TOPPERS_SUPPORT_DYNAMIC_CRE */
 
+#ifdef TOPPERS_SUPPORT_DYNAMIC_CRE
 Inline ER_ID
 acre_isr(const T_CISR *pk_cisr)
 {
 	CAL_SVC_1M(ER_ID, TFN_ACRE_ISR, const T_CISR *, pk_cisr);
 }
+#endif /* TOPPERS_SUPPORT_DYNAMIC_CRE */
 
+#ifdef TOPPERS_SUPPORT_DYNAMIC_CRE
 Inline ER
 del_tsk(ID tskid)
 {
 	CAL_SVC_1M(ER, TFN_DEL_TSK, ID, tskid);
 }
+#endif /* TOPPERS_SUPPORT_DYNAMIC_CRE */
 
+#ifdef TOPPERS_SUPPORT_DYNAMIC_CRE
 Inline ER
 del_sem(ID semid)
 {
 	CAL_SVC_1M(ER, TFN_DEL_SEM, ID, semid);
 }
+#endif /* TOPPERS_SUPPORT_DYNAMIC_CRE */
 
+#ifdef TOPPERS_SUPPORT_DYNAMIC_CRE
 Inline ER
 del_flg(ID flgid)
 {
 	CAL_SVC_1M(ER, TFN_DEL_FLG, ID, flgid);
 }
+#endif /* TOPPERS_SUPPORT_DYNAMIC_CRE */
 
+#ifdef TOPPERS_SUPPORT_DYNAMIC_CRE
 Inline ER
 del_dtq(ID dtqid)
 {
 	CAL_SVC_1M(ER, TFN_DEL_DTQ, ID, dtqid);
 }
+#endif /* TOPPERS_SUPPORT_DYNAMIC_CRE */
 
+#ifdef TOPPERS_SUPPORT_DYNAMIC_CRE
 Inline ER
 del_pdq(ID pdqid)
 {
 	CAL_SVC_1M(ER, TFN_DEL_PDQ, ID, pdqid);
 }
+#endif /* TOPPERS_SUPPORT_DYNAMIC_CRE */
 
+#ifdef TOPPERS_SUPPORT_DYNAMIC_CRE
 Inline ER
 del_mtx(ID mtxid)
 {
 	CAL_SVC_1M(ER, TFN_DEL_MTX, ID, mtxid);
 }
+#endif /* TOPPERS_SUPPORT_DYNAMIC_CRE */
 
+#ifdef TOPPERS_SUPPORT_DYNAMIC_CRE
 Inline ER
 del_mbf(ID mbfid)
 {
 	CAL_SVC_1M(ER, TFN_DEL_MBF, ID, mbfid);
 }
+#endif /* TOPPERS_SUPPORT_DYNAMIC_CRE */
 
+#ifdef TOPPERS_SUPPORT_DYNAMIC_CRE
 Inline ER
 del_mpf(ID mpfid)
 {
 	CAL_SVC_1M(ER, TFN_DEL_MPF, ID, mpfid);
 }
+#endif /* TOPPERS_SUPPORT_DYNAMIC_CRE */
 
+#ifdef TOPPERS_SUPPORT_DYNAMIC_CRE
 Inline ER
 del_cyc(ID cycid)
 {
 	CAL_SVC_1M(ER, TFN_DEL_CYC, ID, cycid);
 }
+#endif /* TOPPERS_SUPPORT_DYNAMIC_CRE */
 
+#ifdef TOPPERS_SUPPORT_DYNAMIC_CRE
 Inline ER
 del_alm(ID almid)
 {
 	CAL_SVC_1M(ER, TFN_DEL_ALM, ID, almid);
 }
+#endif /* TOPPERS_SUPPORT_DYNAMIC_CRE */
 
+#ifdef TOPPERS_SUPPORT_DYNAMIC_CRE
 Inline ER
 del_isr(ID isrid)
 {
 	CAL_SVC_1M(ER, TFN_DEL_ISR, ID, isrid);
 }
+#endif /* TOPPERS_SUPPORT_DYNAMIC_CRE */
 
+#ifdef TOPPERS_SUPPORT_DYNAMIC_CRE
 Inline ER
 sac_tsk(ID tskid, const ACVCT *p_acvct)
 {
 	CAL_SVC_2M(ER, TFN_SAC_TSK, ID, tskid, const ACVCT *, p_acvct);
 }
+#endif /* TOPPERS_SUPPORT_DYNAMIC_CRE */
 
+#ifdef TOPPERS_SUPPORT_DYNAMIC_CRE
 Inline ER
 sac_sem(ID semid, const ACVCT *p_acvct)
 {
 	CAL_SVC_2M(ER, TFN_SAC_SEM, ID, semid, const ACVCT *, p_acvct);
 }
+#endif /* TOPPERS_SUPPORT_DYNAMIC_CRE */
 
+#ifdef TOPPERS_SUPPORT_DYNAMIC_CRE
 Inline ER
 sac_flg(ID flgid, const ACVCT *p_acvct)
 {
 	CAL_SVC_2M(ER, TFN_SAC_FLG, ID, flgid, const ACVCT *, p_acvct);
 }
+#endif /* TOPPERS_SUPPORT_DYNAMIC_CRE */
 
+#ifdef TOPPERS_SUPPORT_DYNAMIC_CRE
 Inline ER
 sac_dtq(ID dtqid, const ACVCT *p_acvct)
 {
 	CAL_SVC_2M(ER, TFN_SAC_DTQ, ID, dtqid, const ACVCT *, p_acvct);
 }
+#endif /* TOPPERS_SUPPORT_DYNAMIC_CRE */
 
+#ifdef TOPPERS_SUPPORT_DYNAMIC_CRE
 Inline ER
 sac_pdq(ID pdqid, const ACVCT *p_acvct)
 {
 	CAL_SVC_2M(ER, TFN_SAC_PDQ, ID, pdqid, const ACVCT *, p_acvct);
 }
+#endif /* TOPPERS_SUPPORT_DYNAMIC_CRE */
 
+#ifdef TOPPERS_SUPPORT_DYNAMIC_CRE
 Inline ER
 sac_mtx(ID mtxid, const ACVCT *p_acvct)
 {
 	CAL_SVC_2M(ER, TFN_SAC_MTX, ID, mtxid, const ACVCT *, p_acvct);
 }
+#endif /* TOPPERS_SUPPORT_DYNAMIC_CRE */
 
+#ifdef TOPPERS_SUPPORT_DYNAMIC_CRE
 Inline ER
 sac_mbf(ID mbfid, const ACVCT *p_acvct)
 {
 	CAL_SVC_2M(ER, TFN_SAC_MBF, ID, mbfid, const ACVCT *, p_acvct);
 }
+#endif /* TOPPERS_SUPPORT_DYNAMIC_CRE */
 
+#ifdef TOPPERS_SUPPORT_DYNAMIC_CRE
 Inline ER
 sac_mpf(ID mpfid, const ACVCT *p_acvct)
 {
 	CAL_SVC_2M(ER, TFN_SAC_MPF, ID, mpfid, const ACVCT *, p_acvct);
 }
+#endif /* TOPPERS_SUPPORT_DYNAMIC_CRE */
 
+#ifdef TOPPERS_SUPPORT_DYNAMIC_CRE
 Inline ER
 sac_cyc(ID cycid, const ACVCT *p_acvct)
 {
 	CAL_SVC_2M(ER, TFN_SAC_CYC, ID, cycid, const ACVCT *, p_acvct);
 }
+#endif /* TOPPERS_SUPPORT_DYNAMIC_CRE */
 
+#ifdef TOPPERS_SUPPORT_DYNAMIC_CRE
 Inline ER
 sac_alm(ID almid, const ACVCT *p_acvct)
 {
 	CAL_SVC_2M(ER, TFN_SAC_ALM, ID, almid, const ACVCT *, p_acvct);
 }
+#endif /* TOPPERS_SUPPORT_DYNAMIC_CRE */
 
+#ifdef TOPPERS_SUPPORT_DYNAMIC_CRE
 Inline ER
 sac_isr(ID isrid, const ACVCT *p_acvct)
 {
 	CAL_SVC_2M(ER, TFN_SAC_ISR, ID, isrid, const ACVCT *, p_acvct);
 }
+#endif /* TOPPERS_SUPPORT_DYNAMIC_CRE */
 
 #ifdef TOPPERS_SUPPORT_SUBPRIO
 Inline ER
@@ -902,21 +968,21 @@ chg_spr(ID tskid, uint_t subpri)
 #endif /* TOPPERS_SUPPORT_SUBPRIO */
 
 Inline ER
-mrot_rdq(ID domid, PRI tskpri)
+mrot_rdq(ID schedno, PRI tskpri)
 {
-	CAL_SVC_2M(ER, TFN_MROT_RDQ, ID, domid, PRI, tskpri);
+	CAL_SVC_2M(ER, TFN_MROT_RDQ, ID, schedno, PRI, tskpri);
 }
 
 Inline ER
-mget_lod(ID domid, PRI tskpri, uint_t *p_load)
+mget_lod(ID schedno, PRI tskpri, uint_t *p_load)
 {
-	CAL_SVC_3M(ER, TFN_MGET_LOD, ID, domid, PRI, tskpri, uint_t *, p_load);
+	CAL_SVC_3M(ER, TFN_MGET_LOD, ID, schedno, PRI, tskpri, uint_t *, p_load);
 }
 
 Inline ER
-mget_nth(ID domid, PRI tskpri, uint_t nth, ID *p_tskid)
+mget_nth(ID schedno, PRI tskpri, uint_t nth, ID *p_tskid)
 {
-	CAL_SVC_4M(ER, TFN_MGET_NTH, ID, domid, PRI, tskpri, uint_t, nth, ID *, p_tskid);
+	CAL_SVC_4M(ER, TFN_MGET_NTH, ID, schedno, PRI, tskpri, uint_t, nth, ID *, p_tskid);
 }
 
 #endif /* TOPPERS_MACRO_ONLY */

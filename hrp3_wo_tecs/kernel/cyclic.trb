@@ -37,7 +37,7 @@
 #   アの利用により直接的または間接的に生じたいかなる損害に関しても，そ
 #   の責任を負わない．
 # 
-#   $Id: cyclic.trb 401 2018-05-17 16:53:25Z ertl-hiro $
+#   $Id: cyclic.trb 479 2018-10-18 16:40:46Z ertl-hiro $
 # 
 
 #
@@ -46,18 +46,10 @@
 
 class CyclicObject < KernelObject
   def initialize()
-    super("cyc", "cyclic")
+    super("cyc", "cyclic", true)
   end
 
   def prepare(key, params)
-    # 保護ドメインの囲みの中に記述されていない場合（E_RSATR）［NGKI3741］
-    if !params.has_key?(:domain) || params[:domain] == $TDOM_NONE
-      error_ercd("E_RSATR", params, "cyclic handler `%cycid' " \
-						"in %apiname must belong to a protection domain")
-      # 以降のエラーの抑止
-      params[:domain] = $TDOM_KERNEL
-    end
-
     # cycatrが無効の場合（E_RSATR）［NGKI2383］
     #（TA_STA以外のビットがセットされている場合）
     if (params[:cycatr] & ~($TA_STA)) != 0
@@ -79,13 +71,7 @@ class CyclicObject < KernelObject
   end
 
   def generateInib(key, params)
-    if $cfgData[:DEF_SCY].size == 0 || params[:domain] == $TDOM_KERNEL
-      tmevtHeap = "&(_kernel_tmevt_heap[0])"
-    else
-      params2 = $domData[params[:domain]]
-      tmevtHeap = "&(_kernel_tmevt_heap[#{params2[:tmevtHeap]}])"
-    end
-    return("#{tmevtHeap}, (#{params[:cycatr]}), " \
+    return("#{$domData[params[:domain]][:tmevtHeap]}, (#{params[:cycatr]}), " \
 				"(intptr_t)(#{params[:par1]}), #{params[:nfyhdr]}, " \
 				"(#{params[:cyctim]}), (#{params[:cycphs]}), " \
 				"#{GenerateAcvct(params)}")

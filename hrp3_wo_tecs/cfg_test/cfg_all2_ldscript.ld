@@ -13,14 +13,14 @@ PROVIDE(software_term_hook = 0);
 
 SECTIONS {
 	.discard (NOLOAD) : {
-		start.o(.discard) kernel_cfg.o(.discard) kernel_mem.o(.discard) cfg_all2.o(.discard) -lkernel(.discard) -lc(.discard) -lgcc(.discard) 
+		start.o(.discard) kernel_cfg.o(.discard) kernel_mem.o(.discard) cfg_all2.o(.discard) libkernel.a(.discard) libc.a(.discard) libgcc.a(.discard) 
 	}
 
 	.text_kernel 0x1000000 : ALIGN(4) {
 		__start_mp_text_kernel = .;
 		__start_mo_text_kernel = .;
 		__start_text_kernel = .;
-		start.o(.text .text.*) kernel_cfg.o(.text .text.*) kernel_mem.o(.text .text.*) -lkernel(.text .text.*) *(.text_kernel) 
+		start.o(.text .text.*) kernel_cfg.o(.text .text.*) kernel_mem.o(.text .text.*) libkernel.a(.text .text.*) 
 		__end_text_kernel = .;
 		__end_mo_text_kernel = .;
 		__aend_mo_text_kernel = ALIGN(4K);
@@ -31,7 +31,7 @@ SECTIONS {
 		__start_mp_rodata_kernel = .;
 		__start_mo_rodata_kernel = .;
 		__start_rodata_kernel = .;
-		start.o(.rodata .rodata.*) kernel_cfg.o(.rodata .rodata.*) kernel_mem.o(.rodata .rodata.*) -lkernel(.rodata .rodata.*) *(.rodata_kernel) 
+		start.o(.rodata .rodata.*) kernel_cfg.o(.rodata .rodata.*) kernel_mem.o(.rodata .rodata.*) libkernel.a(.rodata .rodata.*) 
 		__end_rodata_kernel = .;
 		__end_mo_rodata_kernel = .;
 		__aend_mo_rodata_kernel = ALIGN(4K);
@@ -42,7 +42,7 @@ SECTIONS {
 		__start_mp_text_DOM1 = .;
 		__start_mo_text_DOM1 = .;
 		__start_text_DOM1 = .;
-		cfg_all2.o(.text .text.*) *(.text_DOM1_add1) *(.text_DOM1) 
+		cfg_all2.o(.text .text.*) *(.text_DOM1_add1) 
 		__end_text_DOM1 = .;
 		__end_mo_text_DOM1 = .;
 		__aend_mo_text_DOM1 = ALIGN(4K);
@@ -53,7 +53,7 @@ SECTIONS {
 		__start_mp_rodata_DOM1 = .;
 		__start_mo_rodata_DOM1 = .;
 		__start_rodata_DOM1 = .;
-		cfg_all2.o(.rodata .rodata.*) *(.rodata_DOM1) 
+		cfg_all2.o(.rodata .rodata.*) 
 		__end_rodata_DOM1 = .;
 		__end_mo_rodata_DOM1 = .;
 		__aend_mo_rodata_DOM1 = ALIGN(4K);
@@ -75,7 +75,7 @@ SECTIONS {
 		__start_mp_text_shared = .;
 		__start_mo_text_shared = .;
 		__start_text_shared = .;
-		-lc(.text .text.*) -lgcc(.text .text.*) *(.text_shared) 
+		libc.a(.text .text.*) libgcc.a(.text .text.*) 
 		__end_text_shared = .;
 		__end_mo_text_shared = .;
 		__aend_mo_text_shared = ALIGN(4K);
@@ -86,7 +86,7 @@ SECTIONS {
 		__start_mp_rodata_shared = .;
 		__start_mo_rodata_shared = .;
 		__start_rodata_shared = .;
-		-lc(.rodata .rodata.*) -lgcc(.rodata .rodata.*) *(.rodata_shared) 
+		libc.a(.rodata .rodata.*) libgcc.a(.rodata .rodata.*) 
 	} > ROM
 
 	.preinit_array ALIGN(4) : {
@@ -128,20 +128,20 @@ SECTIONS {
 		__start_mp_rwdata_kernel = .;
 		__start_mo_rwdata_kernel = .;
 		__start_data_kernel = .;
-		start.o(.data .data.*) kernel_cfg.o(.data .data.*) kernel_mem.o(.data .data.*) -lkernel(.data .data.*) *(.data_kernel) 
+		start.o(.data .data.*) kernel_cfg.o(.data .data.*) kernel_mem.o(.data .data.*) libkernel.a(.data .data.*) 
 		__end_data_kernel = .;
 	} > RAM AT > ROM
 	__start_idata_kernel = LOADADDR(.data_kernel);
 
 	.bss_kernel ALIGN(4) (NOLOAD) : ALIGN(4) {
 		__start_bss_kernel = .;
-		start.o(.bss .bss.* COMMON) kernel_cfg.o(.bss .bss.* COMMON) kernel_mem.o(.bss .bss.* COMMON) -lkernel(.bss .bss.* COMMON) *(.bss_kernel) 
+		start.o(.bss .bss.* COMMON) kernel_cfg.o(.bss .bss.* COMMON) kernel_mem.o(.bss .bss.* COMMON) libkernel.a(.bss .bss.* COMMON) 
 		__end_bss_kernel = .;
 	} > RAM
 
 	.noinit_kernel ALIGN(4) (NOLOAD) : ALIGN(4) {
 		__start_noinit_kernel = .;
-		start.o(.noinit) kernel_cfg.o(.noinit) kernel_mem.o(.noinit) -lkernel(.noinit) *(.noinit_kernel) 
+		start.o(.noinit) kernel_cfg.o(.noinit) kernel_mem.o(.noinit) libkernel.a(.noinit) *(.noinit_kernel) *(.system_stack) 
 		__end_noinit_kernel = .;
 		__end_mo_rwdata_kernel = .;
 		__aend_mo_rwdata_kernel = ALIGN(4K);
@@ -173,14 +173,14 @@ SECTIONS {
 		__start_mp_rwdata_DOM1 = .;
 		__start_mo_rwdata_DOM1 = .;
 		__start_data_DOM1 = .;
-		cfg_all2.o(.data .data.*) *(.data_DOM1) 
+		cfg_all2.o(.data .data.*) 
 		__end_data_DOM1 = .;
 	} > RAM AT > ROM
 	__start_idata_DOM1 = LOADADDR(.data_DOM1);
 
 	.bss_DOM1 ALIGN(4) (NOLOAD) : ALIGN(4) {
 		__start_bss_DOM1 = .;
-		cfg_all2.o(.bss .bss.* COMMON) *(.bss_DOM1_add1) *(.bss_DOM1) 
+		cfg_all2.o(.bss .bss.* COMMON) *(.bss_DOM1_add1) 
 		__end_bss_DOM1 = .;
 	} > RAM
 
@@ -208,33 +208,25 @@ SECTIONS {
 		__start_mp_rwdata_shared = .;
 		__start_mo_rwdata_shared = .;
 		__start_data_shared = .;
-		-lc(.data .data.*) -lgcc(.data .data.*) *(.data_shared) 
+		libc.a(.data .data.*) libgcc.a(.data .data.*) 
 		__end_data_shared = .;
 	} > RAM AT > ROM
 	__start_idata_shared = LOADADDR(.data_shared);
 
 	.bss_shared ALIGN(4) (NOLOAD) : ALIGN(4) {
 		__start_bss_shared = .;
-		-lc(.bss .bss.* COMMON) -lgcc(.bss .bss.* COMMON) *(.bss_shared) 
+		libc.a(.bss .bss.* COMMON) libgcc.a(.bss .bss.* COMMON) 
 		__end_bss_shared = .;
 	} > RAM
 
 	.noinit_shared ALIGN(4) (NOLOAD) : ALIGN(4) {
 		__start_noinit_shared = .;
-		-lc(.noinit) -lgcc(.noinit) *(.noinit_shared) 
+		libc.a(.noinit) libgcc.a(.noinit) 
 		__end_noinit_shared = .;
 		__end_mo_rwdata_shared = .;
 		__aend_mo_rwdata_shared = ALIGN(4K);
 		__aend_mp_rwdata_shared = ALIGN(4K);
 	} > RAM
-
-	/DISCARD/ : {
-		*(.text .text.*)
-		*(.rodata .rodata.*)
-		*(.data .data.*)
-		*(.bss .bss.* COMMON)
-		*(.noinit)
-	}
 
 	/DISCARD/ : {
 		*(.rel.dyn)
@@ -271,4 +263,8 @@ SECTIONS {
 	.debug_funcnames 0 : { *(.debug_funcnames) }
 	.debug_typenames 0 : { *(.debug_typenames) }
 	.debug_varnames  0 : { *(.debug_varnames) }
+
+	/DISCARD/ : {
+		*(*)
+	}
 }

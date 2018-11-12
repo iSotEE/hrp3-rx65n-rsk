@@ -37,7 +37,7 @@
  *  アの利用により直接的または間接的に生じたいかなる損害に関しても，そ
  *  の責任を負わない．
  * 
- *  $Id: alarm.c 39 2015-08-16 06:14:41Z ertl-hiro $
+ *  $Id: alarm.c 502 2018-10-27 08:05:10Z ertl-hiro $
  */
 
 /*
@@ -385,7 +385,7 @@ sta_alm(ID almid, RELTIM almtim)
 		else {
 			p_almcb->almsta = true;
 		}
-		tmevtb_enqueue(&(p_almcb->tmevtb), almtim,
+		tmevtb_enqueue_reltim(&(p_almcb->tmevtb), almtim,
 									p_almcb->p_alminib->p_tmevt_heap);
 		ercd = E_OK;
 	}

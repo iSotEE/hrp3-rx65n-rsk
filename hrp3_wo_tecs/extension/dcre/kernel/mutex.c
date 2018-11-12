@@ -35,7 +35,7 @@
  *  アの利用により直接的または間接的に生じたいかなる損害に関しても，そ
  *  の責任を負わない．
  * 
- *  $Id: mutex.c 142 2016-03-11 14:00:41Z ertl-hiro $
+ *  $Id: mutex.c 502 2018-10-27 08:05:10Z ertl-hiro $
  */
 
 /*
@@ -159,7 +159,7 @@ initialize_mtxcb(MTXCB *p_mtxcb, MTXINIB *p_mtxinib, const DOMINIB *p_dominib)
 }
 
 void
-initialize_mtxaphore(void)
+initialize_mutex(void)
 {
 	uint_t			i, j, k;
 	ID				domid;
@@ -577,6 +577,11 @@ loc_mtx(ID mtxid)
 	else if (VIOLATE_ACPTN(p_mtxcb->p_mtxinib->acvct.acptn1)) {
 		ercd = E_OACV;
 	}
+	else if (MTX_CEILING(p_mtxcb)
+			&& p_mtxcb->p_mtxinib->ceilpri < p_runtsk->p_dominib->minpriority
+			&& VIOLATE_ACPTN(p_runtsk->p_dominib->acvct.acptn2)) {
+		ercd = E_OACV;									/*［NGKI5124］*/
+	}
 	else if (p_runtsk->raster) {
 		ercd = E_RASTER;
 	}
@@ -597,8 +602,8 @@ loc_mtx(ID mtxid)
 		ercd = E_OBJ;
 	}
 	else {
-		p_runtsk->tstat = TS_WAITING_MTX;
-		wobj_make_wait((WOBJCB *) p_mtxcb, (WINFO_WOBJ *) &winfo_mtx);
+		wobj_make_wait((WOBJCB *) p_mtxcb, TS_WAITING_MTX,
+											(WINFO_WOBJ *) &winfo_mtx);
 		dispatch();
 		ercd = winfo_mtx.winfo.wercd;
 	}
@@ -633,6 +638,11 @@ ploc_mtx(ID mtxid)
 	}
 	else if (VIOLATE_ACPTN(p_mtxcb->p_mtxinib->acvct.acptn1)) {
 		ercd = E_OACV;
+	}
+	else if (MTX_CEILING(p_mtxcb)
+			&& p_mtxcb->p_mtxinib->ceilpri < p_runtsk->p_dominib->minpriority
+			&& VIOLATE_ACPTN(p_runtsk->p_dominib->acvct.acptn2)) {
+		ercd = E_OACV;									/*［NGKI5124］*/
 	}
 	else if (MTX_CEILING(p_mtxcb)
 				&& p_runtsk->bpriority < p_mtxcb->p_mtxinib->ceilpri) {
@@ -688,6 +698,11 @@ tloc_mtx(ID mtxid, TMO tmout)
 	else if (VIOLATE_ACPTN(p_mtxcb->p_mtxinib->acvct.acptn1)) {
 		ercd = E_OACV;
 	}
+	else if (MTX_CEILING(p_mtxcb)
+			&& p_mtxcb->p_mtxinib->ceilpri < p_runtsk->p_dominib->minpriority
+			&& VIOLATE_ACPTN(p_runtsk->p_dominib->acvct.acptn2)) {
+		ercd = E_OACV;									/*［NGKI5124］*/
+	}
 	else if (p_runtsk->raster) {
 		ercd = E_RASTER;
 	}
@@ -711,9 +726,8 @@ tloc_mtx(ID mtxid, TMO tmout)
 		ercd = E_TMOUT;
 	}
 	else {
-		p_runtsk->tstat = TS_WAITING_MTX;
-		wobj_make_wait_tmout((WOBJCB *) p_mtxcb, (WINFO_WOBJ *) &winfo_mtx,
-														&tmevtb, tmout);
+		wobj_make_wait_tmout((WOBJCB *) p_mtxcb, TS_WAITING_MTX,
+								(WINFO_WOBJ *) &winfo_mtx, &tmevtb, tmout);
 		dispatch();
 		ercd = winfo_mtx.winfo.wercd;
 	}

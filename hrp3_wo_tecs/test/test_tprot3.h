@@ -2,7 +2,7 @@
  *  TOPPERS Software
  *      Toyohashi Open Platform for Embedded Real-Time Systems
  * 
- *  Copyright (C) 2015-2016 by Embedded and Real-Time Systems Laboratory
+ *  Copyright (C) 2015-2018 by Embedded and Real-Time Systems Laboratory
  *              Graduate School of Information Science, Nagoya Univ., JAPAN
  * 
  *  上記著作権者は，以下の(1)〜(4)の条件を満たす場合に限り，本ソフトウェ
@@ -34,7 +34,7 @@
  *  アの利用により直接的または間接的に生じたいかなる損害に関しても，そ
  *  の責任を負わない．
  * 
- *  $Id: test_tprot3.h 195 2016-04-10 09:30:59Z ertl-hiro $
+ *  $Id: test_tprot3.h 508 2018-10-27 15:57:48Z ertl-hiro $
  */
 
 /*
@@ -47,6 +47,20 @@
  *  ターゲット依存の定義
  */
 #include "target_test.h"
+
+/*
+ *  システム周期
+ */
+#define SYSTEM_CYCLE	(20 * TEST_TIME_CP)
+
+/*
+ *  タイムウィンドウの長さ
+ */
+#define TWD_SOM1_DOM2_TIME	(5 * TEST_TIME_CP)
+#define TWD_SOM1_DOM1_TIME	(5 * TEST_TIME_CP)
+#define TWD_SOM2_DOM1_TIME	(5 * TEST_TIME_CP)
+#define TWD_SOM2_DOM2_TIME	(5 * TEST_TIME_CP)
+#define TWD_SOM3_DOM1_TIME	(10 * TEST_TIME_CP)
 
 /*
  *  各タスクの優先度の定義
@@ -78,6 +92,6 @@ extern void	task1(intptr_t exinf);
 extern void	task2(intptr_t exinf);
 extern void	task3(intptr_t exinf);
 extern void	task4(intptr_t exinf);
-extern void	alarm1_handler(intptr_t exinf);
+extern void	cyclic1_handler(intptr_t exinf);
 
 #endif /* TOPPERS_MACRO_ONLY */

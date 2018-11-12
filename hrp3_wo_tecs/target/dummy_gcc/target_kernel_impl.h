@@ -35,7 +35,7 @@
  *  アの利用により直接的または間接的に生じたいかなる損害に関しても，そ
  *  の責任を負わない．
  * 
- *  $Id: target_kernel_impl.h 434 2018-08-12 07:34:53Z ertl-hiro $
+ *  $Id: target_kernel_impl.h 520 2018-11-01 12:41:13Z ertl-hiro $
  */
 
 /*
@@ -267,7 +267,7 @@ extern void	dispatch(void);
 /*
  *  非タスクコンテキストからのディスパッチ要求
  */
-#define request_dispatch()
+#define request_dispatch_retint()
 
 /*
  *  ディスパッチャの動作開始

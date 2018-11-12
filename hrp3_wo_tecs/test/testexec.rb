@@ -36,7 +36,7 @@
 #  アの利用により直接的または間接的に生じたいかなる損害に関しても，そ
 #  の責任を負わない．
 # 
-#  $Id: testexec.rb 446 2018-08-17 16:24:47Z ertl-hiro $
+#  $Id: testexec.rb 507 2018-10-27 15:35:48Z ertl-hiro $
 # 
 
 Encoding.default_external = 'utf-8'
@@ -47,6 +47,7 @@ require "pp"
 #
 TEST_SPEC = {
   # 機能テストプログラム
+  "calsvc"   => { SRC: "test_calsvc" },
   "cpuexc1"  => { SRC: "test_cpuexc1" },
   "cpuexc2"  => { SRC: "test_cpuexc2" },
   "cpuexc3"  => { SRC: "test_cpuexc3" },
@@ -65,6 +66,7 @@ TEST_SPEC = {
   "hrt1"     => { SRC: "test_hrt1" },
   "int1"     => { SRC: "test_int1" },
   "lmtdom1"  => { SRC: "test_lmtdom1" },
+  "lmtdom2"  => { SRC: "test_lmtdom2" },
   "messagebuf1" => { SRC: "test_messagebuf1", CDL: "test_pf_bitkernel" },
   "messagebuf2" => { SRC: "test_messagebuf2", CDL: "test_pf_bitkernel" },
   "mprot1"   => { SRC: "test_mprot1" },
@@ -93,6 +95,7 @@ TEST_SPEC = {
   "tprot2"   => { SRC: "test_tprot2", CDL: "test_pf_bitkernel" },
   "tprot3"   => { SRC: "test_tprot3", CDL: "test_pf_bitkernel" },
   "tprot4"   => { SRC: "test_tprot4", CDL: "test_pf_bitkernel" },
+  "tprot5"   => { SRC: "test_tprot5", CDL: "test_pf_bitkernel" },
   "twdnfy"   => { SRC: "test_twdnfy" },
 
   # オーバランハンドラ機能拡張パッケージの機能テストプログラム

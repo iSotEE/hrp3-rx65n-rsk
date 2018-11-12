@@ -36,7 +36,7 @@
 #   アの利用により直接的または間接的に生じたいかなる損害に関しても，そ
 #   の責任を負わない．
 #
-#   $Id: domain.trb 441 2018-08-17 01:18:33Z ertl-hiro $
+#   $Id: domain.trb 495 2018-10-24 17:47:02Z ertl-hiro $
 #
 
 #
@@ -100,22 +100,21 @@ else
 								"#{$cfgData[:DEF_SCY][1][:scyctim]};")
 
   #
-  #  スケジューリングドメイン管理ブロックの数
+  #  スケジューリング単位管理ブロックの数
   #
   $kernelCfgC.add2("const uint_t _kernel_tnum_schedcb = #{$schedcbList.size};")
 
   #
-  #  スケジューリングドメイン管理ブロックの生成
+  #  スケジューリング単位管理ブロックの生成
   #
   $kernelCfgC.add2("SCHEDCB _kernel_schedcb_table[#{$schedcbList.size}];")
 
   #
   #  タイムウィンドウ通知の通知情報の処理
   #
-  $cfgData[:ATT_TWD].sort_by {|key, params| params[:twdidx]} \
-								.each_with_index do |(key, params), index|
+  $twdList.each do |key, params|
     if params.has_key?(:nfymode)
-      params[:twdid] = "TWD#{index}_#{params[:somid]}_#{params[:twdord]}"
+      params[:twdid] = "TWD#{key}"
       params[:domain] = params[:domid].val
       params[:nfyhdr] = generateNotifyHandler(key, params, :twdid)
     else
@@ -128,15 +127,14 @@ else
   #
   #  タイムウィンドウ初期化ブロックの生成
   #
-  if $cfgData[:ATT_TWD].size > 0
+  if $twdList.size > 0
     $kernelCfgC.add("const TWDINIB _kernel_twdinib_table" \
-                   					"[#{$cfgData[:ATT_TWD].size}] = {")
-    $cfgData[:ATT_TWD].sort_by {|key, params| params[:twdidx]} \
-								.each_with_index do |(key, params), index|
+										"[#{$twdList.size}] = {")
+    $twdList.each_with_index do |(key, params), index|
       $kernelCfgC.add(",") if index > 0
       $kernelCfgC.append("\t{ #{params[:twdlen]}, " \
-			"&(_kernel_dominib_table[INDEX_DOM(#{params[:domid]})]), " \
-			"(intptr_t)(#{params[:par1]}), #{params[:nfyhdr]} }")
+				"&(_kernel_dominib_table[INDEX_DOM(#{params[:domid]})]), " \
+				"(intptr_t)(#{params[:par1]}), #{params[:nfyhdr]} }")
     end
     $kernelCfgC.add
     $kernelCfgC.add2("};")
@@ -169,8 +167,7 @@ else
     $kernelCfgC.add("\t{ &(_kernel_twdinib_table[#{params[:twdidx]}]), " \
 				"&(_kernel_sominib_table[INDEX_SOM(#{params[:nxtsom]})]) },")
   end
-  $kernelCfgC.add("\t{ &(_kernel_twdinib_table[#{$cfgData[:ATT_TWD].size}]), " \
-																	"NULL }")
+  $kernelCfgC.add("\t{ &(_kernel_twdinib_table[#{$twdList.size}]), NULL }")
   $kernelCfgC.add2("};")
 end
 

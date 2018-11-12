@@ -3,7 +3,7 @@
 		ユーザーズマニュアル
 
 		対応バージョン: Release 3.1.0
-		最終更新: 2018年8月18日
+		最終更新: 2018年10月28日
 
 このドキュメントは，TOPPERS/HRP3カーネルを使用するために必要な事項を説
 明するものである．
@@ -59,7 +59,7 @@ ASP3カーネルのマニュアルもあわせて読むこと．
  アの利用により直接的または間接的に生じたいかなる損害に関しても，そ
  の責任を負わない．
  
- $Id: user.txt 446 2018-08-17 16:24:47Z ertl-hiro $
+ $Id: user.txt 531 2018-11-11 04:42:51Z ertl-hiro $
 ----------------------------------------------------------------------
 
 ○目次
@@ -88,6 +88,7 @@ ASP3カーネルのマニュアルもあわせて読むこと．
 	11.4 拡張サービスコールの機能コード
 	11.5 タスク間でのスタック領域の共有
 	11.6 システムサービスの呼出し制限
+	11.7 カーネルからのシステムログ出力
 １２．参考情報
 １３．リファレンス
 	13.1 サービスコール一覧
@@ -600,18 +601,21 @@ HRP3カーネルでは，ASP3カーネルと同様のテストプログラム（
 
 HRP3カーネルで追加した機能テストプログラムは次の通り．
 
-(1) test_extsvc1			拡張サービスコールに関するテスト(1)
-(2) test_lmtdom1			保護ドメインに対する制限に関するテスト(1)
-(3) test_sysstat2			システム状態に関するテスト(2)
-(4) test_mprot1				メモリ保護機能のテスト(1)
-(5) test_mprot2				メモリ保護機能のテスト(2)
-(6) test_sched1				ドメイン間のスケジューリングに関するテスト(1)
-(7) test_tprot1				時間パーティショニングに関するテスト(1)
-(8) test_tprot2				時間パーティショニングに関するテスト(2)
-(9) test_tprot3				時間パーティショニングに関するテスト(3)
-(10) test_tprot4			時間パーティショニングに関するテスト(4)
-(11) test_twdnfy			タイムウィンドウ通知に関するテスト
-(12) test_prbstr			prb_strのテスト
+(1) test_calsvc				サービスコール呼出しに関するテスト
+(2) test_extsvc1			拡張サービスコールに関するテスト(1)
+(3) test_lmtdom1			保護ドメインに対する制限に関するテスト(1)
+(4) test_lmtdom2			保護ドメインに対する制限に関するテスト(2)
+(5) test_sysstat2			システム状態に関するテスト(2)
+(6) test_mprot1				メモリ保護機能のテスト(1)
+(7) test_mprot2				メモリ保護機能のテスト(2)
+(8) test_sched1				ドメイン間のスケジューリングに関するテスト(1)
+(9) test_tprot1				時間パーティショニングに関するテスト(1)
+(10) test_tprot2			時間パーティショニングに関するテスト(2)
+(11) test_tprot3			時間パーティショニングに関するテスト(3)
+(12) test_tprot4			時間パーティショニングに関するテスト(4)
+(13) test_tprot5			時間パーティショニングに関するテスト(5)
+(14) test_twdnfy			タイムウィンドウ通知に関するテスト
+(15) test_prbstr			prb_strのテスト
 
 10.2 性能評価プログラム
 
@@ -774,6 +778,23 @@ HRP3カーネルの配布パッケージに含まれるシステムサービス�
 このような事態を避けたい場合には，各拡張サービスコールに，それを呼び出
 せる保護ドメイン（または処理単位）を制限する処理を追加する必要がある．
 
+11.7 カーネルからのシステムログ出力
+
+カーネルからシステムログに出力されるメッセージと，出力される状況は以下
+の通りである．
+
+(1) no time event is processed in hrt interrupt.
+
+高分解能タイマ割込みが発生したが，処理すべきタイムイベントがなかった場
+合に，このメッセージが出力される．このメッセージが出力される状況につい
+ては，ASP3カーネルのユーザーズマニュアルの「11.9 カーネルからのシステ
+ムログ出力」の節を参照すること．
+
+(2) spurious twd interrput (p_runtwd = XXXX, left_twdtim = YYYY)
+
+タイムウィンドウタイマ割込みが発生したが，タイムウィンドウ切換えが必要
+なかった場合に，このメッセージが出力される．
+
 
 １２．参考情報
 
@@ -892,13 +913,13 @@ HRP3カーネルの開発支援のためのTRAC（バグトラッキングシス
 (7) システム状態管理機能
 
 	ER ercd = rot_rdq(PRI tskpri)
-	ER ercd = mrot_rdq(ID domid, PRI tskpri)
+	ER ercd = mrot_rdq(ID schedno, PRI tskpri)
 	ER ercd = get_tid(ID *p_tskid)
 	ER ercd = get_did(ID *p_domid)
 	ER ercd = get_lod(PRI tskpri, uint_t *p_load)
-	ER ercd = mget_lod(ID domid, PRI tskpri, uint_t *p_load)
+	ER ercd = mget_lod(ID schedno, PRI tskpri, uint_t *p_load)
 	ER ercd = get_nth(PRI tskpri, uint_t nth, ID *p_tskid)
-	ER ercd = mget_nth(ID domid, PRI tskpri, uint_t nth, ID *p_tskid)
+	ER ercd = mget_nth(ID schedno, PRI tskpri, uint_t nth, ID *p_tskid)
 	ER ercd = loc_cpu(void)
 	ER ercd = unl_cpu(void)
 	ER ercd = dis_dsp(void)

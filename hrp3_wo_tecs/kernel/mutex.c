@@ -3,7 +3,7 @@
  *      Toyohashi Open Platform for Embedded Real-Time Systems/
  *      High Reliable system Profile Kernel
  * 
- *  Copyright (C) 2005-2015 by Embedded and Real-Time Systems Laboratory
+ *  Copyright (C) 2005-2018 by Embedded and Real-Time Systems Laboratory
  *              Graduate School of Information Science, Nagoya Univ., JAPAN
  * 
  *  上記著作権者は，以下の(1)〜(4)の条件を満たす場合に限り，本ソフトウェ
@@ -35,7 +35,7 @@
  *  アの利用により直接的または間接的に生じたいかなる損害に関しても，そ
  *  の責任を負わない．
  * 
- *  $Id: mutex.c 378 2018-04-19 09:53:29Z ertl-hiro $
+ *  $Id: mutex.c 477 2018-10-18 13:32:54Z ertl-hiro $
  */
 
 /*
@@ -339,6 +339,10 @@ loc_mtx(ID mtxid)
 	CHECK_ID(VALID_MTXID(mtxid));
 	p_mtxcb = get_mtxcb(mtxid);
 	CHECK_ACPTN(p_mtxcb->p_mtxinib->acvct.acptn1);
+	if (MTX_CEILING(p_mtxcb)
+			&& p_mtxcb->p_mtxinib->ceilpri < p_runtsk->p_dominib->minpriority) {
+		CHECK_ACPTN(p_runtsk->p_dominib->acvct.acptn2);		/*［NGKI5124］*/
+	}
 
 	lock_cpu_dsp();
 	if (p_runtsk->raster) {
@@ -361,8 +365,8 @@ loc_mtx(ID mtxid)
 		ercd = E_OBJ;
 	}
 	else {
-		p_runtsk->tstat = TS_WAITING_MTX;
-		wobj_make_wait((WOBJCB *) p_mtxcb, (WINFO_WOBJ *) &winfo_mtx);
+		wobj_make_wait((WOBJCB *) p_mtxcb, TS_WAITING_MTX,
+											(WINFO_WOBJ *) &winfo_mtx);
 		dispatch();
 		ercd = winfo_mtx.winfo.wercd;
 	}
@@ -391,6 +395,10 @@ ploc_mtx(ID mtxid)
 	CHECK_ID(VALID_MTXID(mtxid));
 	p_mtxcb = get_mtxcb(mtxid);
 	CHECK_ACPTN(p_mtxcb->p_mtxinib->acvct.acptn1);
+	if (MTX_CEILING(p_mtxcb)
+			&& p_mtxcb->p_mtxinib->ceilpri < p_runtsk->p_dominib->minpriority) {
+		CHECK_ACPTN(p_runtsk->p_dominib->acvct.acptn2);		/*［NGKI5124］*/
+	}
 
 	lock_cpu();
 	if (MTX_CEILING(p_mtxcb)
@@ -440,6 +448,10 @@ tloc_mtx(ID mtxid, TMO tmout)
 	CHECK_PAR(VALID_TMOUT(tmout));
 	p_mtxcb = get_mtxcb(mtxid);
 	CHECK_ACPTN(p_mtxcb->p_mtxinib->acvct.acptn1);
+	if (MTX_CEILING(p_mtxcb)
+			&& p_mtxcb->p_mtxinib->ceilpri < p_runtsk->p_dominib->minpriority) {
+		CHECK_ACPTN(p_runtsk->p_dominib->acvct.acptn2);		/*［NGKI5124］*/
+	}
 
 	lock_cpu_dsp();
 	if (p_runtsk->raster) {
@@ -465,9 +477,8 @@ tloc_mtx(ID mtxid, TMO tmout)
 		ercd = E_TMOUT;
 	}
 	else {
-		p_runtsk->tstat = TS_WAITING_MTX;
-		wobj_make_wait_tmout((WOBJCB *) p_mtxcb, (WINFO_WOBJ *) &winfo_mtx,
-														&tmevtb, tmout);
+		wobj_make_wait_tmout((WOBJCB *) p_mtxcb, TS_WAITING_MTX,
+								(WINFO_WOBJ *) &winfo_mtx, &tmevtb, tmout);
 		dispatch();
 		ercd = winfo_mtx.winfo.wercd;
 	}

@@ -35,7 +35,7 @@
  *  アの利用により直接的または間接的に生じたいかなる損害に関しても，そ
  *  の責任を負わない．
  * 
- *  $Id: tBitKernel.c 443 2018-08-17 16:18:59Z ertl-hiro $
+ *  $Id: tBitKernel.c 509 2018-10-27 16:22:39Z ertl-hiro $
  */
 
 /*
@@ -168,7 +168,7 @@ on_stack(void *addr, const TINIB *p_tinib)
 }
 
 /*
- *  スケジューリングドメイン管理ブロックの検査
+ *  スケジューリング単位管理ブロックの検査
  */
 #ifndef PRIMAP_BIT
 #define	PRIMAP_BIT(pri)		(1U << (pri))
@@ -310,7 +310,7 @@ bit_domain(void)
 	}
 
 	/*
-	 *  スケジューリングドメイン毎の整合性検査
+	 *  スケジューリング単位毎の整合性検査
 	 */
 	ercd = bit_schedcb(&schedcb_kernel);
 	if (ercd != E_OK) {
@@ -369,7 +369,7 @@ bit_domain(void)
 			return(E_SYS_LINENO);
 		}
 
-		if (p_runtwd == NULL && !newscyc_twdswitch) {
+		if (p_runtwd == NULL) {
 			/*
 			 *  アイドルウィンドウの場合の検査
 			 */
@@ -439,8 +439,8 @@ bit_task(ID tskid)
 	}
 
 	/*
-	 *  保護ドメイン初期化ブロックとスケジューリングドメイン管理ブロッ
-	 *  クへのポインタの検査
+	 *  保護ドメイン初期化ブロックとスケジューリング単位管理ブロックへ
+	 *  のポインタの検査
 	 */
 	if (p_tinib->domid == TDOM_KERNEL) {
 		if (p_dominib != &dominib_kernel) {

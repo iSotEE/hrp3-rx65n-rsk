@@ -36,7 +36,7 @@
 #   アの利用により直接的または間接的に生じたいかなる損害に関しても，そ
 #   の責任を負わない．
 #
-#   $Id: domain_prep.trb 440 2018-08-16 01:07:18Z ertl-hiro $
+#   $Id: domain_prep.trb 495 2018-10-24 17:47:02Z ertl-hiro $
 #
 
 #
@@ -110,7 +110,7 @@ end
 $cfgData[:LMT_DOM].each do |key, params|
   #	LDM_DOMが保護ドメイン中にない（E_RSATR）［NGKI3747］
   if !params.has_key?(:domain) || params[:domain] == $TDOM_NONE
-    error_ercd("E_RSATR", params, "%apiname must belong to a protection domain")
+    error_ercd("E_RSATR", params, "%apiname must be within a protection domain")
     # 以降のエラーの抑止
     params[:domain] = $TDOM_NONE
   end
@@ -215,16 +215,13 @@ end
 #
 #  タイムウィンドウの登録（ATT_TWD）
 #
-# $schedcbList：タイムウィンドウが登録されたユーザドメインのリスト
-# $twdList：システム動作モード毎のタイムウィンドウ（のキー）のリスト
-# $cfgData[:ATT_TWD][key][:twdidx]：タイムウィンドウ初期化ブロックの配
-#									列中でのインデックス
-# $cfgData[:CRE_SOM][key][:twdidx]：システム動作モードに対する先頭のタ
-#									イムウィンドウ情報のインデックス
+# $schedcbList[domain]：domainにタイムウィンドウが登録されているか？
+# $twdList：タイムウィンドウの情報
 #
 # ATT_TWDに関するエラーチェックと前処理
+$globalVars.push("twdList")
 $schedcbList = {}
-$twdList = Hash.new {|hash, key| hash[key] = []}
+$twdList = {}
 $cfgData[:ATT_TWD].each do |key, params|
   # システム周期が設定されていない場合［NGKI5052］
   if $cfgData[:DEF_SCY].size == 0
@@ -250,79 +247,89 @@ $cfgData[:ATT_TWD].each do |key, params|
   end
 
   $schedcbList[params[:domid].val] = true
-  $twdList[params[:somid].val].push(key)
+  $twdList[key] = params.dup
 end
 
-index = 0	# タイムウィンドウ初期化ブロックの配列中でのインデックス
+#
+#  $twdListのソート
+#
+# まずシステム動作モード順にソートし，同じシステム動作モードの中では，
+# システム周期内での順序にソートする．
+#
+$twdList = Hash[$twdList.sort_by.with_index {|(key, params), index| \
+							[ params[:somid].val, params[:twdord], index ]}]
+
+#
+#  タイムウィンドウに関する前処理
+#
+# $cfgData[:CRE_SOM][key][:twdidx]：システム動作モードに対する先頭のタ
+#									イムウィンドウ情報のインデックス
+#
+twdidx = 0	# タイムウィンドウ初期化ブロックの配列中でのインデックス
 $cfgData[:CRE_SOM].sort.each do |key, params|
-  params[:twdidx] = index
+  params[:twdidx] = twdidx
 
-  # $twdList[key]をシステム周期内での順序にソート
-  i = 0		# stable sortを行うための変数
-  $twdList[key].sort_by! {|twdkey| \
-							[ $cfgData[:ATT_TWD][twdkey][:twdord], i += 1 ]}
-
+  # タイムウィンドウ長の合計を求める
   totalLength = 0
-  $twdList[key].each do |twdkey|
-    $cfgData[:ATT_TWD][twdkey][:twdidx] = index
-    totalLength += $cfgData[:ATT_TWD][twdkey][:twdlen]
-    index += 1
+  $twdList.each do |key2, params2|
+    if params2[:somid] == key
+      totalLength += params2[:twdlen]
+      twdidx += 1
+    end
   end
 
   # タイムウィンドウ長の合計が長すぎる（E_PAR）［NGKI5049］
   if totalLength >= $cfgData[:DEF_SCY][1][:scyctim]
-    error("E_PAR: total length #{totalLength} of system operation mode " \
-          "`#{params[:somid]}' must be shorter than the system cycle")
+    error("E_PAR: total time window length #{totalLength} of " \
+				"system operation mode `#{params[:somid]}' " \
+				"must be shorter than the system cycle")
   end
 end
 
 #
-#  タイムイベントヒープのノードの必要数の計算
+#  スケジューリング単位管理ブロック，タイムイベントヒープの変数名の決
+#  定と必要なノード数の計算
 #
-# $domData[key][:tmevtCount]：タイムイベントヒープのノードの必要数
+# $domData[key][:schedcb]：保護ドメインに対するスケジューリング単位管
+#						   理ブロックの参照名
+# $domData[key][:tmevtHeap]：保護ドメインに対するタイムイベントヒープ
+#							 の参照名
+# $domData[key][:tmevtCount]：保護ドメインに対するタイムイベントヒー
+#							  プのノード数
 # 
-$domData[$TDOM_KERNEL][:tmevtCount] = 2
-$udomainList.each do |key|
-  if $schedcbList.has_key?(key)
-    $domData[key][:tmevtCount] = 1
+indexSchedcb = 0
+$domData[$TDOM_KERNEL][:schedcb] = "_kernel_schedcb_kernel"
+$domData[$TDOM_KERNEL][:tmevtHeap] = "_kernel_tmevt_heap_kernel"
+$domData[$TDOM_KERNEL][:tmevtCount] = 1
+$udomainList.each do |domain|
+  params = $domData[domain]
+  if $schedcbList.has_key?(domain)
+    params[:schedcb] = "_kernel_schedcb_table[#{indexSchedcb}]"
+    indexSchedcb += 1
   else
-    $domData[key][:tmevtCount] = 0
+    params[:schedcb] = "_kernel_schedcb_idle"
   end
+  if $cfgData[:DEF_SCY].size == 0
+    params[:tmevtHeap] = "_kernel_tmevt_heap_kernel"
+  elsif $schedcbList.has_key?(domain)
+    params[:tmevtHeap] = "_kernel_tmevt_heap_#{params[:domid]}"
+  else
+    params[:tmevtHeap] = "_kernel_tmevt_heap_idle"
+  end
+  params[:tmevtCount] = 0
 end
 $cfgData[:CRE_TSK].each do |key, params|
-  $domData[params[:domain]][:tmevtCount] += 1
+  if params.has_key?(:domain)		# タスクに関するエラー処理前のため必要
+    $domData[params[:domain]][:tmevtCount] += 1
+  end
 end
 $cfgData[:CRE_CYC].each do |key, params|
-  $domData[params[:domain]][:tmevtCount] += 1
+  if params.has_key?(:domain)		# 周期通知に関するエラー処理前のため必要
+    $domData[params[:domain]][:tmevtCount] += 1
+  end
 end
 $cfgData[:CRE_ALM].each do |key, params|
-  $domData[params[:domain]][:tmevtCount] += 1
-end
-
-#
-#  データ構造へのインデックスの算出
-#
-# $domData[key][:schedcb]：ユーザドメインに対するスケジューリングドメ
-#						   インコントロールブロックのインデックス
-# $domData[key][:tmevtHeap]：ユーザドメインに対するタイムイベントヒー
-#							 プのインデックス
-#
-indexSchedcb = 0
-indexTmevtHeap = $domData[$TDOM_KERNEL][:tmevtCount]
-$schedcbList.keys.sort.each do |key|
-  params = $domData[key]
-  params[:schedcb] = indexSchedcb
-  indexSchedcb += 1
-  params[:tmevtHeap] = indexTmevtHeap
-  indexTmevtHeap += params[:tmevtCount]
-end
-
-# この時点で，indexTmevtHeapは，アイドルドメインに対するタイムイベント
-# ヒープのインデックスとなっている
-$idleTmevtHeap = indexTmevtHeap
-$udomainList.each do |key|
-  params = $domData[key]
-  if !params.has_key?(:tmevtHeap)
-    params[:tmevtHeap] = $idleTmevtHeap
+  if params.has_key?(:domain)		# アラーム通知に関するエラー処理前のため必要
+    $domData[params[:domain]][:tmevtCount] += 1
   end
 end

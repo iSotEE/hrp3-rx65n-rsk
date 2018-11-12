@@ -35,7 +35,7 @@
  *  アの利用により直接的または間接的に生じたいかなる損害に関しても，そ
  *  の責任を負わない．
  * 
- *  $Id: allfunc.h 291 2018-03-21 15:31:52Z ertl-hiro $
+ *  $Id: allfunc.h 511 2018-10-27 16:33:39Z ertl-hiro $
  */
 
 /*
@@ -55,7 +55,9 @@
 #define TOPPERS_twdsta
 #define TOPPERS_twdstp
 #define TOPPERS_twdcntrl
+#define TOPPERS_scycstart
 #define TOPPERS_scycswitch
+#define TOPPERS_twdstart
 #define TOPPERS_twdswitch
 #define TOPPERS_setdspflg
 #define TOPPERS_chg_som
@@ -107,6 +109,7 @@
 #define TOPPERS_tmeset
 #define TOPPERS_tmereg
 #define TOPPERS_tmeenq
+#define TOPPERS_tmeenqrel
 #define TOPPERS_tmedeq
 #define TOPPERS_tmechk
 #define TOPPERS_tmeltim

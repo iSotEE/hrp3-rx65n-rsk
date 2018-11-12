@@ -35,7 +35,7 @@
  *  アの利用により直接的または間接的に生じたいかなる損害に関しても，そ
  *  の責任を負わない．
  * 
- *  $Id: domain.c 443 2018-08-17 16:18:59Z ertl-hiro $
+ *  $Id: domain.c 531 2018-11-11 04:42:51Z ertl-hiro $
  */
 
 /*
@@ -69,22 +69,22 @@
 #ifdef TOPPERS_domini
 
 /*
- *  現在スケジューリングドメイン
+ *  現在スケジューリング単位
  */
 SCHEDCB		*p_twdsched;
 
 /*
- *  アイドル時スケジューリングドメイン
+ *  アイドル時スケジューリング単位
  */
 SCHEDCB		*p_idlesched;
 
 /*
- *  カーネルドメインに対応するスケジューリングドメイン管理ブロック
+ *  カーネルドメインに対応するスケジューリング単位管理ブロック
  */
 SCHEDCB		schedcb_kernel;
 
 /*
- *  アイドルドメインに対応するスケジューリングドメイン管理ブロック
+ *  アイドルドメインに対応するスケジューリング単位管理ブロック
  */
 SCHEDCB		schedcb_idle;
 
@@ -104,11 +104,6 @@ const SOMINIB	*p_nxtsom;
 TMEVTB	scyc_tmevtb;
 
 /*
- *  システム周期切換え処理を実行したことを示すフラグ
- */
-bool_t	proc_scycswitch;
-
-/*
  *  システム周期切換え処理を保留していることを示すフラグ
  */
 bool_t	pending_scycswitch;
@@ -117,11 +112,6 @@ bool_t	pending_scycswitch;
  *  実行中のタイムウィンドウ
  */
 const TWDINIB	*p_runtwd;
-
-/*
- *  システム周期の最初のタイムウィンドウへの切換えを要求
- */
-bool_t	newscyc_twdswitch;
 
 /*
  *  タイムウィンドウ切換え処理を保留していることを示すフラグ
@@ -154,7 +144,7 @@ ACPTN	rundom;
 const DOMINIB	*p_ctxdom;
 
 /*
- *  スケジューリングドメイン管理ブロックの初期化
+ *  スケジューリング単位管理ブロックの初期化
  */
 static void
 initialize_schedcb(SCHEDCB *p_schedcb)
@@ -182,16 +172,15 @@ initialize_domain(void)
 		initialize_schedcb(&(schedcb_table[i]));
 	}
 
+	p_cursom = NULL;
 	pending_scycswitch = false;
 	p_runtwd = NULL;
-	newscyc_twdswitch = false;
 	pending_twdswitch = false;
 	twdtimer_enable = false;
 	twdtimer_flag = false;
 	rundom = TACP_KERNEL;
 	p_ctxdom = NULL;
 
-	p_cursom = p_inisom;
 	if (system_cyctim == 0U) {
 		/*
 		 *  時間パーティショニングを使用しない場合
@@ -209,21 +198,13 @@ initialize_domain(void)
 		p_twdsched = &schedcb_kernel;
 		p_idlesched = &schedcb_kernel;
 
-		if (p_cursom != NULL) {
+		if (p_inisom != NULL) {
 			/*
 			 *  初期システム動作モードが定義されている場合
 			 */
-			scyc_tmevtb.evttim = system_cyctim;
-			tmevtb_register(&scyc_tmevtb, p_tmevt_heap_kernel);
-			p_nxtsom = p_cursom->p_nxtsom;
-
-			/*
-			 *  タイムウィンドウ切換え処理の起動を要求
-			 *
-			 *  この時点では，タイムウィンドウタイマの初期化ができてい
-			 *  ないため，タイムウィンドウタイマの動作を開始できない．
-			 */
-			newscyc_twdswitch = true;
+			p_nxtsom = p_inisom;
+			scyc_tmevtb.evttim = 0;
+			tmevtb_register(&scyc_tmevtb, tmevt_heap_kernel);
 		}
 	}
 }
@@ -301,6 +282,51 @@ twdtimer_control(void)
 #endif /* TOPPERS_twdcntrl */
 
 /*
+ *  システム周期の実行開始
+ */
+#ifdef TOPPERS_scycstart
+
+void
+scyc_start(void)
+{
+	if (p_runtwd != NULL) {
+		/*
+		 *  システム周期オーバラン
+		 */
+		twdtimer_stop();
+		pending_twdswitch = false;
+		raise_scycovr_exception();
+	}
+
+	p_cursom = p_nxtsom;
+	if (p_cursom == NULL) {
+		/*
+		 *  システム周期を停止させる場合
+		 */
+		p_twdsched = &schedcb_kernel;
+		p_idlesched = &schedcb_kernel;
+		p_runtwd = NULL;
+		twdtimer_enable = false;
+	}
+	else {
+		/*
+		 *  システム周期の開始
+		 */
+		scyc_tmevtb.evttim += system_cyctim;
+		tmevtb_enqueue(&scyc_tmevtb, tmevt_heap_kernel);
+		p_nxtsom = p_cursom->p_nxtsom;
+
+		/*
+		 *  システム周期の最初のタイムウィンドウの開始
+		 */
+		p_runtwd = p_cursom->p_twdinib;
+		twd_start();
+	}
+}
+
+#endif /* TOPPERS_scycstart */
+
+/*
  *  システム周期切換え処理
  *
  *  この関数は，CPUロック状態で呼び出される．
@@ -310,45 +336,12 @@ twdtimer_control(void)
 void
 scyc_switch(void)
 {
-	if (p_runtwd != NULL) {
-		/*
-		 *  システム周期オーバラン
-		 */
-		twdtimer_stop();
-		raise_scycovr_exception();
-		pending_twdswitch = false;
-	}
-
 	if (dspflg) {
-		p_cursom = p_nxtsom;
-		p_runtwd = NULL;
-		twdtimer_enable = false;
-		if (p_cursom == NULL) {
-			/*
-			 *  システム周期を停止させる場合
-			 */
-			p_twdsched = &schedcb_kernel;
-			p_idlesched = &schedcb_kernel;
-			update_schedtsk();
-			if (p_runtsk != p_schedtsk) {
-				request_dispatch();
-			}
+		scyc_start();
+		update_schedtsk();
+		if (p_runtsk != p_schedtsk) {
+			request_dispatch_retint();
 		}
-		else {
-			/*
-			 *  システム周期の開始
-			 */
-			scyc_tmevtb.evttim += system_cyctim;
-			tmevtb_register(&scyc_tmevtb, p_tmevt_heap_kernel);
-			p_nxtsom = p_cursom->p_nxtsom;
-
-			/*
-			 *  タイムウィンドウ切換え処理の要求
-			 */
-			newscyc_twdswitch = true;
-			target_twdtimer_raise_int();
-		}
-		proc_scycswitch = true;
 	}
 	else {
 		pending_scycswitch = true;
@@ -358,14 +351,56 @@ scyc_switch(void)
 #endif /* TOPPERS_scycswitch */
 
 /*
- *  タイムウィンドウ切換え処理
+ *  タイムウィンドウの実行開始
  */
-#ifdef TOPPERS_twdswitch
+#ifdef TOPPERS_twdstart
 
-static void
-proc_tmevt_heap(TMEVTN *p_tmevt_heap)
+/*
+ *  タイムイベントの処理を中断すべきかの判定
+ */
+Inline bool_t
+suspend_proc_tmevt(void)
 {
-	proc_scycswitch = false;
+	if (twdtimer_enable) {
+		/*
+		 *  タイムウィンドウをの時間を使い切っているか？
+		 */
+		return(target_twdtimer_get_current() == 0U);
+	}
+	else {
+		/*
+		 *  システム周期切換え時刻になっているか？
+		 */
+		return(tmevt_lefttim(&scyc_tmevtb) == 0U);
+	}
+}
+
+void
+twd_start(void)
+{
+	TMEVTN	*p_tmevt_heap;
+
+	if (p_runtwd < (p_cursom + 1)->p_twdinib) {
+		/*
+		 *  実行すべきタイムウィンドウがある場合
+		 */
+		p_twdsched = p_runtwd->p_dominib->p_schedcb;
+		p_idlesched = &schedcb_idle;
+		p_tmevt_heap = p_runtwd->p_dominib->p_tmevt_heap;
+		twdtimer_enable = true;
+		left_twdtim = p_runtwd->twdlen;
+		twdtimer_start();
+	}
+	else {
+		/*
+		 *  実行すべきタイムウィンドウがない場合は，アイドルウィンドウに
+		 */
+		p_runtwd = NULL;
+		p_twdsched = &schedcb_idle;
+		p_idlesched = &schedcb_idle;
+		p_tmevt_heap = tmevt_heap_idle;
+		twdtimer_enable = false;
+	}
 
 	/*
 	 *  通知ハンドラが登録されている場合，CPUロック解除状態で呼び出す．
@@ -377,63 +412,34 @@ proc_tmevt_heap(TMEVTN *p_tmevt_heap)
 	}
 
 	/*
-	 *  システム周期切換え処理が実行されず，処理中にタイムウィンドウの
-	 *  時間を使い切っていない場合，先頭のタイムイベントを処理する．
+	 *  タイムイベントの処理を中断すべき状況になるまで，先頭のタイムイ
+	 *  ベントを処理を繰り返す．
 	 */
-	while (!proc_scycswitch
-			&& !(twdtimer_enable && target_twdtimer_get_current() == 0U)
-			&& tmevt_proc_top(p_tmevt_heap)) ;
+	while (!suspend_proc_tmevt() && tmevt_proc_top(p_tmevt_heap)) ;
 }
+
+#endif /* TOPPERS_twdstart */
+
+/*
+ *  タイムウィンドウ切換え処理
+ */
+#ifdef TOPPERS_twdswitch
 
 void
 twd_switch(void)
 {
-	TMEVTN	*p_tmevt_heap;
-
 	lock_cpu();
-	if ((twdtimer_enable && left_twdtim == 0U) || newscyc_twdswitch
-													|| pending_twdswitch) {
+	if (twdtimer_enable && left_twdtim == 0U) {
 		if (dspflg) {
-			if (newscyc_twdswitch) {
-				/*
-				 *  システム周期の最初のタイムウィンドウに
-				 */
-				p_runtwd = p_cursom->p_twdinib;
-				newscyc_twdswitch = false;
-			}
-			else {
-				/*
-				 *  次のタイムウィンドウに
-				 */
-				p_runtwd += 1;
-			}
-			if (p_runtwd < (p_cursom + 1)->p_twdinib) {
-				/*
-				 *  次のタイムウィンドウがある場合
-				 */
-				p_twdsched = p_runtwd->p_dominib->p_schedcb;
-				p_tmevt_heap = p_runtwd->p_dominib->p_tmevt_heap;
-				twdtimer_enable = true;
-				left_twdtim = p_runtwd->twdlen;
-				p_idlesched = &schedcb_idle;
-				twdtimer_start();
-			}
-			else {
-				/*
-				 *  次のタイムウィンドウがない場合は，アイドルウィンドウに
-				 */
-				p_runtwd = NULL;
-				p_twdsched = &schedcb_idle;
-				p_tmevt_heap = p_tmevt_heap_idle;
-				twdtimer_enable = false;
-				p_idlesched = &schedcb_idle;
-			}
+			/*
+			 *  次のタイムウィンドウに
+			 */
+			p_runtwd += 1;
+			twd_start();
 			update_schedtsk();
 			if (p_runtsk != p_schedtsk) {
-				request_dispatch();
+				request_dispatch_retint();
 			}
-			proc_tmevt_heap(p_tmevt_heap);
-			pending_twdswitch = false;
 		}
 		else {
 			/*
@@ -448,8 +454,9 @@ twd_switch(void)
 		 *  このルーチンが呼び出される前に，タイムウィンドウの切換えが
 		 *  キャンセルされた場合
 		 */
-		syslog_2(LOG_ERROR, "spurious (p_runtwd = %x, left_twdtim = %u)",
-										(uintptr_t) p_runtwd, left_twdtim);
+		syslog_2(LOG_NOTICE, "spurious twd interrput "
+									"(p_runtwd = %x, left_twdtim = %u)",
+									(uintptr_t) p_runtwd, left_twdtim);
 	}
 	unlock_cpu();
 }
@@ -470,46 +477,17 @@ set_dspflg(void)
 		/*
 		 *  保留していたシステム周期切換え処理を実行
 		 */
-		if (p_runtwd != NULL) {
-			/*
-			 *  システム周期オーバラン
-			 */
-			twdtimer_stop();
-			raise_scycovr_exception();
-			pending_twdswitch = false;
-		}
-
-		p_cursom = p_nxtsom;
-		p_runtwd = NULL;
-		twdtimer_enable = false;
-		if (p_cursom == NULL) {
-			/*
-			 *  システム周期を停止させる場合
-			 */
-			p_twdsched = &schedcb_kernel;
-			p_idlesched = &schedcb_kernel;
-		}
-		else {
-			/*
-			 *  システム周期の開始
-			 */
-			scyc_tmevtb.evttim += system_cyctim;
-			tmevtb_register(&scyc_tmevtb, &(_kernel_tmevt_heap[0]));
-			p_nxtsom = p_cursom->p_nxtsom;
-
-			/*
-			 *  タイムウィンドウ切換え処理の要求
-			 */
-			newscyc_twdswitch = true;
-			target_twdtimer_raise_int();
-		}
+		scyc_start();
 		pending_scycswitch = false;
+		pending_twdswitch = false;
 	}
 	else if (pending_twdswitch) {
 		/*
-		 *  タイムウィンドウ切換え処理を起動
+		 *  次のタイムウィンドウに
 		 */
-		target_twdtimer_raise_int();
+		p_runtwd += 1;
+		twd_start();
+		pending_twdswitch = false;
 	}
 
 	/*
@@ -547,16 +525,21 @@ chg_som(ID somid)
 	if (p_cursom == NULL) {
 		if (p_sominib != NULL) {
 			p_cursom = p_sominib;				/*［NGKI5037］*/
-			tmevtb_enqueue(&scyc_tmevtb, system_cyctim, p_tmevt_heap_kernel);
+			tmevtb_enqueue_reltim(&scyc_tmevtb, system_cyctim,
+												tmevt_heap_kernel);
 			p_nxtsom = p_cursom->p_nxtsom;
 
 			/*
-			 *  タイムウィンドウ切換え処理を起動する．
+			 *  システム周期の最初のタイムウィンドウの開始
 			 */
-			p_runtwd = NULL;
-			newscyc_twdswitch = true;
-			twdtimer_enable = false;
-			target_twdtimer_raise_int();
+			p_runtwd = p_cursom->p_twdinib;
+			twd_start();
+			if (dspflg) {
+				update_schedtsk();
+				if (p_runtsk != p_schedtsk) {
+					dispatch();
+				}
+			}
 		}
 	}
 	else {

@@ -39,6 +39,45 @@ no_support(void)
 #define prb_int no_support
 #endif /* TOPPERS_SUPPORT_PRB_INT */
 
+#ifndef TOPPERS_SUPPORT_DYNAMIC_CRE
+#define acre_tsk no_support
+#define acre_sem no_support
+#define acre_flg no_support
+#define acre_dtq no_support
+#define acre_pdq no_support
+#define acre_mtx no_support
+#define acre_mbf no_support
+#define acre_mpf no_support
+#define acre_cyc no_support
+#define acre_alm no_support
+#define acre_isr no_support
+#define acre_spn no_support
+#define del_tsk no_support
+#define del_sem no_support
+#define del_flg no_support
+#define del_dtq no_support
+#define del_pdq no_support
+#define del_mtx no_support
+#define del_mbf no_support
+#define del_mpf no_support
+#define del_cyc no_support
+#define del_alm no_support
+#define del_isr no_support
+#define del_spn no_support
+#define sac_tsk no_support
+#define sac_sem no_support
+#define sac_flg no_support
+#define sac_dtq no_support
+#define sac_pdq no_support
+#define sac_mtx no_support
+#define sac_mbf no_support
+#define sac_mpf no_support
+#define sac_cyc no_support
+#define sac_alm no_support
+#define sac_isr no_support
+#define sac_spn no_support
+#endif /* TOPPERS_SUPPORT_DYNAMIC_CRE */
+
 #ifndef TOPPERS_SUPPORT_SUBPRIO
 #define chg_spr no_support
 #endif /* TOPPERS_SUPPORT_SUBPRIO */

@@ -37,7 +37,7 @@
 #   アの利用により直接的または間接的に生じたいかなる損害に関しても，そ
 #   の責任を負わない．
 # 
-#   $Id: pridataq.trb 104 2016-02-26 09:47:37Z ertl-hiro $
+#   $Id: pridataq.trb 461 2018-09-24 11:43:34Z ertl-hiro $
 # 
 
 #
@@ -52,9 +52,6 @@ class PridataqObject < KernelObject
   def prepare(key, params)
     # パラメータが省略された時のデフォルト値の設定
     params[:pdqmb] ||= "NULL"
-
-    # 保護ドメインの囲みの中に記述されていない場合は無所属とする
-    params[:domain] ||= $TDOM_NONE
 
     # pdqatrが無効の場合（E_RSATR）［NGKI1804］
     #（TA_TPRI以外のビットがセットされている場合）

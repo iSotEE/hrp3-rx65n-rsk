@@ -1,7 +1,7 @@
 /*
  *		全静的APIのテスト(2)
  * 
- *  $Id: cfg_all2.h 367 2018-04-15 02:01:28Z ertl-hiro $
+ *  $Id: cfg_all2.h 465 2018-09-30 11:03:02Z ertl-hiro $
  */
 
 #include <kernel.h>
@@ -31,6 +31,8 @@
  */
 #define	STACK_SIZE		4096		/* タスクのスタックサイズ */
 
+#ifndef TOPPERS_MACRO_ONLY
+
 /*
  *  スタック領域，カーネルの管理領域の定義
  */
@@ -47,8 +49,6 @@ extern volatile int var2;
 /*
  *  関数のプロトタイプ宣言
  */
-#ifndef TOPPERS_MACRO_ONLY
-
 extern void	task1(intptr_t exinf);
 extern void	task2(intptr_t exinf);
 

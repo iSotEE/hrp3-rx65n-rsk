@@ -32,32 +32,30 @@ extern char __start_ustack_TOPPERS_RAM_DUMMY1[];
 extern char __start_ustack_TASK2[];
 extern char __start_mo_rwdata_DOM1[];
 extern char __start_mo_rwdata_DOM1_S_1_S[];
-extern char __start_mo_rwdata_shared[];
-extern char __aend_mo_rwdata_shared[];
+extern char __aend_mo_rwdata_DOM1_S_1_S[];
 
-const uint_t _kernel_tnum_meminib = 17U;
+const uint_t _kernel_tnum_meminib = 16U;
 
-void *const _kernel_memtop_table[18] = {
+void *const _kernel_memtop_table[17] = {
 	0,
 	__start_mo_text_kernel /* 0x01000000 */,
-	__start_mo_rodata_kernel /* 0x01009000 */,
-	__start_mo_text_DOM1 /* 0x0100a000 */,
-	__start_mo_text_shared /* 0x0100b000 */,
-	__aend_mo_text_shared /* 0x0100c000 */,
+	__start_mo_rodata_kernel /* 0x0100a000 */,
+	__start_mo_text_DOM1 /* 0x0100b000 */,
+	__start_mo_text_shared /* 0x0100c000 */,
+	__aend_mo_text_shared /* 0x0100d000 */,
 	__start_mo_rwdata_kernel /* 0x01800000 */,
 	__start_ustack_TASK1 /* 0x01804000 */,
 	__start_ustack_TOPPERS_RAM_DUMMY1 /* 0x01805000 */,
 	__start_ustack_TASK2 /* 0x01806000 */,
 	__start_mo_rwdata_DOM1 /* 0x01807000 */,
 	__start_mo_rwdata_DOM1_S_1_S /* 0x01809000 */,
-	__start_mo_rwdata_shared /* 0x0180a000 */,
-	__aend_mo_rwdata_shared /* 0x0180b000 */,
+	__aend_mo_rwdata_DOM1_S_1_S /* 0x0180a000 */,
 	(void *)(0xf0000000) /* 0xf0000000 */,
 	(void *)(0xf1000000) /* 0xf1000000 */,
 	(void *)(((char *)(0xf1000000)) + (0x1000000)) /* 0xf2000000 */
 };
 
-const MEMINIB _kernel_meminib_table[18] = {
+const MEMINIB _kernel_meminib_table[17] = {
 	{ TA_NOEXS, 0U, 0U, 0U },
 	{ TA_TEXTSEC, 0U, TACP_KERNEL, TACP_KERNEL },
 	{ TA_RODATASEC, 0U, TACP_KERNEL, TACP_KERNEL },
@@ -70,7 +68,6 @@ const MEMINIB _kernel_meminib_table[18] = {
 	{ TA_USTACK|(TA_NOINITSEC), TACP(DOM1), TACP(DOM1), TACP(DOM1) },
 	{ 0x0, TACP(DOM1), TACP(DOM1), TACP(DOM1) },
 	{ 0x0, TACP_SHARED, TACP(DOM1), TACP_SHARED },
-	{ 0x0, TACP_SHARED, TACP_SHARED, TACP_SHARED },
 	{ TA_NOEXS, 0U, 0U, 0U },
 	{ TA_ATTMEM|(TA_NULL), TACP(DOM1), TACP(DOM1), TACP(DOM1) },
 	{ TA_ATTMEM|(TA_NULL), TACP_SHARED, TACP(DOM1), TACP_SHARED },
@@ -81,15 +78,9 @@ const MEMINIB _kernel_meminib_table[18] = {
  *  Data Section Initialization Information
  */
 
-extern char __start_data_shared[];
-extern char __end_data_shared[];
-extern char __start_idata_shared[];
+const uint_t _kernel_tnum_datasec = 0U;
 
-const uint_t _kernel_tnum_datasec = 1U;
-
-const DATASECINIB _kernel_datasecinib_table[1] = {
-	{ __start_data_shared, __end_data_shared, __start_idata_shared }
-};
+TOPPERS_EMPTY_LABEL(const DATASECINIB, _kernel_datasecinib_table);
 
 /*
  *  BSS Section Initialization Information

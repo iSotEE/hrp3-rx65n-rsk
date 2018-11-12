@@ -34,7 +34,7 @@
  *  アの利用により直接的または間接的に生じたいかなる損害に関しても，そ
  *  の責任を負わない．
  * 
- *  $Id: test_extsvc1.h 186 2016-04-05 15:49:42Z ertl-hiro $
+ *  $Id: test_extsvc1.h 508 2018-10-27 15:57:48Z ertl-hiro $
  */
 
 /* 
@@ -54,6 +54,14 @@
 #define TASK3_PRIORITY	9		/* タスク3の優先度 */
 
 /*
+ *  拡張SVC番号の定義
+ */
+#define TFN_EXTSVC0		(50)
+#define TFN_EXTSVC1		(51)
+#define TFN_EXTSVC2		(52)
+#define TFN_EXTSVC3		(53)
+
+/*
  *  ターゲットに依存する可能性のある定数の定義
  */
 #ifndef STACK_SIZE
@@ -71,14 +79,6 @@
 #ifndef NON_OVERFLOW_STACK_SIZE
 #define NON_OVERFLOW_STACK_SIZE		(STACK_SIZE * 20)
 #endif /* NON_OVERFLOW_STACK_SIZE */
-
-/*
- *  拡張SVC番号の定義
- */
-#define TFN_EXTSVC0		(50)
-#define TFN_EXTSVC1		(51)
-#define TFN_EXTSVC2		(52)
-#define TFN_EXTSVC3		(53)
 
 /*
  *  関数のプロトタイプ宣言

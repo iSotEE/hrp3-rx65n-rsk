@@ -35,7 +35,7 @@
  *  アの利用により直接的または間接的に生じたいかなる損害に関しても，そ
  *  の責任を負わない．
  * 
- *  $Id: chip_timer.c 451 2018-09-03 09:40:27Z ertl-hiro $
+ *  $Id: chip_timer.c 533 2018-11-11 05:11:47Z ertl-hiro $
  */
 
 /*
@@ -51,6 +51,10 @@
 #include "target_timer.h"
 #include <sil.h>
 #include "mpcore.h"
+
+#ifndef MPCORE_TMR_CLEAR_INT
+#define MPCORE_TMR_CLEAR_INT()
+#endif /* MPCORE_TMR_CLEAR_INT */
 
 #ifdef USE_MPCORE_TMRWDG_HRT
 /*
@@ -97,6 +101,7 @@ target_hrt_initialize(intptr_t exinf)
 	 *  タイマ割込み要求をクリアする．
 	 */
 	sil_wrw_mem(MPCORE_TMR_ISR, MPCORE_TMR_ISR_EVENTFLAG);
+	MPCORE_TMR_CLEAR_INT();
 }
 
 /*
@@ -115,6 +120,7 @@ target_hrt_terminate(intptr_t exinf)
 	 *  タイマ割込み要求をクリアする．
 	 */
 	sil_wrw_mem(MPCORE_TMR_ISR, MPCORE_TMR_ISR_EVENTFLAG);
+	MPCORE_TMR_CLEAR_INT();
 }
 
 /*
@@ -127,6 +133,7 @@ target_hrt_handler(void)
 	 *  タイマ割込み要求をクリアする．
 	 */
 	sil_wrw_mem(MPCORE_TMR_ISR, MPCORE_TMR_ISR_EVENTFLAG);
+	MPCORE_TMR_CLEAR_INT();
 
 	/*
 	 *  高分解能タイマ割込みを処理する．

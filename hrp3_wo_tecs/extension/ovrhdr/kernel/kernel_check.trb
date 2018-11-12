@@ -37,7 +37,7 @@
 #   アの利用により直接的または間接的に生じたいかなる損害に関しても，そ
 #   の責任を負わない．
 # 
-#   $Id: kernel_check.trb 423 2018-07-29 08:16:49Z ertl-hiro $
+#   $Id: kernel_check.trb 499 2018-10-26 12:17:01Z ertl-hiro $
 #  
 
 #
@@ -504,16 +504,14 @@ end
 #  タイムウィンドウに関するチェック
 #
 twdinib = SYMBOL("_kernel_twdinib_table")
-$cfgData[:ATT_TWD].sort_by {|key, params| params[:twdidx]} \
-											.each do |(key, params)|
-  if !params[:nfymode].nil?
+$twdList.each do |key, params|
+  if params.has_key?(:twdid)
     exinf = PEEK(twdinib + $offsetof_TWDINIB_exinf, $sizeof_intptr_t)
     nfyhdr = PEEK(twdinib + $offsetof_TWDINIB_nfyhdr, $sizeof_NFYHDR)
 
     # 通知情報のチェック
     checkNotifyHandler(key, params, :twdid, exinf, nfyhdr)
   end
-
   twdinib += $sizeof_TWDINIB
 end
 

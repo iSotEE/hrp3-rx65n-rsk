@@ -37,7 +37,7 @@
 #   アの利用により直接的または間接的に生じたいかなる損害に関しても，そ
 #   の責任を負わない．
 # 
-#   $Id: task.trb 436 2018-08-12 09:10:12Z ertl-hiro $
+#   $Id: task.trb 482 2018-10-21 08:26:34Z ertl-hiro $
 # 
 
 #
@@ -46,7 +46,7 @@
 
 class TaskObject < KernelObject
   def initialize()
-    super("tsk", "task", "t")
+    super("tsk", "task", true, "t")
   end
 
   def checkMinSystemStksz(sstksz, params)
@@ -65,14 +65,6 @@ class TaskObject < KernelObject
       params[:stk] ||= NumStr.new(0, "NULL")
     end
     params[:sstk] ||= "NULL"
-
-    # 保護ドメインの囲みの中に記述されていない場合（E_RSATR）［NGKI1030］
-    if !params.has_key?(:domain) || params[:domain] == $TDOM_NONE
-      error_ercd("E_RSATR", params, "task `%tskid' " \
-						"in %apiname must belong to a protection domain")
-      # 以降のエラーの抑止
-      params[:domain] = $TDOM_KERNEL
-    end
 
     # tskatrが無効の場合（E_RSATR）［NGKI1028］
     #（TA_ACT，TA_NOACTQUE，TARGET_TSKATR以外のビットがセットされている場合）
@@ -271,6 +263,11 @@ class TaskObject < KernelObject
       else
         $ustackListUser.push($lastMOKey)
       end
+    end
+
+    # ターゲット依存の処理
+    if defined? TargetTaskPrepare()
+      TargetTaskPrepare(key, params)
     end
   end
 

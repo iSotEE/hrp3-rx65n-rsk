@@ -5,7 +5,7 @@
  * 
  *  Copyright (C) 2000-2003 by Embedded and Real-Time Systems Laboratory
  *                              Toyohashi Univ. of Technology, JAPAN
- *  Copyright (C) 2005-2015 by Embedded and Real-Time Systems Laboratory
+ *  Copyright (C) 2005-2018 by Embedded and Real-Time Systems Laboratory
  *              Graduate School of Information Science, Nagoya Univ., JAPAN
  * 
  *  上記著作権者は，以下の(1)〜(4)の条件を満たす場合に限り，本ソフトウェ
@@ -37,7 +37,7 @@
  *  アの利用により直接的または間接的に生じたいかなる損害に関しても，そ
  *  の責任を負わない．
  * 
- *  $Id: time_event.h 160 2016-03-14 09:39:55Z ertl-hiro $
+ *  $Id: time_event.h 498 2018-10-25 13:57:41Z ertl-hiro $
  */
 
 /*
@@ -89,29 +89,22 @@ union time_event_node {
 };
 
 /*
- *  タイムイベントヒープ（kernel_cfg.c）
+ *  タイムイベントヒープ
  *
  *  タイムイベントヒープは，タイムイベントを効率的に処理するために，発
  *  生を待っているタイムイベントの集合を管理し，その中で発生時刻が最も
  *  早いものを効率的に取り出すためのデータ構造である．
- *
- *  tmevt_heap中には，カーネルドメイン，各ユーザドメイン，アイドルドメ
- *  インのタイムイベントヒープが，この順に含まれている．
  */
-extern TMEVTN	tmevt_heap[];
 
 /*
- *  カーネルドメインのタイムイベントヒープ
+ *  カーネルドメインのタイムイベントヒープ（kernel_cfg.c）
  */
-#define p_tmevt_heap_kernel			(&(tmevt_heap[0]))
+extern TMEVTN	tmevt_heap_kernel[];
 
 /*
  *  アイドルドメインのタイムイベントヒープ（kernel_cfg.c）
- *
- *  tmevt_heap中のアイドルドメインのタイムイベントヒープの先頭を指すポ
- *  インタ．
  */
-extern TMEVTN	*const p_tmevt_heap_idle;
+extern TMEVTN	tmevt_heap_idle[];
 
 /*
  *  境界イベント時刻［ASPD1008］
@@ -178,13 +171,26 @@ extern void		update_current_evttim(void);
 extern void		set_hrt_event(void);
 
 /*
+ *  タイムイベントブロックのヒープへの挿入
+ *
+ *  p_tmevtbで指定したタイムイベントブロックを登録する．タイムイベント
+ *  の発生時刻，コールバック関数，コールバック関数へ渡す引数は，
+ *  p_tmevtbが指すタイムイベントブロック中に設定しておく．
+ *
+ *  高分解能タイマ割込みの発生タイミングの設定を行わないため，カーネル
+ *  の初期化時か，高分解能タイマ割込みの処理中で，それが必要ない場合に
+ *  のみ用いることができる．
+ */
+extern void		tmevtb_register(TMEVTB *p_tmevtb, TMEVTN *p_tmevt_heap);
+
+/*
  *  タイムイベントの登録
  *
  *  p_tmevtbで指定したタイムイベントブロックを登録する．タイムイベント
  *  の発生時刻，コールバック関数，コールバック関数へ渡す引数は，
  *  p_tmevtbが指すタイムイベントブロック中に設定しておく．
  */
-extern void		tmevtb_register(TMEVTB *p_tmevtb, TMEVTN *p_tmevt_heap);
+extern void		tmevtb_enqueue(TMEVTB *p_tmevtb, TMEVTN *p_tmevt_heap);
 
 /*
  *  相対時間指定によるタイムイベントの登録
@@ -195,7 +201,7 @@ extern void		tmevtb_register(TMEVTB *p_tmevtb, TMEVTN *p_tmevt_heap);
  *  ントブロック中に設定しておく．
  *  
  */
-extern void		tmevtb_enqueue(TMEVTB *p_tmevtb, RELTIM time,
+extern void		tmevtb_enqueue_reltim(TMEVTB *p_tmevtb, RELTIM time,
 												TMEVTN *p_tmevt_heap);
 
 /*

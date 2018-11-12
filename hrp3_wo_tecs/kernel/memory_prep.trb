@@ -36,7 +36,7 @@
 #   アの利用により直接的または間接的に生じたいかなる損害に関しても，そ
 #   の責任を負わない．
 # 
-#   $Id: memory_prep.trb 440 2018-08-16 01:07:18Z ertl-hiro $
+#   $Id: memory_prep.trb 487 2018-10-23 14:48:52Z ertl-hiro $
 # 
 
 #
@@ -265,7 +265,7 @@ $ustackListUser = []
 #  ATT_MODしたのと同等に扱うオブジェクトモジュールの処理
 #
 # カーネルドメインの先頭：START_OBJS
-# カーネルドメインの末尾：kernel_cfg.o, kernel_mem.o, -lkernel，END_OBJS
+# カーネルドメインの末尾：kernel_cfg.o, kernel_mem.o, libkernel.a，END_OBJS
 # 無所属の末尾：TARGET_LIBS
 #
 if $TOPPERS_SUPPORT_ATT_MOD
@@ -284,7 +284,7 @@ if $TOPPERS_SUPPORT_ATT_MOD
 
   $cfgData[:ATT_MOD][lastKey += 1] = ModuleParams("kernel_cfg.o", $TDOM_KERNEL)
   $cfgData[:ATT_MOD][lastKey += 1] = ModuleParams("kernel_mem.o", $TDOM_KERNEL)
-  $cfgData[:ATT_MOD][lastKey += 1] = ModuleParams("-lkernel", $TDOM_KERNEL)
+  $cfgData[:ATT_MOD][lastKey += 1] = ModuleParams("libkernel.a", $TDOM_KERNEL)
   if !$END_OBJS.nil?
     $END_OBJS.each do |modName|
       $cfgData[:ATT_MOD][lastKey += 1] = ModuleParams(modName, $TDOM_KERNEL)
@@ -362,8 +362,7 @@ end
 #
 # ターゲット依存部で定義した$targetStandardSectionListに，ターゲット依
 # 存部で定義した$defaultSectionsで定義される標準のセクションのリストを
-# 追加する．さらに，保護ドメイン毎の標準セクションのリストもそれに追加
-# する．
+# 追加する．
 #
 # $standardSecnameList：登録できないセクション名のリスト
 #
@@ -372,12 +371,6 @@ if $TOPPERS_ML_AUTO
   if $TOPPERS_SUPPORT_ATT_MOD
     $defaultSections.each do |sectionInfo|
       $standardSecnameList.push(sectionInfo[:SECNAME])
-    end
-  end
-  $domData.each do |key, params|
-    $defaultSections.each do |sectionInfo|
-      $standardSecnameList.push \
-			(StandardSecnameDomain(sectionInfo[:SECNAME], params[:label]))
     end
   end
 end
@@ -472,29 +465,6 @@ $cfgData[:ATT_SEC].each do |key, params|
 
   # secnameListに登録
   secnameList[params[:secname]] = key
-end
-
-#
-#  保護ドメイン毎の標準セクションに関する情報の生成
-#
-if $TOPPERS_ML_AUTO
-  $domData.each do |key, params|
-    $defaultSections.each do |sectionInfo|
-      # メモリオブジェクト情報の生成
-      params2 = {}
-      params2[:type] = :ATTSEC
-      params2[:linker] = true
-      params2[:domain] = key
-      params2[:memreg] = $standardMemreg[key][sectionInfo[:MEMREG]]
-      params2[:secname] = \
-			StandardSecnameDomain(sectionInfo[:SECNAME], params[:label])
-      params2[:mematr] = sectionInfo[:MEMATR]
-      params2[:acptn1] = $defaultAcptn[key]
-      params2[:acptn2] = $defaultAcptn[key]
-      params2[:acptn4] = $defaultAcptn[key]
-      $memObj[$lastMOKey += 1] = params2
-    end
-  end
 end
 
 #

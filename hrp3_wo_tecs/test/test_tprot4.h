@@ -34,7 +34,7 @@
  *  アの利用により直接的または間接的に生じたいかなる損害に関しても，そ
  *  の責任を負わない．
  * 
- *  $Id: test_tprot4.h 195 2016-04-10 09:30:59Z ertl-hiro $
+ *  $Id: test_tprot4.h 508 2018-10-27 15:57:48Z ertl-hiro $
  */
 
 /*
@@ -47,6 +47,17 @@
  *  ターゲット依存の定義
  */
 #include "target_test.h"
+
+/*
+ *  システム周期
+ */
+#define SYSTEM_CYCLE	(20 * TEST_TIME_CP)
+
+/*
+ *  タイムウィンドウの長さ
+ */
+#define TWD_DOM1_TIME	(5 * TEST_TIME_CP)
+#define TWD_DOM2_TIME	(5 * TEST_TIME_CP)
 
 /*
  *  各タスクの優先度の定義

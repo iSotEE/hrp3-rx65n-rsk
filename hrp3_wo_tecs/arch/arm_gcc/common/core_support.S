@@ -37,7 +37,7 @@
  *  アの利用により直接的または間接的に生じたいかなる損害に関しても，そ
  *  の責任を負わない．
  * 
- *  $Id: core_support.S 412 2018-07-25 09:38:09Z ertl-hiro $
+ *  $Id: core_support.S 530 2018-11-08 07:15:30Z ertl-hiro $
  */
 
 /*
@@ -128,7 +128,9 @@ ALABEL(dispatch)
 	ldr		r2, [r0,#TCB_p_tinib]	/* p_runtsk->p_tinib → r2 */
 	ldr		r1, [r2,#TINIB_tskatr]	/* p_runtsk->p_tinib->tskatr → r1 */
 	tst		r1, #TA_FPU
-	vpushne	{d8-d15}				/* 非スクラッチFPUレジスタの保存 */
+	beq		1f
+	vpush	{d8-d15}				/* 非スクラッチFPUレジスタの保存 */
+1:
 #endif /* USE_ARM_FPU */
 	str		sp, [r0,#TCB_sp]		/* スタックポインタを保存 */
 	adr		r1, dispatch_r
@@ -148,7 +150,9 @@ ALABEL(dispatch_r)
 	biceq	r0, r0, #FPEXC_ENABLE
 	orrne	r0, r0, #FPEXC_ENABLE
 	vmsr	fpexc, r0				/* FPEXCを設定 */
-	vpopne	{d8-d15}				/* 非スクラッチFPUレジスタの復帰 */
+	beq		1f
+	vpop	{d8-d15}				/* 非スクラッチFPUレジスタの復帰 */
+1:
 #endif /* USE_ARM_FPU */
 	ldm		sp, {sp,lr}^			/* sp_usr,lr_usrを復帰 */
 	add		sp, sp, #8
@@ -326,7 +330,7 @@ ALABEL(dispatcher_2)
 	AGLOBAL(call_exit_kernel)
 ALABEL(call_exit_kernel)
 	msr		cpsr_c, #(CPSR_SVC_MODE AOR CPSR_INTLOCK)
-	ldr		r0, =istkpt				/* 非タスクコンテキストのスタックへ */
+	ldr		r0, =istkpt				/* 非タスクコンテキスト用のスタックに */
 	ldr		sp, [r0]
 	b		exit_kernel
 
@@ -437,22 +441,23 @@ ALABEL(irq_handler)
 	push	{r0-r5,r12,lr,pc}		/* pcはスペース確保のため */
 
 	/*
-	 *  IRQモードに戻して，戻り番地とspsr（戻り先のcpsr）を取得する．
+	 *  IRQモードに戻して，戻り番地（lr−4）と戻り先のcpsr（spsr）を取
+	 *  得する．
 	 */
 	msr		cpsr_c, #(CPSR_IRQ_MODE AOR CPSR_IRQ_BIT)
 	sub		r2, lr, #4
 	mrs		r1, spsr
 
 	/*
-	 *  スーパバイザモードに切り換え，戻り番地とspsrを保存する．
+	 *  スーパバイザモードに切り換え，戻り番地と戻り先のcpsrを保存する．
 	 */
 	msr		cpsr_c, #(CPSR_SVC_MODE AOR CPSR_IRQ_BIT)
 	str		r2, [sp,#0x20]			/* 戻り番地をスタックに保存（pcの場所）*/
-	push	{r1}					/* spsrをスタックに保存 */
+	push	{r1}					/* 戻り先のcpsrをスタックに保存 */
 #else /* __TARGET_ARCH_ARM < 6 */
 	/*
-	 *  戻り先（lr）とspsr（cpsr_svc）をスーパバイザモードのスタックに
-	 *  保存する．
+	 *  戻り番地（lr）と戻り先のcpsr（spsr）をスーパバイザモードのスタッ
+	 *  クに保存する．
 	 */
 	sub		lr, lr, #4				/* 戻り番地の算出 */
 	srsfd	#CPSR_SVC_MODE!
@@ -763,22 +768,23 @@ ALABEL(undef_handler)
 	push	{r0-r5,r12,lr,pc}		/* pcはスペース確保のため */
 
 	/*
-	 *  未定義モードに戻して，戻り番地とspsrを取得する．
+	 *  未定義モードに戻して，戻り番地（lr）と戻り先のcpsr（spsr）を取
+	 *  得する．
 	 */
 	msr		cpsr_c, #(CPSR_UND_MODE AOR CPSR_FIQ_IRQ_BIT)
 	mov		r2, lr
 	mrs		r1, spsr
 
 	/*
-	 *  スーパバイザモードに切り換え，戻り番地とspsrを保存する．
+	 *  スーパバイザモードに切り換え，戻り番地と戻り先のcpsrを保存する．
 	 */
 	msr		cpsr_c, #(CPSR_SVC_MODE AOR CPSR_FIQ_IRQ_BIT)
 	str		r2, [sp,#0x20]			/* 戻り番地をスタックに保存（pcの場所）*/
-	push	{r1}					/* spsrをスタックに保存 */
+	push	{r1}					/* 戻り先のcpsrをスタックに保存 */
 #else /* __TARGET_ARCH_ARM < 6 */
 	/*
-	 *  戻り先（lr）とspsr（cpsr_svc）をスーパバイザモードのスタックに
-	 *  保存する．
+	 *  戻り番地（lr）と戻り先のcpsr（spsr）をスーパバイザモードのスタッ
+	 *  クに保存する．
 	 */
 	srsfd	#CPSR_SVC_MODE!
 
@@ -823,33 +829,24 @@ ALABEL(svc_handler)
 
 #if __TARGET_ARCH_ARM < 6
 	/*
-	 *  IビットとFビットをセットし，スクラッチレジスタ＋αを保存する．
+	 *  IビットとFビットをセットし，戻り番地（lr），スクラッチレジスタ
+	 *  ＋α，戻り先のcpsr（spsr）を保存する（lrは二重に保存される）．
 	 */
 	msr		cpsr_c, #(CPSR_SVC_MODE AOR CPSR_FIQ_IRQ_BIT)
-	push	{r0-r5,r12,lr,pc}		/* pcはスペース確保のため */
-
-	/*
-	 *  戻り番地とspsrを取得する．
-	 */
-	mov		r2, lr
+	push	{lr}
+	push	{r0-r5,r12,lr}
 	mrs		r1, spsr
-
-	/*
-	 *  戻り番地とspsrを保存する．
-	 */
-	str		r2, [sp,#0x20]			/* 戻り番地をスタックに保存（pcの場所）*/
-	push	{r1}					/* spsrをスタックに保存 */
+	push	{r1}
 #else /* __TARGET_ARCH_ARM < 6 */
 	/*
-	 *  戻り先（lr）とspsr（cpsr_svc）をスーパバイザモードのスタックに
-	 *  保存する．
+	 *  戻り番地（lr）と戻り先のcpsr（spsr）をスーパバイザモードのスタッ
+	 *  クに保存する．
 	 */
 	srsfd	#CPSR_SVC_MODE!
 
 	/*
 	 *  スーパバイザモードで，スクラッチレジスタ＋αを保存する．
 	 */
-	cps		#CPSR_SVC_MODE			/* 不要と思われる */
 	push	{r0-r5,r12,lr}
 #endif /* __TARGET_ARCH_ARM < 6 */
 	mov		r4, #EXCNO_SVC
@@ -876,22 +873,23 @@ ALABEL(pabort_handler)
 	push	{r0-r5,r12,lr,pc}		/* pcはスペース確保のため */
 
 	/*
-	 *  アボートモードに戻して，戻り番地とspsrを取得する．
+	 *  アボートモードに戻して，戻り番地（lr）と戻り先のcpsr（spsr）を
+	 *  取得する．
 	 */
 	msr		cpsr_c, #(CPSR_ABT_MODE AOR CPSR_FIQ_IRQ_BIT)
 	mov		r2, lr
 	mrs		r1, spsr
 
 	/*
-	 *  スーパバイザモードに切り換え，戻り番地とspsrを保存する．
+	 *  スーパバイザモードに切り換え，戻り番地と戻り先のcpsrを保存する．
 	 */
 	msr		cpsr_c, #(CPSR_SVC_MODE AOR CPSR_FIQ_IRQ_BIT)
 	str		r2, [sp,#0x20]			/* 戻り番地をスタックに保存（pcの場所）*/
-	push	{r1}					/* spsrをスタックに保存 */
+	push	{r1}					/* 戻り先のcpsrをスタックに保存 */
 #else /* __TARGET_ARCH_ARM < 6 */
 	/*
-	 *  戻り先（lr）とspsr（cpsr_svc）をスーパバイザモードのスタックに
-	 *  保存する．
+	 *  戻り番地（lr）と戻り先のcpsr（spsr）をスーパバイザモードのスタッ
+	 *  クに保存する．
 	 */
 	srsfd	#CPSR_SVC_MODE!
 
@@ -937,22 +935,23 @@ ALABEL(dabort_handler_1)
 	push	{r0-r5,r12,lr,pc}		/* pcはスペース確保のため */
 
 	/*
-	 *  アボートモードに戻して，戻り番地とspsrを取得する．
+	 *  アボートモードに戻して，戻り番地（lr）と戻り先のcpsr（spsr）を
+	 *  取得する．
 	 */
 	msr		cpsr_c, #(CPSR_ABT_MODE AOR CPSR_FIQ_IRQ_BIT)
 	mov		r2, lr
 	mrs		r1, spsr
 
 	/*
-	 *  スーパバイザモードに切り換え，戻り番地とspsrを保存する．
+	 *  スーパバイザモードに切り換え，戻り番地と戻り先のcpsrを保存する．
 	 */
 	msr		cpsr_c, #(CPSR_SVC_MODE AOR CPSR_FIQ_IRQ_BIT)
 	str		r2, [sp,#0x20]			/* 戻り番地をスタックに保存（pcの場所）*/
-	push	{r1}					/* spsrをスタックに保存 */
+	push	{r1}					/* 戻り先のcpsrをスタックに保存 */
 #else /* __TARGET_ARCH_ARM < 6 */
 	/*
-	 *  戻り先（lr）とspsr（cpsr_svc）をスーパバイザモードのスタックに
-	 *  保存する．
+	 *  戻り番地（lr）と戻り先のcpsr（spsr）をスーパバイザモードのスタッ
+	 *  クに保存する．
 	 */
 	srsfd	#CPSR_SVC_MODE!
 
@@ -981,18 +980,19 @@ ALABEL(fatal_dabort_handler)
 	push	{r0-r5,r12,lr,pc}		/* pcはスペース確保のため */
 
 	/*
-	 *  アボートモードに戻して，戻り番地とspsrを取得する．
+	 *  アボートモードに戻して，戻り番地（lr）と戻り先のcpsr（spsr）を
+	 *  取得する．
 	 */
 	msr		cpsr_c, #(CPSR_ABT_MODE AOR CPSR_FIQ_IRQ_BIT)
 	mov		r2, lr
 	mrs		r1, spsr
 
 	/*
-	 *  スーパバイザモードに切り換え，戻り番地とspsrを保存する．
+	 *  スーパバイザモードに切り換え，戻り番地と戻り先のcpsrを保存する．
 	 */
 	msr		cpsr_c, #(CPSR_SVC_MODE AOR CPSR_FIQ_IRQ_BIT)
 	str		r2, [sp,#0x20]			/* 戻り番地をスタックに保存（pcの場所）*/
-	push	{r1}					/* spsrをスタックに保存 */
+	push	{r1}					/* 戻り先のcpsrをスタックに保存 */
 #else /* __TARGET_ARCH_ARM < 6 */
 	/*
 	 *  IビットとFビットをセットし，スーパバイザモードに切り換え，スタッ
@@ -1003,8 +1003,8 @@ ALABEL(fatal_dabort_handler)
 	ldr		sp, [sp]
 
 	/*
-	 *  アボートモードに戻して，戻り先（lr）とspsr（cpsr_svc）をスーパ
-	 *  バイザモードのスタックに保存する．
+	 *  アボートモードに戻して，戻り番地（lr）と戻り先のcpsr（spsr）を
+	 *  スーパバイザモードのスタックに保存する．
 	 */
 	cps		#CPSR_ABT_MODE
 	srsfd	#CPSR_SVC_MODE!
@@ -1047,22 +1047,23 @@ ALABEL(fiq_handler)
 	push	{r0-r5,r12,lr,pc}		/* pcはスペース確保のため */
 
 	/*
-	 *  FIQモードに戻して，戻り番地とspsrを取得する．
+	 *  FIQモードに戻して，戻り番地（lr）と戻り先のcpsr（spsr）を取得
+	 *  する．
 	 */
 	msr		cpsr_c, #(CPSR_FIQ_MODE AOR CPSR_FIQ_IRQ_BIT)
 	mov		r2, lr
 	mrs		r1, spsr
 
 	/*
-	 *  スーパバイザモードに切り換え，戻り番地とspsrを保存する．
+	 *  スーパバイザモードに切り換え，戻り番地と戻り先のcpsrを保存する．
 	 */
 	msr		cpsr_c, #(CPSR_SVC_MODE AOR CPSR_FIQ_IRQ_BIT)
 	str		r2, [sp,#0x20]			/* 戻り番地をスタックに保存（pcの場所）*/
-	push	{r1}					/* spsrをスタックに保存 */
+	push	{r1}					/* 戻り先のcpsrをスタックに保存 */
 #else /* __TARGET_ARCH_ARM < 6 */
 	/*
-	 *  戻り先（lr）とspsr（cpsr_svc）をスーパバイザモードのスタックに
-	 *  保存する．
+	 *  戻り番地（lr）と戻り先のcpsr（spsr）をスーパバイザモードのスタッ
+	 *  クに保存する．
 	 */
 	srsfd	#CPSR_SVC_MODE!
 

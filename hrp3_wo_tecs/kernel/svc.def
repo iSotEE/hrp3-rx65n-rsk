@@ -37,7 +37,7 @@
 #  アの利用により直接的または間接的に生じたいかなる損害に関しても，そ
 #  の責任を負わない．
 # 
-#  $Id: svc.def 404 2018-05-25 05:56:15Z ertl-hiro $
+#  $Id: svc.def 524 2018-11-04 13:01:46Z ertl-hiro $
 # 
 
 #
@@ -53,10 +53,12 @@
 #  属性の意味は次の通り．
 #
 #	S : ASP3カーネルがサポート
-#	P : HRP3カーネルが追加サポート
-#	m : メモリをアクセスする
+#	P : HRP3カーネル，HRMP3カーネルが追加サポート
+#	M : FMP3カーネル，HRMP3カーネルが追加サポート
+#	P|M : HRP3カーネル，FMP3カーネル，HRMP3カーネルが追加サポート
 #	[XXX] : XXXをサポート条件とする
-#	- : HRP3カーネルがサポートしない，予約
+#	<YYY> : CAL_SVC_nMに代えて，CAL_SVC_nM_YYYを使用する
+#	- : 現在実装されているカーネルがサポートしない，予約
 #
 #  XXXがサポート条件であるとは，TOPPERS_SUPPORT_XXXがマクロ定義されてい
 #  る時のみ，そのサービスコールがサポートされることを示す．
@@ -140,7 +142,7 @@
 		S				ER		trcv_pdq(ID pdqid, intptr_t *p_data, \
 													PRI *p_datapri, TMO tmout)
 		-
--73		S				ER		set_tim(SYSTIM systim)
+-73		S<SYSTIM>		ER		set_tim(SYSTIM systim)
 		S				ER		get_tim(SYSTIM *p_systim)
 		S				ER		adj_tim(int32_t adjtim)
 		S[DRIFT]		ER		set_dft(int32_t drift)
@@ -328,28 +330,28 @@
 		-
 		-
 		-
--257	-				ER		mact_tsk(ID tskid, ID prcid)
+-257	M				ER		mact_tsk(ID tskid, ID prcid)
 		-
-		-				ER		mig_tsk(ID tskid, ID prcid)
+		M				ER		mig_tsk(ID tskid, ID prcid)
 		S[SUBPRIO]		ER		chg_spr(ID tskid, uint_t subpri)
--261	-				ER		msta_cyc(ID cycid, ID prcid)
+-261	M				ER		msta_cyc(ID cycid, ID prcid)
 		-
-		-				ER		msta_alm(ID almid, RELTIM almtim, ID prcid)
+		M				ER		msta_alm(ID almid, RELTIM almtim, ID prcid)
 		-
--265	P				ER		mrot_rdq(ID domid, PRI tskpri)
-		P				ER		mget_lod(ID domid, PRI tskpri, uint_t *p_load)
+-265	P|M				ER		mrot_rdq(ID schedno, PRI tskpri)
+		P|M				ER		mget_lod(ID schedno, PRI tskpri, uint_t *p_load)
 		-				ER		get_pid(ID *p_prcid)
-		P				ER		mget_nth(ID domid, PRI tskpri, \
+		P|M				ER		mget_nth(ID schedno, PRI tskpri, \
 													uint_t nth, ID *p_tskid)
 -269	-
 		-
 		-
 		-
--273	-				ER		loc_spn(ID spnid)
+-273	M				ER		loc_spn(ID spnid)
 		-
-		-				ER		try_spn(ID spnid)
+		M				ER		try_spn(ID spnid)
 		-
--277	-				ER		unl_spn(ID spnid)
+-277	M				ER		unl_spn(ID spnid)
 		-
 		-
 		-

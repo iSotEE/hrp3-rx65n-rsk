@@ -37,7 +37,7 @@
  *  アの利用により直接的または間接的に生じたいかなる損害に関しても，そ
  *  の責任を負わない．
  * 
- *  $Id: sample1.c 285 2018-03-21 02:55:49Z ertl-hiro $
+ *  $Id: sample1.c 502 2018-10-27 08:05:10Z ertl-hiro $
  */
 
 /* 
@@ -179,8 +179,6 @@ ID		ALMHDR1 = -1;
  */
 char user_stack_TASK3[STACK_SIZE]
 		__attribute__((section(".noinit_DOM2"),nocommon,aligned(4096)));
-char system_stack_TASK3[STACK_SIZE]
-		__attribute__((section(".noinit_kernel"),nocommon,aligned(8)));
 
 /*
  *  並行実行されるタスク
