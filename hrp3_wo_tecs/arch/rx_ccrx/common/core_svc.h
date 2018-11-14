@@ -97,6 +97,13 @@ _svc_service_call_5(intptr_t par1, intptr_t par2, intptr_t par3, intptr_t par4, 
 	INT		#SVC_SERVICE_CALL
 }
 
+#pragma inline_asm _svc_service_call_1_systim
+static ER_UINT
+_svc_service_call_1_systim(SYSTIM par1, FN fncd) {
+	MOV.L	R3, R5
+	INT		#SVC_SERVICE_CALL
+}
+
 #define CAL_SVC_0M(TYPE, FNCD) \
 		return ((TYPE)_svc_service_call_0(FNCD))
 
@@ -114,6 +121,9 @@ _svc_service_call_5(intptr_t par1, intptr_t par2, intptr_t par3, intptr_t par4, 
 
 #define CAL_SVC_5M(TYPE, FNCD, TYPE1, PAR1, TYPE2, PAR2, TYPE3, PAR3, TYPE4, PAR4, TYPE5, PAR5) \
 		return ((TYPE)_svc_service_call_5((intptr_t)(PAR1), (intptr_t)(PAR2), (intptr_t)(PAR3), (intptr_t)(PAR4), (intptr_t)(PAR5), FNCD))
+
+#define CAL_SVC_1M_SYSTIM(TYPE, FNCD, TYPE1, PAR1) \
+		return ((TYPE)_svc_service_call_1_systim((TYPE1)(PAR1), FNCD))
 
 /*
  *  サービスコール呼出し関数の展開

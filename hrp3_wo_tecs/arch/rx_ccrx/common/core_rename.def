@@ -3,7 +3,8 @@ call_exit_kernel
 dispatch
 exit_and_dispatch
 start_dispatch
-start_r
+start_stask_r
+start_utask_r
 
 # core_kernel_impl.c
 default_exc_handler

@@ -22,6 +22,8 @@ TCB_svclevel   .equ #{$offsetof_TCB_svclevel}
 TINIB_exinf    .equ #{$offsetof_TINIB_exinf}
 TINIB_task     .equ #{$offsetof_TINIB_task}
 TINIB_sstk     .equ #{$offsetof_TINIB_sstk}
+TINIB_ustk     .equ #{$offsetof_TINIB_ustk}
+TINIB_ustksz   .equ #{$offsetof_TINIB_ustksz}
 TINIB_domid    .equ #{$offsetof_TINIB_domid}
 SVCINIB_svcrtn .equ #{$offsetof_SVCINIB_svcrtn}
 SVCINIB_stksz  .equ #{$offsetof_SVCINIB_stksz}

@@ -374,34 +374,27 @@ extern void call_exit_kernel(void) NoReturn;
 /*
  *  タスクコンテキストの初期化
  *
- *  タスクが休止状態から実行できる状態に遷移する時に呼ばれる．この時点
- *  でスタック領域を使ってはならない．
- *
- *  activate_contextを，インライン関数ではなくマクロ定義としているのは，
- *  この時点ではTCBが定義されていないためである．
- */
-extern void start_r(void);
-
-/*
- *  タスクコンテキストの初期化
- *
  *  タスクが休止状態から実行できる状態に移行する時に呼ばれる．この時点
  *  でスタック領域を使ってはならない．
  *
  *  activate_contextを，インライン関数ではなくマクロ定義としているのは，
  *  この時点ではTCBが定義されていないためである．
  */
-#define activate_context( p_tcb )														\
-{																						\
-	{																					\
-																						\
-		/*  スタックポインタ初期値の設定  */											\
-		( p_tcb )->tskctxb.sp = ( void * )((( uint32_t ) ( p_tcb )->p_tinib->sstk ) + 	\
-								( p_tcb )->p_tinib->sstksz );							\
-		/* 起動番地の設定 */															\
-		( p_tcb )->tskctxb.pc = ( FP ) start_r;											\
-	}																					\
+extern void start_stask_r(void);
+extern void start_utask_r(void);
+
+#define activate_context(p_tcb)											\
+{																		\
+	(p_tcb)->tskctxb.sp = (void *)((char *)((p_tcb)->p_tinib->sstk)		\
+										+ (p_tcb)->p_tinib->sstksz);	\
+	if ((p_tcb)->p_dominib->domptn == TACP_KERNEL) {					\
+		(p_tcb)->tskctxb.pc = (FP) start_stask_r;						\
+	}																	\
+	else {																\
+		(p_tcb)->tskctxb.pc = (FP) start_utask_r;						\
+	}																	\
 }
+
 
 /*
  *  割込みハンドラの設定

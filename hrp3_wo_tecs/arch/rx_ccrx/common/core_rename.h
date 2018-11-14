@@ -10,7 +10,8 @@
 #define dispatch					_kernel_dispatch
 #define exit_and_dispatch			_kernel_exit_and_dispatch
 #define start_dispatch				_kernel_start_dispatch
-#define start_r						_kernel_start_r
+#define start_stask_r				_kernel_start_stask_r
+#define start_utask_r				_kernel_start_utask_r
 
 /*
  *  core_kernel_impl.c

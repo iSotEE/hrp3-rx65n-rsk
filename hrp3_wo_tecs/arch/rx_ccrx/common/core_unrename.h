@@ -11,7 +11,8 @@
 #undef dispatch
 #undef exit_and_dispatch
 #undef start_dispatch
-#undef start_r
+#undef start_stask_r
+#undef start_utask_r
 
 /*
  *  core_kernel_impl.c
