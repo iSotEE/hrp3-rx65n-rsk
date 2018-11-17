@@ -90,5 +90,15 @@ extern void	target_initialize(void);
  */
 extern void	target_exit(void) NoReturn;
 
+
+// TODO: DUMMY BELOW THIS LINE
+/*
+ *  システム周期オーバラン例外の要求
+ */
+Inline void
+raise_scycovr_exception(void)
+{
+}
+
 #endif /* TOPPERS_MACRO_ONLY */
 #endif /* TOPPERS_TARGET_KERNEL_IMPL_H */

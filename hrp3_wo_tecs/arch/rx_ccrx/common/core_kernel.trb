@@ -104,9 +104,9 @@ if not DEBUG_UNREG_INT
 	.glb	__kernel_default_int_handler
 	.glb	__kernel_default_int_handler_entry
 __kernel_default_int_handler_entry:
-	pushm	r1-r5								; スクラッチレジスタをタスクスタックへ退避
-	mov.l	#0FFFFFFFFH, r1						; 割込みハンドラ番号をr1へ
-	mov.l	#__kernel_default_int_handler, r2	; ハンドラのアドレスをr2へ
+	pushm	r1-r7								; スクラッチレジスタとr6-r7をタスクスタックへ退避
+	mov.l	#0FFFFFFFFH, r6						; 割込みハンドラ番号をr6へ
+	mov.l	#__kernel_default_int_handler, r7	; ハンドラのアドレスをr7へ
 	bra.a	_kernel_interrupt					; 共通ルーチンへ
 EOS
 end
@@ -130,9 +130,9 @@ INHNO_RANGE.each do |inhno|
 	.glb	#{inthdr}
 	.glb	__kernel#{inthdr}_#{inhno}_entry
 __kernel#{inthdr}_#{inhno}_entry:
-	pushm	r1-r5						; スクラッチレジスタをタスクスタックへ退避
-	mov.l	##{inhno}, r1			; 割込みハンドラ番号をr1へ
-	mov.l	##{inthdr}, r2		; ハンドラのアドレスをr2へ
+	pushm	r1-r7						; スクラッチレジスタとr6-r7をタスクスタックへ退避
+	mov.l	##{inhno}, r6			; 割込みハンドラ番号をr6へ
+	mov.l	##{inthdr}, r7		; ハンドラのアドレスをr7へ
 	bra.a	_kernel_interrupt			; 共通ルーチンへ
 EOS
   end
@@ -142,9 +142,9 @@ end
 kernelCfgAsm.add(<<EOS)
 	.glb	__kernel_default_exc_handler_entry
 __kernel_default_exc_handler_entry:
-	pushm	r1-r5								; スクラッチレジスタをタスクスタックへ退避
-	mov.l	#0FFFFFFFFH, r1						; CPU例外ハンドラ番号をr1へ
-	mov.l	#__kernel_default_exc_handler, r2	; ハンドラのアドレスをr2へ
+	pushm	r1-r7								; スクラッチレジスタとr6-r7をタスクスタックへ退避
+	mov.l	#0FFFFFFFFH, r6						; CPU例外ハンドラ番号をr6へ
+	mov.l	#__kernel_default_exc_handler, r7	; ハンドラのアドレスをr7へ
 	bra.a	_kernel_exception					; 共通ルーチンへ
 EOS
 
@@ -158,9 +158,9 @@ $EXCNO_VALID.each do |excno|
 	.glb	_#{exc[:exchdr]}
 	.glb	__kernel_#{exc[:exchdr]}_#{excno}_entry
 __kernel_#{exc[:exchdr]}_#{excno}_entry:
-	pushm	r1-r5						; スクラッチレジスタをタスクスタックへ退避
-	mov.l	##{excno}, r1			; CPU例外ハンドラ番号をr1へ
-	mov.l	#_#{exc[:exchdr]}, r2		; ハンドラのアドレスをr2へ
+	pushm	r1-r7						; スクラッチレジスタとr6-r7をタスクスタックへ退避
+	mov.l	##{excno}, r6			; CPU例外ハンドラ番号をr6へ
+	mov.l	#_#{exc[:exchdr]}, r7		; ハンドラのアドレスをr7へ
 	bra.a	_kernel_exception			; 共通ルーチンへ
 EOS
   end

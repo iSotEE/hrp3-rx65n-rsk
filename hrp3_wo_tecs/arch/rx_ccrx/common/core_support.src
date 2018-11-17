@@ -1,43 +1,41 @@
 ;
-;   TOPPERS/ASP Kernel
-;       Toyohashi Open Platform for Embedded Real-Time Systems/
-;       Advanced Standard Profile Kernel
+;  TOPPERS/HRP Kernel
+;      Toyohashi Open Platform for Embedded Real-Time Systems/
+;      High Reliable system Profile Kernel
 ;
-;   Copyright (C) 2000-2003 by Embedded and Real-Time Systems Laboratory
-;                               Toyohashi Univ. of Technology, JAPAN
-;   Copyright (C) 2007      by Embedded and Real-Time Systems Laboratory
-;               Graduate School of Information Science, Nagoya Univ., JAPAN
-;   Copyright (C) 2010 by Witz Corporation, JAPAN
-;   Copyright (C) 2013      by Mitsuhiro Matsuura
+;  Copyright (C) 2000-2004 by Embedded and Real-Time Systems Laboratory
+;                              Toyohashi Univ. of Technology, JAPAN
+;  Copyright (C) 2006-2018 by Embedded and Real-Time Systems Laboratory
+;              Graduate School of Information Science, Nagoya Univ., JAPAN
 ;
-;   上記著作権者は，以下の(1)～(4)の条件を満たす場合に限り，本ソフトウェ
-;   ア（本ソフトウェアを改変したものを含む．以下同じ）を使用・複製・改
-;   変・再配布（以下，利用と呼ぶ）することを無償で許諾する．
-;   (1) 本ソフトウェアをソースコードの形で利用する場合には，上記の著作
-;       権表示，この利用条件および下記の無保証規定が，そのままの形でソー
-;       スコード中に含まれていること．
-;   (2) 本ソフトウェアを，ライブラリ形式など，他のソフトウェア開発に使
-;       用できる形で再配布する場合には，再配布に伴うドキュメント（利用
-;       者マニュアルなど）に，上記の著作権表示，この利用条件および下記
-;       の無保証規定を掲載すること．
-;   (3) 本ソフトウェアを，機器に組み込むなど，他のソフトウェア開発に使
-;       用できない形で再配布する場合には，次のいずれかの条件を満たすこ
-;       と．
-;     (a) 再配布に伴うドキュメント（利用者マニュアルなど）に，上記の著
-;         作権表示，この利用条件および下記の無保証規定を掲載すること．
-;     (b) 再配布の形態を，別に定める方法によって，TOPPERSプロジェクトに
-;         報告すること．
-;   (4) 本ソフトウェアの利用により直接的または間接的に生じるいかなる損
-;       害からも，上記著作権者およびTOPPERSプロジェクトを免責すること．
-;       また，本ソフトウェアのユーザまたはエンドユーザからのいかなる理
-;       由に基づく請求からも，上記著作権者およびTOPPERSプロジェクトを
-;       免責すること．
+;  上記著作権者は，以下の(1)〜(4)の条件を満たす場合に限り，本ソフトウェ
+;  ア（本ソフトウェアを改変したものを含む．以下同じ）を使用・複製・改
+;  変・再配布（以下，利用と呼ぶ）することを無償で許諾する．
+;  (1) 本ソフトウェアをソースコードの形で利用する場合には，上記の著作
+;      権表示，この利用条件および下記の無保証規定が，そのままの形でソー
+;      スコード中に含まれていること．
+;  (2) 本ソフトウェアを，ライブラリ形式など，他のソフトウェア開発に使
+;      用できる形で再配布する場合には，再配布に伴うドキュメント（利用
+;      者マニュアルなど）に，上記の著作権表示，この利用条件および下記
+;      の無保証規定を掲載すること．
+;  (3) 本ソフトウェアを，機器に組み込むなど，他のソフトウェア開発に使
+;      用できない形で再配布する場合には，次のいずれかの条件を満たすこ
+;      と．
+;    (a) 再配布に伴うドキュメント（利用者マニュアルなど）に，上記の著
+;        作権表示，この利用条件および下記の無保証規定を掲載すること．
+;    (b) 再配布の形態を，別に定める方法によって，TOPPERSプロジェクトに
+;        報告すること．
+;  (4) 本ソフトウェアの利用により直接的または間接的に生じるいかなる損
+;      害からも，上記著作権者およびTOPPERSプロジェクトを免責すること．
+;      また，本ソフトウェアのユーザまたはエンドユーザからのいかなる理
+;      由に基づく請求からも，上記著作権者およびTOPPERSプロジェクトを
+;      免責すること．
 ;
-;   本ソフトウェアは，無保証で提供されているものである．上記著作権者お
-;   よびTOPPERSプロジェクトは，本ソフトウェアに関して，特定の使用目的
-;   に対する適合性も含めて，いかなる保証も行わない．また，本ソフトウェ
-;   アの利用により直接的または間接的に生じたいかなる損害に関しても，そ
-;   の責任を負わない．
+;  本ソフトウェアは，無保証で提供されているものである．上記著作権者お
+;  よびTOPPERSプロジェクトは，本ソフトウェアに関して，特定の使用目的
+;  に対する適合性も含めて，いかなる保証も行わない．また，本ソフトウェ
+;  アの利用により直接的または間接的に生じたいかなる損害に関しても，そ
+;  の責任を負わない．
 ;
 ;
 
@@ -57,15 +55,18 @@
 ;
 ;  各種EQU定義(Hファイルの#define定義)
 ;
+	.glb	__kernel_dominib_kernel
 	.glb	__kernel_exit_kernel
 	.glb	__kernel_ext_tsk
 	.glb	__kernel_intnest
 	.glb	__kernel_istkpt
+	.glb	__kernel_p_ctxdom
 	.glb	__kernel_p_runtsk
 	.glb	__kernel_p_schedtsk
 	.glb	__kernel_rundom
 	.glb	__kernel_svc_table
 	.glb	__kernel_svcinib_table
+	.glb	__kernel_tcb_table
 	.glb	__kernel_tmax_fncd
 	.glb	__kernel_twdtimer_enable
 	.glb	__kernel_twdtimer_start
@@ -186,9 +187,9 @@ __kernel_dispatch:
 	mvfc	usp, r5						; uspを取得
 	pushm	r4-r13						; rundom、uspと非スクラッチレジスタ保存
 	mov.l	#__kernel_p_runtsk, r15
-	mov.l	[r15], r14
-	st_TCB_sp	r0, r14, r5				; スタックポインタをTCBに保存
-	st_TCB_pc	#dispatch_r, r14, r5	; 実行再開番地をTCBに保存
+	mov.l	[r15], r1					; p_runtsk → r1
+	st_TCB_sp	r0, r1, r5				; スタックポインタをTCBに保存
+	st_TCB_pc	#dispatch_r, r1, r5		; 実行再開番地をTCBに保存
 	bra		dispatcher
 
 ;
@@ -213,60 +214,191 @@ dispatch_r_after_twd:
 	rts  	                        		; dispatch 呼び出し元へ戻る.
 
 ;
-;  タスクの終了処理
+;  ディスパッチャの動作開始
 ;
-call_ext_tsk:
-	mov.l	#TFN_EXT_TSK, r5
-	int		#SVC_SERVICE_CALL
-	mov.l	#TFN_EXT_KER, r5
-	int		#SVC_SERVICE_CALL
-call_ext_tsk_loop:
-	bra		call_ext_tsk_loop
+__kernel_start_dispatch:
+	;
+	;  このルーチンは，カーネル起動時に，非タスクコンテキストで，NMIを
+	;  除くすべての割込みを禁止した状態（全割込みロック状態と同等）で
+	;  呼び出される．
+	;
+	;  dispatcher_0へ分岐する前に，タスクコンテキスト・CPUロック状態・
+	;  割込み優先度マスク全解除状態にし，使用するスタックを，IDが1のタ
+	;  スクのスタック領域に切り換えなければならない．
+	;
+
+	;
+	;  タスクコンテキストに切り換える．
+	;
+	mov.l	#__kernel_intnest, r5
+	mov.w	#0, [r5]						; 例外ネストカウントを0に
+
+	;
+	;  IDが1のタスクのシステムスタック領域に切り換える．
+	;
+	mov.l	#__kernel_tcb_table, r4			; tcb_table[0] → r4
+	mov.l	TCB_p_tinib[r4], r3				; tcb_table[0].p_tinib → r3
+	mov.l	TINIB_sstk[r3], r1
+	mov.l	TINIB_sstksz[r3], r2
+	add		r1, r2, sp
+
+	;
+	;  CPUロック状態にして，ディスパッチャ本体へ分岐する．
+	;
+.if	TIPM_LOCK != TIPM_LOCK_ALL
+	mvtc	#(IPL_LOCK | 00010000H), psw	; 全割込みロック解除状態
+											; 割込み優先度マスク全解除でない状態
+.endif
+	bra		dispatcher_0
+
+;
+;  現在のコンテキストを捨ててディスパッチ
+;
+__kernel_exit_and_dispatch:
+	;
+	;  このルーチンは，タスクコンテキスト・CPUロック状態・割込み優先度
+	;  マスク全解除状態・ディスパッチ許可状態で呼び出される．
+	;
+.if	LOG_DSP_ENTER == 1
+	mov.l	#__kernel_p_runtsk, r1	; p_runtsk → r1
+	mov.l	[r1], r1
+.endif
+	; ディスパッチャ本体（dispatcher）へ
+
+;
+;  ディスパッチャ本体
+;
+dispatcher:
+.if	LOG_DSP_ENTER == 1
+	;
+	; 【この時点のレジスタ状態】
+	;  r1：p_runtsk（タスク切換え前）
+	;
+	bsr		_kernel_log_dsp_enter
+.endif
+
+dispatcher_0:
+	;
+	;  このルーチンは，タスクコンテキスト・CPUロック状態・割込み優先度
+	;  マスク全解除状態・ディスパッチ許可状態で呼び出される．実行再開番
+	;  地へもこの状態のまま分岐する．
+	;
+	mov.l	#__kernel_p_schedtsk, r1	; p_schedtsk → r6 → p_runtsk
+	mov.l	[r1], r6
+	mov.l	#__kernel_p_runtsk, r2
+	mov.l	r6, [r2]
+	cmp		#0, r6
+	bz		dispatcher_1				; p_runtskがNULLならdispatcher_1へ
+	ld_TCB_sp	sp, r6, r5				; タスクスタックを復帰
+
+	;
+	;  MMU/MPUの設定切換え
+	;
+	; 【この時点のレジスタ状態】
+	;  r6：p_runtsk（タスク切換え後）
+	;
+	mov.l	TCB_p_dominib[r6], r1			; p_runtsk->p_dominib → r1
+	mov.l	#__kernel_dominib_kernel, r2	; カーネルドメインであれば
+	cmp		r1, r2							; 			 dispatcher_3へ
+	beq		dispatcher_3
+	mov.l	#__kernel_p_ctxdom, r2			; p_dominibとp_ctxdomが一致して
+	mov.l	[r2], r3						; 		  いれば，dispatcher_3へ
+	cmp		r3, r1
+	beq		dispatcher_3
+	mov.l	r1, [r2]						; p_dominib → p_ctxdom
+
+;	TODO: MPU処理
+
+dispatcher_3:
+.if	LOG_DSP_LEAVE == 1
+	mov.l	r6, r1					; p_runtskをパラメータに渡す
+	bsr		_kernel_log_dsp_leave
+.endif
+	ld_TCB_pc	r1, r6, r5			; 実行再開番地を復帰
+	jmp		r1						; p_runtskをr6に入れた状態で分岐する
+
+	;
+	;  アイドル処理
+	;
+	;  割込みをすべて許可し，CPUロック解除状態にして割込みを待つ．
+	;
+dispatcher_1:
+	mov.l	#__kernel_twdtimer_enable, r1	; twdtimer_enableがtrueの場合
+	mov.l	[r1], r1
+	cmp		#0, r1
+	beq		dispatcher_1_after_twd
+	bsr		__kernel_twdtimer_start			; タイムウィンドウタイマの動作開始
+dispatcher_1_after_twd:
+
+.if	TIPM_LOCK != TIPM_LOCK_ALL
+	mov.l	#__kernel_lock_flag, r5	; CPUロック解除状態へ
+	mov.l	#0, [r5]
+	mvtc	#0, psw					; 優先度0の割込み処理中を偽装
+.endif
+
+dispatcher_2:
+	setpsw	i				; 全割込み許可
+	clrpsw	i				; 全割込み禁止
+	bra   	dispatcher_2	; 割込み待ち
+
+;
+;  カーネルの終了処理の呼出し
+;
+;  割込みロック状態にし，使用するスタックを非タスクコンテキスト用のスタッ
+;  ク領域に切り替え，exit_kernelを呼び出す．
+;
+__kernel_call_exit_kernel:
+.if	TIPM_LOCK != TIPM_LOCK_ALL
+	clrpsw	i							; 全割込み禁止
+	mov.l	#__kernel_lock_flag, r5		; CPUロック解除状態へ
+	mov.l	#0, [r5]
+.endif
+	mov.l	#__kernel_istkpt, r5
+	mov.l	[r5], sp					; 割込み用のスタックへ切替え
+	mov.l	#__kernel_intnest, r5
+	mov.w	#1, [r5]					; 非タスクコンテキストに切換え
+	bsr		__kernel_exit_kernel
 
 ;
 ;  システムタスクの実行開始時処理
 ;
-;  呼び出し条件:
-;	・ディスパッチャモード(ファイルヘッダ参照)
-;   ・r6：p_runtskの値（タスク切換え後）
-;
-;  ここでは, CPUロック解除状態にし, タスクを起動する.
-;
 __kernel_start_stask_r:
+	;
+	; 【この時点のレジスタ状態】
+	;  r6：p_runtsk（タスク切換え後）
+	;
 	mov.l	#__kernel_rundom, r1
 	mov.l	#0, [r1]						; TACP_KERNEL → rundom
 	mov.l	#__kernel_twdtimer_enable, r1	; twdtimer_enableがtrueの場合
 	mov.l	[r1], r1
 	cmp		#0, r1
-	beq		start_stask_r_1
+	beq		start_stask_r_after_twd
 	bsr		__kernel_twdtimer_stop			; タイムウィンドウタイマの停止
-start_stask_r_1:
+start_stask_r_after_twd:
 .if	TIPM_LOCK == TIPM_LOCK_ALL
-	setpsw	i							; 割込み許可(CPUロック解除状態)
+	setpsw	i								; 割込み許可(CPUロック解除状態)
 .else
-	mov.l	#__kernel_lock_flag, r4		; CPUロック解除状態へ
-	mov.l	#0, [r4]					; ここに来るときは必ず saved_ipl の
-	mvtc	#00010000H, psw				; 値は 0 のため, 直値を設定する.
-										; 全割込みロック解除状態( I = 1 )
-										; 割込み優先度マスク全解除状態( IPL = 0 )
+	mov.l	#__kernel_lock_flag, r4			; CPUロック解除状態へ
+	mov.l	#0, [r4]						; ここに来るときは必ず saved_ipl の
+	mvtc	#00010000H, psw					; 値は 0 のため, 直値を設定する.
+											; 全割込みロック解除状態( I = 1 )
+											; 割込み優先度マスク全解除状態( IPL = 0 )
 .endif
-	mov.l 	#__kernel_ext_tsk, r5
-	push.l	r5							; 戻り番地をスタックに積む
-	ld_TCB_p_tinib	r5, r6, r4
-	ld_TINIB_exinf	r1, r5, r4			; 拡張情報を第一引数に設定
-	ld_TINIB_task	r5, r5, r4			; タスクの起動番地を取得
+	mov.l 	#__kernel_ext_tsk, r5			; タスク本体からの戻り番地を設定（スタックに積む）
+	push.l	r5
+	ld_TCB_p_tinib	r2, r6, r4				; p_runtsk->p_tinib → r2
+	ld_TINIB_exinf	r1, r2, r4				; exinfをパラメータに
+	ld_TINIB_task	r5, r2, r4				; タスク起動番地にジャンプ
 	jmp		r5
 
 ;
 ;  ユーザタスクの実行開始時処理
 ;
-;  呼び出し条件:
-;	・ディスパッチャモード(ファイルヘッダ参照)
-;   ・r6：p_runtskの値（タスク切換え後）
-;
-;  ここでは, CPUロック解除状態にし, タスクを起動する.
-;
 __kernel_start_utask_r:
+	;
+	; 【この時点のレジスタ状態】
+	;  r6：p_runtsk（タスク切換え後）
+	;
 	mov.l	TCB_p_dominib[r6], r1			; p_runtsk->p_dominib → r1
 	mov.l	DOMINIB_domptn[r1], r2			; p_dominib->domptn → r2
 	mov.l	#__kernel_rundom, r1
@@ -274,14 +406,14 @@ __kernel_start_utask_r:
 	mov.l	#__kernel_twdtimer_enable, r1	; twdtimer_enableがtrueの場合
 	mov.l	[r1], r1
 	cmp		#0, r1
-	beq		start_utask_r_1
+	beq		start_utask_r_after_twd
 	bsr		__kernel_twdtimer_start			; タイムウィンドウタイマの動作開始
-start_utask_r_1:
+start_utask_r_after_twd:
 	mov.l	TCB_p_tinib[r6], r1				; p_runtsk->p_tinib → r1
 	mov.l	TINIB_ustk[r1], r2				; p_tinib->ustk → r2
 	mov.l	TINIB_ustksz[r1], r3			; p_tinib->ustksz → r3
-	add		r3, r2							; ユーザスタックの初期値 → r2
-	mvtc	r2, usp							; r2 → usp
+	add		r3, r2							; ユーザスタックの初期値 → r2 → usp
+	mvtc	r2, usp
 
 	mov.l	TINIB_task[r1], r2				; タスク起動番地 → r2
 	mov.l	#00130000H, r3					; PSWの初期値（U、I、PM） → r3
@@ -297,115 +429,6 @@ start_utask_r_1:
 	rte
 
 ;
-;  カーネル起動からのタスクディスパッチャ入口
-;
-;  このルーチンは，カーネル起動時に，すべての割込みを禁止した状態
-; （割込みロック状態と同等）で呼び出される．また，割込みモード（非
-;  タスクコンテキストと同等）で呼び出されることを想定している．
-;
-;  呼び出し条件:
-;	・割込み(CPU例外)処理モード(ファイルヘッダ参照)
-;
-;  ここでは, ディスパッチャモードに変更する.
-;
-__kernel_start_dispatch:
-	mov.l	#__kernel_intnest, r5
-	mov.w	#0, [r5]					; タスクコンテキストに切換え
-.if	TIPM_LOCK != TIPM_LOCK_ALL
-	mvtc	#(IPL_LOCK | 00010000H), psw	; 全割込みロック解除状態
-										; 割込み優先度マスク全解除でない状態
-.endif
-
-;
-; タスク終了(現在のコンテキストを捨てる)からのタスクディスパッチャ入口
-;
-;  呼び出し条件:
-;	・ディスパッチャモード(ファイルヘッダ参照)
-;
-;  ここでは, 何もすることはない.
-;  なお, p_runtsk のアドレス取得だけは行なう.
-;
-__kernel_exit_and_dispatch:
-	mov.l	#__kernel_p_runtsk, r15
-
-;
-; ディスパッチャ本体
-;
-;  呼び出し条件:
-;	・すべてのタスクのコンテキストは保存されている.
-;	・r14:p_runtskの値（ディスパッチ元TCB）
-;	・r15:p_runtskのアドレス
-;
-;  dispatcher 呼出時のスタック:
-;	・__kernel_dispatch からきた場合			: タスクスタック
-;	・exit_and_dispatch からきた場合:
-;		exit_task からきた場合					: タスクスタック
-;		カーネル起動時(__kernel_start_dispatch)	: 割込みスタック
-;	・ret_int からきた場合						: タスクスタック
-;	・dispatcher_idle_loop からきた場合			: 割込みスタック
-;
-dispatcher:
-.if	LOG_DSP_ENTER == 1
-	push.l	r15
-	mov.l	r14, r1						; 引数(ディスパッチ元TCB)を設定
-	bsr		_kernel_log_dsp_enter
-	pop.l	r15
-.endif
-dispatcher_0:
-	mov.l	#__kernel_p_schedtsk, r5
-	mov.l	[r5], r6					; p_schedtsk を p_runtsk に
-	mov.l	r6, [r15]
-	cmp		#0, r6
-	bz		dispatcher_pre_idle			; schedtsk がなければアイドルループへ
-	ld_TCB_sp	r0, r6, r5				; タスクスタックポインタを復帰
-.if	LOG_DSP_LEAVE == 1
-	mov.l	r6, r1						; 引数(ディスパッチ先TCB)を設定
-	bsr		_kernel_log_dsp_leave
-.endif
-	ld_TCB_pc	r5, r6, r4
-	jmp		r5					; 実行再開番地へジャンプ
-
-;
-;  schdedtskがNULLの場合はアイドルループに入る
-;  アイドルループは割込み処理モードで動作させる
-;
-dispatcher_pre_idle:
-	mov.l	#__kernel_twdtimer_enable, r1	; twdtimer_enableがtrueの場合
-	mov.l	[r1], r1
-	cmp		#0, r1
-	beq		dispatcher_pre_idle_after_twd
-	bsr		__kernel_twdtimer_start			; タイムウィンドウタイマの動作開始
-dispatcher_pre_idle_after_twd:
-
-.if	TIPM_LOCK != TIPM_LOCK_ALL
-	mov.l	#__kernel_lock_flag, r5		; CPUロック解除状態へ
-	mov.l	#0, [r5]
-	mvtc	#0, psw						; 優先度0の割込み処理中を偽装
-.endif
-dispatcher_idle_loop:
-	setpsw	i							; 全割込み許可
-	clrpsw	i							; 全割込み禁止
-	bra   	dispatcher_idle_loop		; アイドルループを繰り返す
-
-;
-; カーネルの終了処理の呼出し
-;
-; モードとスタックを非タスクコンテキスト用に切り替え．
-;
-__kernel_call_exit_kernel:
-.if	TIPM_LOCK != TIPM_LOCK_ALL
-	clrpsw	i							; 全割込み禁止
-	mov.l	#__kernel_lock_flag, r5		; CPUロック解除状態へ
-	mov.l	#0, [r5]
-.endif
-	mov.l	#__kernel_istkpt, r5
-	mov.l	[r5], r0					; 割込み用のスタックへ切替え
-	mov.l	#__kernel_intnest, r5
-	mov.w	#1, [r5]					; 非タスクコンテキストに切換え
-	bsr		__kernel_exit_kernel
-	bra		__kernel_call_exit_kernel
-
-;
 ;  割込みの出入口処理(アセンブリ言語記述部分)
 ;
 ;  呼出し条件:
@@ -416,11 +439,11 @@ __kernel_call_exit_kernel:
 ;  ・割込み発生時のH/W処理により,スタックに割込みからの復帰PCとPSWが
 ;    保存されている.
 ;  ・ベクタテーブルに登録された個別の入り口処理により, スタックに
-;    スクラッチレジスタ(R1-R5)が保存されている.
+;    スクラッチレジスタ(R1-R5)とR6-R7が保存されている.
 ;
 ;  引数:
-;  ・r1:割込み要因番号
-;  ・r2:割込みハンドラのアドレス
+;  ・r6:割込み要因番号
+;  ・r7:割込みハンドラのアドレス
 ;
 ;  レジスタがスタック上にどのように保存されているかを以下に示す.
 ;  この図では上が低位, 下が高位のアドレスで, スタックは下から
@@ -447,10 +470,14 @@ __kernel_call_exit_kernel:
 ;	-------------------------(SP + 32)
 ;	|       R5(4byte)       |
 ;	-------------------------(SP + 36)
-;	|       PC(4byte)       |
+;	|       R6(4byte)       |
 ;	-------------------------(SP + 40)
-;	|       PSW(4byte)      |
+;	|       R7(4byte)       |
 ;	-------------------------(SP + 44)
+;	|       PC(4byte)       |
+;	-------------------------(SP + 48)
+;	|       PSW(4byte)      |
+;	-------------------------(SP + 52)
 ;
 ;  ここでは, 割込み処理モードに変更してハンドラを実行する.
 ;
@@ -461,9 +488,9 @@ __kernel_call_exit_kernel:
 
 ;
 ;  ret_int先頭でスタックに積まれているPSWレジスタへのオフセット
-;  ACC + FPSW + R14--R15 + R1--R5 + PC
+;  ACC + FPSW + R14--R15 + R1--R7 + PC
 ;
-	RET_INT_GET_PSW_OFFSET	.equ	(8+4+28+4)
+	RET_INT_GET_PSW_OFFSET	.equ	(8+4+36+4)
 
 _kernel_interrupt:
 	pushm	r14-r15						; スクラッチレジスタを退避
@@ -472,125 +499,96 @@ _kernel_interrupt:
 	shll	#16, r5						; ACC最下位16bitは0とする
 	mvfachi	r4
 	pushm	r4-r5						; アキュムレータ退避
+
+	;
+	;  例外ネストカウントをインクリメントする．割込みが非タスクコンテキ
+	;  ストで発生した場合には，irq_handler_1へ分岐する．
+	;
 	mov.l	#__kernel_intnest, r5
 	mov.w	[r5], r4
 	add		#1, r4						; ネスト回数をインクリメント
 	mov.w	r4, [r5]
-	cmp		#1, r4						; 多重割り込みかどうか
-	bnz		interrupt_from_int			; 加算前が0でなければ多重割込み
-
-										; 初段の割込み
+	cmp		#1, r4						; 割込みが非タスクコンテキストで発生
+	bnz		_kernel_interrupt_1			; 			  なら_kernel_interrupt_1に分岐
 
 	mov.l	#__kernel_twdtimer_enable, r3	; twdtimer_enableがtrueの場合
 	mov.l	[r3], r3
 	cmp		#0, r3
-	beq		_kernel_interrupt_1
-	pushm	r1-r2
+	beq		_kernel_interrupt_after_twd
 	bsr		__kernel_twdtimer_stop			; タイムウィンドウタイマの停止
-	popm	r1-r2
-_kernel_interrupt_1:
+_kernel_interrupt_after_twd:
 
 	;
 	;  rundomをスタックに保存し，TACP_KERNELにする．
 	;
 	mov.l	#__kernel_rundom, r3
 	mov.l	[r3], r4
-	pushm	r3-r4							; rundomの番地と値をスタックに保存
-	mov.l	#0, [r3]						; TACP_KERNEL → rundom
+	pushm	r3-r4						; rundomの番地と値をスタックに保存
+	mov.l	#0, [r3]					; TACP_KERNEL → rundom
 
 	;
 	;  非タスクコンテキスト用のスタックに切り換える．
 	;
-	mov.l	r0, r3						; スタックポインタを取り出し
+	mov.l	sp, r3						; スタックポインタを取り出し
 	mov.l	#__kernel_istkpt, r5		; 割込み用のスタックへ切替える
-	mov.l	[r5], r0
+	mov.l	[r5], sp
 	push.l	r3							; タスクスタックを保持
 
-interrupt_from_int:						; 多重割込み
-	setpsw	i							; 割込み許可(CPUロック解除状態)
-
-.if	LOG_INH_LEAVE == 1
-	push.l	r1							; ログトレースの引数を保持
-.endif
+_kernel_interrupt_1:
+	setpsw	i							; CPUロック解除状態にする（割込み許可）
 
 .if	LOG_INH_ENTER == 1
-	push.l	r2
-	bsr		_kernel_log_inh_enter		; ログトレース関数の呼出し
-							; 引数の割込み要因番号は既にr1に入っている
-	pop		r2
+	;
+	;  ログ出力の呼出し
+	;
+	mov.l	r6, r1						; 割込み番号をパラメータに渡す
+	bsr		_kernel_log_inh_enter
 .endif
 
-	jsr  	r2							; Cルーチン呼び出し
+	jsr  	r7							; 割込みハンドラの呼出し
 
 .if	LOG_INH_LEAVE == 1
-	pop		r1							; 引数に割込み要因番号を設定
-	bsr		_kernel_log_inh_leave		; ログトレース関数の呼出し
+	;
+	;  ログ出力の呼出し
+	;
+	mov.l	r6, r1						; 割込み番号をパラメータに渡す
+	bsr		_kernel_log_inh_leave
 .endif
 
-	clrpsw	i							; 割込み禁止(CPUロック状態)
+	;
+	;  カーネル管理の割込みを禁止する．
+	;
+	clrpsw	i							; 割込み禁止(CPUロック状態) TODO: should kernel only?
+
+	;
+	;  例外ネストカウントをデクリメントする．
+	;
 	mov.l	#__kernel_intnest, r5
 	mov.w	[r5], r4
 	sub		#1, r4						; ネスト回数をデクリメント
 	mov.w	r4, [r5]
-	cmp		#0, r4						; 多重割り込みかどうか
-	bnz		interrupt_return			; 多重割り込みならリターン
-	; 初段の割込み
-	pop		r0							; タスクのスタックに戻す
-task_return:
-	mov.l	#__kernel_p_runtsk, r15		; &(p_runtsk) → r15
-	mov.l	[r15], r14					; p_runtsk → r14
-	cmp		#0, r14
-	bz		idle_task_return			; p_runtsk が NULLなら idle_task_return へ
-	mov.l	#__kernel_p_schedtsk, r4	; p_schedtsk → r4
-	mov.l	[r4], r4
-	cmp		r4, r14
-	beq		interrupt_return			; p_runtsk == p_schedtskなら interrupt_return へ
-.if	TIPM_LOCK == TIPM_LOCK_ALL
-	mov.l	RET_INT_GET_PSW_OFFSET[r0], r5	; 割込み/CPU例外発生前のIPL値取得
-	and		#PSW_IPL_MASK, r5
-	mvtc	r5, psw						; 全割込みロック(CPUロック)状態
-										; 割込み/CPU例外発生前の割込み優先度
-.else
-	mov.l	#__kernel_lock_flag, r5		; CPUロック状態へ
-	mov.l	#1, [r5]
-	mov.l	RET_INT_GET_PSW_OFFSET[r0], r5	; 割込み/CPU例外発生前のIPL値取得
-	and		#PSW_IPL_MASK, r5
-	mov.l	#__kernel_saved_ipl, r4
-	mov.l	r5, [r4]
-	mvtc	#(IPL_LOCK | PSW_I_MASK), psw	; 全割込みロック解除状態
-										; 割込み優先度マスク全解除でない状態
-.endif
-	mvfc	usp, r5						; uspを取得
-	pushm	r5-r13						; uspとスクラッチレジスタを除くすべてのレジスタをスタックに保存する
-	st_TCB_sp	r0, r14, r5				; スタックポインタを自タスク（p_runtsk）のTCBに保存する
-	st_TCB_pc	#ret_int_r, r14, r5		; ret_int_rを，実行再開番地として自タスクのTCBに保存する
-	bra		dispatcher					; dispatcherに分岐する
-ret_int_r:
-	popm 	r5-r13						; uspとスクラッチレジスタを除くすべてのレジスタをスタックから復帰する
-	mvtc	r5, usp
-interrupt_return:
-	;
-	;  rundomをスタックから復帰する．
-	;
-	popm	r3-r4							; rundomの番地と値をスタックから復帰
-	mov.l	r4, [r3]
+	cmp		#0, r4						; 戻り先が非タスクコンテキストなら
+	bnz		_kernel_interrupt_5			; 				_kernel_interrupt_5に分岐
 
-	mov.l	#__kernel_twdtimer_enable, r3	; twdtimer_enableがtrueの場合
-	mov.l	[r3], r3
-	cmp		#0, r3
-	beq		interrupt_return_1
-	bsr		__kernel_twdtimer_control		; タイムウィンドウタイマの切換え
-interrupt_return_1:
+	;
+	;  タスク用のスタックに戻す．
+	;
+	pop		sp
 
-	popm	r4-r5						; アキュムレータ復帰
-	mvtaclo	r5							; ACC最下位16bitは0で復帰
-	mvtachi	r4
-	popc	fpsw						; FPUステータスレジスタ復帰
-	popm	r14-r15						; レジスタ復帰
-	popm	r1-r5
-	rte									; 割込み前の処理に戻る
-idle_task_return:
-	add		#(8+44), r0					; タスクのスタックに保存したスクラッチレジスタ等を捨てる （PSWを除いて、11*4=44Bytes + rundomの番地と値）
+	;
+	;  p_runtskがNULLか判定する．
+	;
+	mov.l	#__kernel_p_runtsk, r1	; p_runtsk → r1
+	mov.l	[r1], r1
+	cmp		#0, r1					; p_runtskがNULLでなければ
+	bne		_kernel_interrupt_3		; 		_kernel_interrupt_3に分岐
+
+	;
+	;  タスクのスタックに保存したスクラッチレジスタ等を捨てる．
+	;
+	add		#(8+52), sp					; rundomの番地と値、スクラッチレジスタ（PSWを除いて、13*4=52Bytes）等を捨てる
+
+	; TODO: check need this? why?
 .if	TIPM_LOCK == TIPM_LOCK_ALL
 	pop		r5							; 割込み/CPU例外発生前のIPL値取得
 	and		#PSW_IPL_MASK, r5
@@ -608,6 +606,78 @@ idle_task_return:
 .endif
 	bra		dispatcher_0				; dispatcher_0に分岐する
 
+	;
+	;  ディスパッチが必要か判定する．
+	;
+_kernel_interrupt_3:
+	;
+	; 【この時点のレジスタ状態】
+	;  r1：p_runtsk
+	;
+	mov.l	#__kernel_p_schedtsk, r4	; p_schedtsk → r4
+	mov.l	[r4], r4
+	cmp		r1, r4						; p_runtskとp_schedtskが同じなら
+	beq		_kernel_interrupt_4			; 				  _kernel_interrupt_4へ
+
+.if	TIPM_LOCK == TIPM_LOCK_ALL
+	mov.l	RET_INT_GET_PSW_OFFSET[r0], r5	; 割込み/CPU例外発生前のIPL値取得
+	and		#PSW_IPL_MASK, r5
+	mvtc	r5, psw							; 全割込みロック(CPUロック)状態
+											; 割込み/CPU例外発生前の割込み優先度
+.else
+	mov.l	#__kernel_lock_flag, r5			; CPUロック状態へ
+	mov.l	#1, [r5]
+	mov.l	RET_INT_GET_PSW_OFFSET[r0], r5	; 割込み/CPU例外発生前のIPL値取得
+	and		#PSW_IPL_MASK, r5
+	mov.l	#__kernel_saved_ipl, r4
+	mov.l	r5, [r4]
+	mvtc	#(IPL_LOCK | PSW_I_MASK), psw	; 全割込みロック解除状態
+											; 割込み優先度マスク全解除でない状態
+.endif
+
+	;
+	;  コンテキストを保存する．
+	;
+	mvfc	usp, r7						; uspを取得
+	pushm	r7-r13						; 残りのレジスタの保存（uspとr8-r13）
+	st_TCB_sp	sp, r1, r5				; スタックポインタを保存
+	st_TCB_pc	#ret_int_r, r1, r5		; 実行再開番地を保存
+	bra		dispatcher					; r1にはp_runtskが格納されている
+
+ret_int_r:
+	;
+	;  コンテキストを復帰する．
+	;
+	; 【この時点のレジスタ状態】
+	;  r6：p_runtsk（タスク切換え後）
+	;
+	popm 	r7-r13						; 残りのレジスタの復帰（uspとr8-r13）
+	mvtc	r7, usp
+_kernel_interrupt_4:
+	;
+	;  rundomをスタックから復帰する．
+	;
+	popm	r3-r4							; rundomの番地と値をスタックから復帰
+	mov.l	r4, [r3]
+
+	mov.l	#__kernel_twdtimer_enable, r3	; twdtimer_enableがtrueの場合
+	mov.l	[r3], r3
+	cmp		#0, r3
+	beq		_kernel_interrupt_5
+	bsr		__kernel_twdtimer_control		; タイムウィンドウタイマの切換え
+
+	;
+	;  割込み処理からのリターン
+	;
+_kernel_interrupt_5:
+	popm	r4-r5						; アキュムレータ復帰
+	mvtaclo	r5							; ACC最下位16bitは0で復帰
+	mvtachi	r4
+	popc	fpsw						; FPUステータスレジスタ復帰
+	popm	r14-r15						; レジスタ復帰
+	popm	r1-r7
+	rte									; 割込み前の処理に戻る
+
 ;
 ;  CPU例外の出入口処理(アセンブリ言語記述部分)
 ;
@@ -618,61 +688,63 @@ idle_task_return:
 ;  ・CPU例外発生時のH/W処理により,スタックにCPU例外からの復帰PCと
 ;    PSWが保存されている.
 ;  ・ベクタテーブルに登録された個別の入り口処理により, スタックに
-;    スクラッチレジスタ(R1-R5)が保存されている.
+;    スクラッチレジスタ(R1-R5)とR6-R7が保存されている.
 ;
 ;  引数:
-;  ・r1:CPU例外要因番号
-;  ・r2:CPU例外ハンドラのアドレス
+;  ・r6:CPU例外要因番号
+;  ・r7:CPU例外ハンドラのアドレス
 ;
 ;  レジスタがスタック上にどのように保存されているかを以下に示す.
 ;  この図では上が低位, 下が高位のアドレスで, スタックは下から
 ;  上方向に向かって積み上げられるものとする.
-;  なお, CPU例外要因番号とR6-R13はCPU例外ハンドラ内で情報を取得
+;  なお, CPU例外要因番号、rundomとR8-R13はCPU例外ハンドラ内で情報を取得
 ;  する目的で退避しており, 出口処理では保存内容を破棄すればよい.
 ;
 ;	-------------------------
-;	|    CPU例外要因番号    | <----- p_excinf
+;	|    CPU例外要因番号              | <----- p_excinf
 ;	------------------------- (intptr_t)(p_excinf + 0)
-;	|       R6(4byte)       |
+;	|        rundom         |
 ;	------------------------- (intptr_t)(p_excinf + 4)
-;	|       R7(4byte)       |
-;	------------------------- (intptr_t)(p_excinf + 8)
 ;	|       R8(4byte)       |
-;	------------------------- (intptr_t)(p_excinf + 12)
+;	------------------------- (intptr_t)(p_excinf + 8)
 ;	|       R9(4byte)       |
-;	------------------------- (intptr_t)(p_excinf + 16)
+;	------------------------- (intptr_t)(p_excinf + 12)
 ;	|       R10(4byte)      |
-;	------------------------- (intptr_t)(p_excinf + 20)
+;	------------------------- (intptr_t)(p_excinf + 16)
 ;	|       R11(4byte)      |
-;	------------------------- (intptr_t)(p_excinf + 24)
+;	------------------------- (intptr_t)(p_excinf + 20)
 ;	|       R12(4byte)      |
-;	------------------------- (intptr_t)(p_excinf + 28)
+;	------------------------- (intptr_t)(p_excinf + 24)
 ;	|       R13(4byte)      |
-;	------------------------- (intptr_t)(p_excinf + 32)
+;	------------------------- (intptr_t)(p_excinf + 28)
 ;	|       ACC-HI(4byte)   |
-;	------------------------- (intptr_t)(p_excinf + 36)
+;	------------------------- (intptr_t)(p_excinf + 32)
 ;	|       ACC-LO(4byte)   |
-;	------------------------- (intptr_t)(p_excinf + 40)
+;	------------------------- (intptr_t)(p_excinf + 36)
 ;	|       FPSW(4byte)     |
-;	------------------------- (intptr_t)(p_excinf + 44)
+;	------------------------- (intptr_t)(p_excinf + 40)
 ;	|       R14(4byte)      |
-;	------------------------- (intptr_t)(p_excinf + 48)
+;	------------------------- (intptr_t)(p_excinf + 44)
 ;	|       R15(4byte)      |
-;	------------------------- (intptr_t)(p_excinf + 52)
+;	------------------------- (intptr_t)(p_excinf + 48)
 ;	|       R1(4byte)       |
-;	------------------------- (intptr_t)(p_excinf + 56)
+;	------------------------- (intptr_t)(p_excinf + 52)
 ;	|       R2(4byte)       |
-;	------------------------- (intptr_t)(p_excinf + 60)
+;	------------------------- (intptr_t)(p_excinf + 56)
 ;	|       R3(4byte)       |
-;	------------------------- (intptr_t)(p_excinf + 64)
+;	------------------------- (intptr_t)(p_excinf + 60)
 ;	|       R4(4byte)       |
-;	------------------------- (intptr_t)(p_excinf + 68)
+;	------------------------- (intptr_t)(p_excinf + 64)
 ;	|       R5(4byte)       |
+;	------------------------- (intptr_t)(p_excinf + 68)
+;	|       R6(4byte)       |
 ;	------------------------- (intptr_t)(p_excinf + 72)
-;	|       PC(4byte)       |
+;	|       R7(4byte)       |
 ;	------------------------- (intptr_t)(p_excinf + 76)
-;	|       PSW(4byte)      |
+;	|       PC(4byte)       |
 ;	------------------------- (intptr_t)(p_excinf + 80)
+;	|       PSW(4byte)      |
+;	------------------------- (intptr_t)(p_excinf + 84)
 ;
 ;  ここでは, 割込み処理モードに変更してハンドラを実行する.
 ;  CPU例外ハンドラに渡すVP型の変数 p_excinf としてISPの値渡す．
@@ -686,103 +758,264 @@ idle_task_return:
 
 ;
 ;  CPU例外ハンドラ呼出し後に不要となるスタック情報のサイズ
-;  EXCNO + R6--R13
+;  EXCNO + RUNDOM + R8--R13
 ;
-	EXCINF_REG_SIZE	.equ	(4+32)
+	EXCINF_REG_SIZE	.equ	(4+4+24)
+	EXC_GET_RUNDOM_OFFSET .equ (4)
 
 _kernel_exception:
+	;
+	;  スクラッチレジスタをスタックに保存する
+	;
 	pushm	r14-r15						; スクラッチレジスタを退避
 	pushc	fpsw
 	mvfacmi	r5
 	shll	#16, r5						; ACC最下位16bitは0とする
 	mvfachi	r4
 	pushm	r4-r5						; アキュムレータ退避
-	pushm	r6-r13						; 非スクラッチレジスタ保存
-	push.l	r1							; CPU例外要因番号を保持
-	mov.l	r0, r3						; スタックポインタを取り出し
-	mov.l	EXC_GET_PSW_OFFSET[r3], r5
+
+	;
+	;  CPU例外が発生した状況を判断するための追加情報をスタックに保存する
+	;
+	pushm	r8-r13						; 非スクラッチレジスタ保存
+	push.l	r6							; CPU例外要因番号を保持
+	mov.l	#__kernel_rundom, r6
+	push.l	[r6]						; rundomをスタックに保存
+	mov.l	sp, r6						; 例外情報の先頭番地 → r6
+	mov.l	#__kernel_intnest, r2		; intnestの番地 → r2
+	mov.w	[r2], r3					; intnestの値 → r3
+
+	;
+	;  カーネル管理外のCPU例外か判定する
+	;
+	mov.l	EXC_GET_PSW_OFFSET[r6], r5
 	and		#PSW_I_MASK, r5
 	bz		exception_nonkernel			; 全割込み禁止(CPUロック)状態なら管理外
 .if	TIPM_LOCK != TIPM_LOCK_ALL
-	mov.l	EXC_GET_PSW_OFFSET[r3], r5
+	mov.l	EXC_GET_PSW_OFFSET[r6], r5
 	and		#PSW_IPL_MASK, r5
 	cmp		#IPL_LOCK, r5
-	bgt	exception_nonkernel			; IPLがCPUロックレベル以上なら管理外
+	bgt		exception_nonkernel			; IPLがCPUロックレベル以上なら管理外
 .endif
-	mov.l	#__kernel_intnest, r5
-	mov.w	[r5], r4
-	add		#1, r4						; ネスト回数をインクリメント
-	mov.w	r4, [r5]
-	cmp		#1, r4						; 多重割り込みかどうか
-	bnz		exception_from_int			; 加算前が0でなければ多重割込み
-						; 初段の割込み
-	mov.l	#__kernel_istkpt, r5		; 割込み用のスタックへ切替える
-	mov.l	[r5], r0
-	push.l	r3							; タスクスタックを保持
-exception_from_int:		; 多重割込み
-	mov.l	EXC_GET_PSW_OFFSET[r3], r5
+
+	;
+	; 【この時点のレジスタ状態】
+	;  r2：intnestの番地
+	;  r3：intnestの値
+	;  r6：CPU例外の情報を記憶している領域の先頭番地
+	;  r7：CPU例外ハンドラのアドレス
+	;
+
+	;
+	;  例外ネストカウントをインクリメントする．
+	;
+	add		#1, r3
+	mov.w	r3, [r2]
+	cmp		#1, r3						; CPU例外発生前が非タスクコンテキスト
+	bnz		_kernel_exception_2			; 			   なら_kernel_exception_2に分岐
+
+	mov.l	#__kernel_twdtimer_enable, r3	; twdtimer_enableがtrueの場合
+	mov.l	[r3], r3
+	cmp		#0, r3
+	beq		_kernel_exception_after_twd
+	bsr		__kernel_twdtimer_stop			; タイムウィンドウタイマの停止
+_kernel_exception_after_twd:
+
+	;
+	;  rundomをTACP_KERNELにする．
+	;
+	mov.l	#__kernel_rundom, r1
+	mov.l	#0, [r1]					; TACP_KERNEL → rundom
+
+
+	;
+	;  非タスクコンテキスト用のスタックに切り換える．
+	;
+	mov.l	#__kernel_istkpt, r5		; 非タスクコンテキスト用のスタックに
+	mov.l	[r5], sp
+	push.l	r6							; 切換え前のスタックポインタを保存
+
+_kernel_exception_2:
+	;
+	; 【この時点のレジスタ状態】
+	;  r6：CPU例外の情報を記憶している領域の先頭番地
+	;  r7：CPU例外ハンドラのアドレス
+	;
+
+	mov.l	EXC_GET_PSW_OFFSET[r6], r5
 	mvtc	r5, psw						; CPU例外発生前の状態に戻す
-.if	LOG_EXC_LEAVE == 1
-	push.l	r1							; ログトレースの引数を保持
-.endif
 
 .if	LOG_EXC_ENTER == 1
-	pushm	r2-r3
+	mov.l	[r6], r1					; 引数の割込み要因番号  → r1
 	bsr		_kernel_log_exc_enter		; ログトレース関数の呼出し
-							; 引数の割込み要因番号は既にr1に入っている
-	popm	r2-r3
 .endif
 
-	mov.l	r3, r1						; 引数のp_excinfを設定
-	jsr  	r2							; Cルーチン呼び出し
+	mov.l	r6, r1						; 引数のp_excinfを設定
+	jsr  	r7							; Cルーチン呼び出し
 
 .if	LOG_EXC_LEAVE == 1
-	pop		r1							; 引数に割込み要因番号を設定
+	mov.l	[r6], r1					; 引数の割込み要因番号  → r1
 	bsr		_kernel_log_exc_leave		; ログトレース関数の呼出し
 .endif
 
 	clrpsw	i							; ここからは必ず割込み禁止
+
+	;
+	;  例外ネストカウントをデクリメントする．
+	;
 	mov.l	#__kernel_intnest, r5
 	mov.w	[r5], r4
 	sub		#1, r4						; ネスト回数をデクリメント
 	mov.w	r4, [r5]
-	cmp		#0, r4						; 多重割り込みかどうか
-	bnz		exception_return			; 多重割り込みならリターン
-	; 初段の割込み
-	pop		r0							; タスクのスタックに戻す
-	add		#EXCINF_REG_SIZE, r0		; CPU例外情報の破棄
-	bra		task_return					; 割込みのtask_returnへ
+	cmp		#0, r4						; 戻り先が非タスクコンテキストなら
+	bnz		_kernel_exception_5			; 				_kernel_exception_5に分岐
+
+	;
+	;  タスク用のスタックに戻す．
+	;
+	pop		sp
+
+	;
+	;  p_runtskがNULLか判定する．
+	;
+	mov.l	#__kernel_p_runtsk, r1	; p_runtsk → r1
+	mov.l	[r1], r1
+	cmp		#0, r1					; p_runtskがNULLでなければ
+	bnz		_kernel_exception_3		; 		_kernel_exception_3に分岐
+
+	;
+	;  タスクのスタックに保存したスクラッチレジスタ等を捨てる．
+	;
+	add		#EXC_GET_PSW_OFFSET+4, sp
+	bra		dispatcher_0
+
+	;
+	;  ディスパッチが必要か判定する．
+	;
+_kernel_exception_3:
+	;
+	; 【この時点のレジスタ状態】
+	;  r1：p_runtsk
+	;
+	mov.l	#__kernel_p_schedtsk, r2	; p_schedtsk → r2
+	mov.l	[r2], r2
+	cmp		r1, r2						; p_runtskとp_schedtskが同じなら
+	beq		_kernel_exception_4			; 				  _kernel_exception_4へ
+
+
+	;
+	;  コンテキストを保存する．
+	;
+	mvfc	usp, r3						; usp以外（i.e. r8-r13）は既に例外情報に保存してある
+	push.l	r3
+	st_TCB_sp sp, r1, r5				; スタックポインタを保存
+	st_TCB_pc #ret_exc_r, r1, r5		; 実行再開番地を保存
+	bra		dispatcher					; r1にはp_runtskが格納されている
+
+ret_exc_r:
+	;
+	;  コンテキストを復帰する．
+	;
+	; 【この時点のレジスタ状態】
+	;  r6：p_runtsk（タスク切換え後）
+	;
+	pop		r3
+	mvtc	r3, usp
+
+	;
+	; r8-r13を例外情報から復帰
+	;
+	mov.l	sp, r1
+	add		#8, sp
+	popm	r8-r13
+	mov.l	r1, sp
+
+_kernel_exception_4:
+	;
+	;  例外フレームからrundomを復帰する．
+	;
+	mov.l	#__kernel_rundom, r1
+	mov.l	EXC_GET_RUNDOM_OFFSET[sp], [r1]
+
+	mov.l	#__kernel_twdtimer_enable, r3	; twdtimer_enableがtrueの場合
+	mov.l	[r3], r3
+	cmp		#0, r3
+	beq		_kernel_exception_4_after_twd
+	bsr		__kernel_twdtimer_control		; タイムウィンドウタイマの切換え
+_kernel_exception_4_after_twd:
+
+	;
+	;  CPU例外処理からのリターン
+	;
+_kernel_exception_5:
+	add		#EXCINF_REG_SIZE, sp	; スタック上の例外情報を捨てる
+	bra		_kernel_interrupt_5		; スタック状態が同じであるため、割込み用リターンへ
+
+;
+;  カーネル管理外のCPU例外の出入口処理
+;
 exception_nonkernel:
-	mov.l	#__kernel_intnest, r5
-	mov.w	[r5], r4
-	add		#1, r4						; ネスト回数をインクリメント
-	mov.w	r4, [r5]
-	cmp		#1, r4						; 多重割り込みかどうか
-	bnz		exception_from_nonkernelint	; 加算前が0でなければ多重割込み
-						; 初段の割込み
-	mov.l	#__kernel_istkpt, r5		; 割込み用のスタックへ切替える
-	mov.l	[r5], r0
-	push.l	r3							; タスクスタックを保持
-exception_from_nonkernelint:	; 多重割込み
-	mov.l	EXC_GET_PSW_OFFSET[r3], r5
+	;
+	; 【この時点のレジスタ状態】
+	;  r2：intnestの番地
+	;  r3：intnestの値
+	;  r6：CPU例外の情報を記憶している領域の先頭番地
+	;  r7：CPU例外ハンドラのアドレス
+	;
+
+	;
+	;  例外ネストカウントをインクリメントする．
+	;
+	add		#1, r3
+	mov.w	r3, [r2]
+	cmp		#1, r3						; CPU例外発生前が非タスクコンテキスト
+	bnz		exception_nonkernel_2		; 			   ならexception_nonkernel_2に分岐
+
+	;
+	;  rundomをTACP_KERNELにする．
+	;
+	mov.l	#__kernel_rundom, r1
+	mov.l	#0, [r1]					; TACP_KERNEL → rundom
+
+	;
+	;  非タスクコンテキスト用のスタックに切り換える．
+	;
+	mov.l	#__kernel_istkpt, r5		; 非タスクコンテキスト用のスタックに
+	mov.l	[r5], sp
+	push.l	r6							; 切換え前のスタックポインタを保存
+
+exception_nonkernel_2:
+	;
+	;  システム状態（コンテキストは除く）を，CPU例外発生時の状態へ
+	;
+	mov.l	EXC_GET_PSW_OFFSET[r6], r5
 	mvtc	r5, psw						; CPU例外発生前の状態に戻す
 
-	mov.l	r3, r1						; 引数のp_excinfを設定
-	jsr  	r2							; Cルーチン呼び出し
+	;
+	;  CPU例外ハンドラの呼出し
+	;
+	mov.l	r6, r1						; 引数のp_excinfを設定
+	jsr  	r7							; Cルーチン呼び出し
+
 
 	clrpsw	i							; ここからは必ず割込み禁止
+
+	;
+	;  例外ネストカウントをデクリメントする．
+	;
 	mov.l	#__kernel_intnest, r5
 	mov.w	[r5], r4
 	sub		#1, r4						; ネスト回数をデクリメント
 	mov.w	r4, [r5]
-	cmp		#0, r4						; 多重割り込みかどうか
-	bnz		exception_return			; 多重割り込みならリターン
-	; 初段の割込み
-	pop		r0							; タスクのスタックに戻す
+	cmp		#0, r4						; 戻り先が非タスクコンテキストなら
+	bnz		_kernel_exception_5			; 				_kernel_exception_5に分岐
 
-exception_return:
-	add		#EXCINF_REG_SIZE, r0		; CPU例外情報の破棄
-	bra		interrupt_return
+	;
+	;  タスク用のスタックに戻す．
+	;
+	pop		sp
+
+	bra		_kernel_exception_5
 
 ;
 ;  サービスコールの出入口処理
@@ -1038,5 +1271,16 @@ ret_extsvc:
 	mov.l	#__kernel_rundom, r5
 	mov.l	DOMINIB_domptn[r14], [r5]
 	bra		ret_svc_1
+
+;
+;  タスクの終了処理
+;
+call_ext_tsk:
+	mov.l	#TFN_EXT_TSK, r5
+	int		#SVC_SERVICE_CALL
+	mov.l	#TFN_EXT_KER, r5
+	int		#SVC_SERVICE_CALL
+call_ext_tsk_loop:
+	bra		call_ext_tsk_loop
 
 	.end
