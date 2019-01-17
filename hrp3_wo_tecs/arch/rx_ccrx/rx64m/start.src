@@ -40,7 +40,7 @@
 ;
 ;  初期化ルーチン
 ;
-	.section	P_START, CODE
+	.section	P, CODE
 
 	.glb	_core_start
 	.glb	_start

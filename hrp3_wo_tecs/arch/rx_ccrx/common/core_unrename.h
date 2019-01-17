@@ -26,5 +26,12 @@
  */
 #undef cfg_int_table
 
+/*
+ *  kernel_mem.c
+ */
+#undef shared_mpu_num
+#undef max_domain_mpu_num
+#undef mpu_info_table
+
 
 #endif /* TOPPERS_CORE_RENAME_H */

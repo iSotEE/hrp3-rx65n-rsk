@@ -70,7 +70,7 @@ $cfgData[:ATT_REG].each do |key, params|
   # regatrが無効の場合（E_RSATR）［NGKI2800］
   #（TA_NOWRITE，TARGET_REGATR以外のビットがセットされている場合）
   if (params[:regatr] & ~($TA_NOWRITE|$TARGET_REGATR)) != 0
-    error_illegal_id("E_RSATR", params, :regname);
+    error_illegal_id("E_RSATR", params, :regatr, :regname);
   end
 
   # 保護ドメインの囲みの中に記述されている（E_RSATR）［NGKI2814］

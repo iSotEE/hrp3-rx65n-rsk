@@ -47,6 +47,7 @@
 #define FREQ_MAIN_CLOCK (24000000UL)  /* 24MHz */
 #define FREQ_PCLK_BCD   (60000000UL)  /* 60MHz */
 #define FREQ_CMTW0      (7500000UL)   /* 7.5MHz */
+#define FREQ_CMTW1      (7500000UL)   /* 7.5MHz */
 
 /*
  *  UARTデフォルト設定

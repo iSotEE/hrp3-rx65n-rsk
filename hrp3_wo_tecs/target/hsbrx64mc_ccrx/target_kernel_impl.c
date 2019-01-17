@@ -52,7 +52,7 @@
 void
 hardware_init_hook(void)
 {
-#if FREQ_MAIN_CLOCK == 24000000 && FREQ_PCLK_BCD == 60000000 && FREQ_CMTW0 == 7500000
+#if FREQ_MAIN_CLOCK == 24000000 && FREQ_PCLK_BCD == 60000000 && FREQ_CMTW0 == 7500000 && FREQ_CMTW1 == 7500000
 	/*
 	 *  クロック設定.
 	 *  メインクロック: 24MHz,
@@ -63,7 +63,7 @@ hardware_init_hook(void)
 	 *  PCLKA(周辺モジュールクロックA): PLL / 2 = 120MHz,
 	 *  PCLKB/C/D(周辺モジュールクロックB/C/D): PLL / 4 = 60MHz,
 	 *  UCLK(USBクロック): PLL / 5 = 48MHz.
-	 *  CMTW0の周波数: PCLKB / 8 = 7.5MHz.
+	 *  CMTW0/1の周波数: PCLKB / 8 = 7.5MHz.
 	 *
 	 *  References:
 	 *  [1] 9.8 クロックソース切り替え, page 324.
@@ -107,8 +107,9 @@ hardware_init_hook(void)
 	/* PRCRで書込み禁止 */
 	sil_wrh_mem((void *)SYSTEM_PRCR_ADDR, SYSTEM_PRCR_PRKEY_BITS);
 
-	/* Set CMTW0.CMWCR.CTS to match FREQ_CMTW0 */
+	/* Set CMTW0/1.CMWCR.CTS to match FREQ_CMTW0/1 */
 	sil_wrh_mem((void *)CMTW0_CMWCR_ADDR, (0x0 << CMTWn_CMWCR_CKS_SHIFT));
+	sil_wrh_mem((void *)CMTW1_CMWCR_ADDR, (0x0 << CMTWn_CMWCR_CKS_SHIFT));
 
 #else
 #error Must modify code above if target frequencies are changed.
@@ -130,6 +131,16 @@ software_init_hook(void)
 void
 target_initialize(void)
 {
+	int i; // TODO: init_mpu()
+	/*
+	 *  TODO: MPU有効化
+	 */
+	for (i = 0; i < _kernel_shared_mpu_num; i++) {
+		sil_wrw_mem((void *)MPU_RSPAGEn_ADDR(7-i), _kernel_mpu_info_table[i].rspage);
+		sil_wrw_mem((void *)MPU_REPAGEn_ADDR(7-i), _kernel_mpu_info_table[i].repage);
+	}
+	sil_wrw_mem((void *)MPU_MPEN_ADDR, 0x1);
+
 	/*
 	 *  バナー出力のため、SIO初期化を呼び出す
 	 */

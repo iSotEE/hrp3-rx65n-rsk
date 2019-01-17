@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
 #
-#   TOPPERS/ASP Kernel
+#   TOPPERS/HRP Kernel
 #       Toyohashi Open Platform for Embedded Real-Time Systems/
 #       Advanced Standard Profile Kernel
 # 
-#   Copyright (C) 2015,2016 by Embedded and Real-Time Systems Laboratory
+#   Copyright (C) 2015-2019 by Embedded and Real-Time Systems Laboratory
 #               Graduate School of Information Science, Nagoya Univ., JAPAN
 # 
 #   上記著作権者は，以下の(1)〜(4)の条件を満たす場合に限り，本ソフトウェ
@@ -47,6 +47,59 @@
 $EXCNO_VALID = [ 20, 21, 23, 25, 30 ]
 
 #
+#  保護ドメイン初期化コンテキストブロック
+#
+
+# カーネルドメインの保護ドメイン初期化コンテキストブロック
+$kernelDominictxb = "{ 0U, &_kernel_mpu_info_table[0] }"
+
+# 保護ドメイン初期化コンテキストブロック生成の前処理
+def PrepareDominictxb(genFile)
+  # タイムイベントヒープ領域用extern宣言の生成
+  aTmevtHeapList = ["kernel", "idle"]
+  $udomainList.each{|key|
+    aTmevtHeapList.push("#{$domData[key][:domid]}")
+  }
+  aTmevtHeapList.each{|suffix|
+     genFile.add("extern TMEVTN _kernel_tmevt_heap_#{suffix}[];");
+  }
+  genFile.add()
+end
+
+# 保護ドメイン初期化コンテキストブロックの生成
+def GenerateDominictxb(key, params)
+    return "{ 0U, NULL }"
+end
+
+#
+#  ユーザスタック領域のセクション名と確保方法
+#
+def SecnameUserStack(tskid)
+  return("B_USTACK_#{tskid}")
+end
+
+def AllocUserStack(stack, size, secname)
+  ustksz = (size + $CHECK_USTKSZ_ALIGN - 1) & ~($CHECK_USTKSZ_ALIGN - 1)
+  $kernelCfgC.add("#pragma section B #{secname}")
+  $kernelCfgC.add("static STK_T #{stack}[COUNT_STK_T(#{ustksz})];")
+  $kernelCfgC.add("#pragma section")
+  return("ROUND_STK_T(#{ustksz})")
+end
+
+#
+#  固定長メモリプール領域のセクション名と確保方法
+#
+def SecnameUserMempfix(mpfid)
+  return("B_MPF_#{mpfid}")
+end
+
+def AllocUserMempfix(mpf, blkcnt, blksz, secname)
+  $kernelCfgC.add("#pragma section B #{secname}")
+  $kernelCfgC.add("static MPF_T #{mpf}[(#{blkcnt}) * COUNT_MPF_T(#{blksz})];")
+  $kernelCfgC.add("#pragma section")
+end
+
+#
 #  ターゲット非依存部のインクルード
 #
 IncludeTrb("kernel/kernel.trb")
@@ -67,6 +120,27 @@ INTNO_RANGE.each do |intno|
 end
 $kernelCfgC.add2("};")
 
+if $TOPPERS_ML_AUTO
+  #
+  #  自動メモリ配置の場合
+  #
+
+  #
+  #  仮MPU情報の生成
+  #
+  $kernelMemC.add(<<EOS)
+const MPU_INFO _kernel_mpu_info_table[MPU_INFO_TABLE_SIZE] = {{0, 0}};
+const uint8_t _kernel_shared_mpu_num = 1U;
+const uint8_t _kernel_max_domain_mpu_num = 1U;
+EOS
+
+  #
+  #  リンカスクリプトの生成
+  #
+  IncludeTrb("arch/ccrx/linker.trb")
+else
+  IncludeTrb("ccrx_mpu_mml.trb")
+end
 
 # 
 #  アセンブラ出力ファイル
@@ -138,8 +212,12 @@ EOS
   end
 end
 
+#
 # 未登録CPU例外ハンドラ入口処理
-kernelCfgAsm.add(<<EOS)
+#
+DEBUG_UNREG_EXC = true
+if not DEBUG_UNREG_EXC
+  kernelCfgAsm.add(<<EOS)
 	.glb	__kernel_default_exc_handler_entry
 __kernel_default_exc_handler_entry:
 	pushm	r1-r7								; スクラッチレジスタとr6-r7をタスクスタックへ退避
@@ -147,20 +225,28 @@ __kernel_default_exc_handler_entry:
 	mov.l	#__kernel_default_exc_handler, r7	; ハンドラのアドレスをr7へ
 	bra.a	_kernel_exception					; 共通ルーチンへ
 EOS
+end
 
 # 
 #  CPU例外ハンドラ入口処理
 # 
 $EXCNO_VALID.each do |excno|
+  exchdr = nil
   if $cfgData[:DEF_EXC].has_key?(excno)
     exc = $cfgData[:DEF_EXC][excno]
+    exchdr = "_#{exc[:exchdr]}"
+  elsif DEBUG_UNREG_EXC
+    exchdr = "__kernel_default_exc_handler"
+  end
+
+  if exchdr
     kernelCfgAsm.add(<<EOS)
-	.glb	_#{exc[:exchdr]}
-	.glb	__kernel_#{exc[:exchdr]}_#{excno}_entry
-__kernel_#{exc[:exchdr]}_#{excno}_entry:
+	.glb	#{exchdr}
+	.glb	__kernel#{exchdr}_#{excno}_entry
+__kernel#{exchdr}_#{excno}_entry:
 	pushm	r1-r7						; スクラッチレジスタとr6-r7をタスクスタックへ退避
 	mov.l	##{excno}, r6			; CPU例外ハンドラ番号をr6へ
-	mov.l	#_#{exc[:exchdr]}, r7		; ハンドラのアドレスをr7へ
+	mov.l	##{exchdr}, r7		; ハンドラのアドレスをr7へ
 	bra.a	_kernel_exception			; 共通ルーチンへ
 EOS
   end
@@ -221,6 +307,8 @@ $EXCNO_VALID.each do |excno|
   if $cfgData[:DEF_EXC].has_key?(excno)
     exc = $cfgData[:DEF_EXC][excno]
     exchdr[excno] = "_kernel_#{exc[:exchdr]}_#{excno}_entry"
+  elsif DEBUG_UNREG_EXC
+    exchdr[excno] = "_kernel__kernel_default_exc_handler_#{excno}_entry"
   else
     exchdr[excno] = "_kernel_default_exc_handler_entry"
   end

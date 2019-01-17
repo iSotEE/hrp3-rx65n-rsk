@@ -15,3 +15,8 @@ saved_ipl
 
 # kernel_cfg.c
 cfg_int_table
+
+# kernel_mem.c
+shared_mpu_num
+max_domain_mpu_num
+mpu_info_table

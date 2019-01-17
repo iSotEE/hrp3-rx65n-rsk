@@ -17,7 +17,12 @@
 #undef target_hrt_set_event
 #undef target_hrt_raise_event
 #undef target_hrt_handler
-
+#undef target_twdtimer_initialize
+#undef target_twdtimer_terminate
+#undef target_twdtimer_start
+#undef target_twdtimer_stop
+#undef target_twdtimer_get_current
+#undef target_twdtimer_handler
 
 #include "core_unrename.h"
 

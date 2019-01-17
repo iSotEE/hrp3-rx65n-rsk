@@ -1,7 +1,7 @@
 ;*
-;*  TOPPERS/ASP Kernel
+;*  TOPPERS/HRP Kernel
 ;*      Toyohashi Open Platform for Embedded Real-Time Systems/
-;*      Advanced Standard Profile Kernel
+;*      High Reliable system Profile Kernel
 ;* 
 ;*  Copyright (C) 2000-2003 by Embedded and Real-Time Systems Laboratory
 ;*                              Toyohashi Univ. of Technology, JAPAN
@@ -9,6 +9,8 @@
 ;*              Graduate School of Information Science, Nagoya Univ., JAPAN
 ;*  Copyright (C) 2008-2010 by Witz Corporation, JAPAN
 ;*  Copyright (C) 2013      by Mitsuhiro Matsuura
+;*  Copyright (C) 2018-2019 by Embedded and Real-Time Systems Laboratory
+;*              Graduate School of Information Science, Nagoya Univ., JAPAN
 ;* 
 ;*  上記著作権者は，Free Software Foundation によって公表されている 
 ;*  GNU General Public License の Version 2 に記述されている条件か，以
@@ -37,36 +39,19 @@
 ;*  かなる損害に関しても，その責任を負わない．
 ;* 
 
-	;
-	;  初期値有りデータ領域のセクション
-	;
-	.section	D, ROMDATA
-	.section	D_2, ROMDATA, ALIGN = 2
-	.section	D_1, ROMDATA
-
-	;
-	;  初期値無しデータ領域のセクション
-	;
-	.section	B, DATA, ALIGN = 4
-	.section	B_2, DATA, ALIGN = 2
-	.section	B_1, DATA
-
-	;
-	;  初期値有りデータ領域の初期値
-	;
-	.section	R, DATA, ALIGN = 4
-	.section	R_2, DATA, ALIGN = 2
-	.section	R_1, DATA
-
 ;
 ;  RXコア共通の初期化ルーチン
 ;
-	.section	P_START, CODE
+	.section	P, CODE
 
 	.glb	_sta_ker
 	.glb	_software_init_hook
 	.glb	_hardware_init_hook
 	.glb	__kernel_istkpt
+	.glb	__kernel_tnum_datasec
+	.glb	__kernel_datasecinib_table
+	.glb	__kernel_tnum_bsssec
+	.glb	__kernel_bsssecinib_table
 	.glb	VVECTOR_TOP
 	.glb	_core_start
 _core_start:
@@ -90,56 +75,43 @@ _core_start:
 	;
 	mov.l	#_hardware_init_hook, r5
 	cmp		#0, r5
-	beq.b	init_D
+	beq.b	initialize_datasec
 	jsr		r5
 
 	;
-	;  初期値あり変数領域の初期化
+	;  DATAセクションとBSSセクションの初期化
 	;
-init_D:
-	mov.l	#(sizeof R), r3
-	cmp		#0, r3
-	beq.b	init_D_2					; サイズ0なら初期化必要なし
-	mov.l	#(topof R), r1
-	mov.l	#(topof D), r2
+initialize_datasec:
+	mov.l	#__kernel_tnum_datasec, r4
+	mov.l	[r4], r4
+	mov.l	#__kernel_datasecinib_table, r5
+initialize_datasec_loop:
+	cmp		#0, r4
+	beq		initialize_bsssec
+	mov.l	0[r5], r1
+	mov.l	8[r5], r2
+	mov.l	4[r5], r3
+	sub		r1, r3
 	smovf
-
-init_D_2:
-	mov.l	#(sizeof R_2), r3
-	cmp		#0, r3
-	beq.b	init_D_1					; サイズ0なら初期化必要なし
-	mov.l	#(topof R_2), r1
-	mov.l	#(topof D_2), r2
-	smovf
-
-init_D_1:
-	mov.l	#(sizeof R_1), r3
-	cmp		#0, r3
-	beq.b	clear_B						; サイズ0なら初期化必要なし
-	mov.l	#(topof R_1), r1
-	mov.l	#(topof D_1), r2
-	smovf
-
-	;
-	;  初期値なし変数領域の初期化
-	;
-clear_B:
+	add		#12, r5
+	sub		#1, r4
+	bra		initialize_datasec_loop
+initialize_bsssec:
+	mov.l	#__kernel_tnum_bsssec, r4
+	mov.l	[r4], r4
+	mov.l	#__kernel_bsssecinib_table, r5
 	mov.l	#0, r2
-	mov.l	#(topof B), r1
-	mov.l	#(sizeof B) , r3
+initialize_bsssec_loop:
+	cmp		#0, r4
+	beq		initialize_bsssec_end
+	mov.l	0[r5], r1
+	mov.l	4[r5], r3
+	sub		r1, r3
 	sstr.b
-
-clear_B_2:
-	mov.l	#0, r2
-	mov.l	#(topof B_2), r1
-	mov.l	#(sizeof B_2) , r3
-	sstr.b
-
-clear_B_1:
-	mov.l	#0, r2
-	mov.l	#(topof B_1), r1
-	mov.l	#(sizeof B_1) , r3
-	sstr.b
+	add		#8, r5
+	sub		#1, r4
+	bra		initialize_bsssec_loop
+initialize_bsssec_end:
 
 	;
 	;  software_init_hook を呼出し（0 でない場合）

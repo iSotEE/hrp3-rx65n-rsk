@@ -53,7 +53,19 @@
  */
 #define INHNO_TIMER		INT_CMWI0			/* 割込みハンドラ番号 */
 #define INTNO_TIMER		INT_CMWI0			/* 割込み番号 */
-#define INTATR_TIMER	TA_ENAINT			/* 割込み属性 */
+#define INTPRI_TIMER	(TMAX_INTPRI - 1)	/* 割込み優先度 */
+#define INTATR_TIMER	TA_NULL				/* 割込み属性 */
+
+/*
+ *  タイムウィンドウタイマ割込みハンドラ登録のための定数
+ *
+ *  タイムウィンドウタイマ割込みの優先度は，高分解能タイマ割込みと同じ
+ *  にしなければならない．
+ */
+#define INHNO_TWDTIMER	INT_CMWI1			/* 割込みハンドラ番号 */
+#define INTNO_TWDTIMER	INT_CMWI1			/* 割込み番号 */
+#define INTPRI_TWDTIMER	INTPRI_TIMER		/* 割込み優先度 */
+#define INTATR_TWDTIMER	TA_NULL				/* 割込み属性 */
 
 #ifndef TOPPERS_MACRO_ONLY
 
@@ -73,7 +85,13 @@ extern void	target_hrt_terminate(intptr_t exinf);
 Inline HRTCNT
 target_hrt_get_current(void)
 {
-	return((HRTCNT)CMWCNT_TO_HRTCNT(sil_rew_mem((void*)CMTW0_CMWCNT_ADDR)));
+#if TCYC_HRTCNT == 572662306U
+	uint32_t cnt = sil_rew_mem((void*)CMTW0_CMWCNT_ADDR);
+	if (cnt == 0xFFFFFFFFU) return (TCYC_HRTCNT - 1U);
+	return((HRTCNT)CMWCNT_TO_HRTCNT(cnt));
+#else
+#error TCYC_HRTCNT must be 572662306.
+#endif
 }
 
 /*
@@ -93,6 +111,99 @@ extern  void target_hrt_raise_event(void);
  *  高分解能タイマ割込みハンドラ
  */
 extern void	target_hrt_handler(void);
+
+/*
+ *  タイムウィンドウタイマの初期化処理
+ */
+extern void target_twdtimer_initialize(intptr_t exinf);
+
+/*
+ *  タイムウィンドウタイマの停止処理
+ */
+extern void target_twdtimer_terminate(intptr_t exinf);
+
+/*
+ *  タイムウィンドウタイマの動作開始
+ */
+Inline void
+target_twdtimer_start(PRCTIM twdtim)
+{
+	if (twdtim != 0) {
+		/*
+		 * CMWCORを設定
+		 */
+		sil_wrw_mem((void*)CMTW1_CMWCOR_ADDR, PRCTIM_TO_CMWCNT(twdtim));
+
+		/*
+		 * タイマ動作開始
+		 */
+		*CMTW1_CMWSTR_ADDR |= CMTWn_CMWSTR_STR_BIT;
+	} else {
+		raise_int(INTNO_TWDTIMER);
+	}
+}
+
+/*
+ *  タイムウィンドウタイマの停止
+ */
+Inline PRCTIM
+target_twdtimer_stop(void)
+{
+	uint32_t current, compare;
+
+	/*
+	 *  現在のカウント値を読み
+	 */
+	current = sil_rew_mem((void*)CMTW1_CMWCNT_ADDR);
+	compare = sil_rew_mem((void*)CMTW1_CMWCOR_ADDR);
+
+	/*
+	 * タイマ停止
+	 */
+	*CMTW1_CMWSTR_ADDR &= ~CMTWn_CMWSTR_STR_BIT;
+
+	/*
+	 * タイマカウンタ設定
+	 */
+	*CMTW1_CMWCNT_ADDR = 0U;
+
+	/*
+	 * タイマ割込み要求をクリアする．
+	 */
+	clear_int(INTNO_TWDTIMER);
+
+	if (current >= compare) {
+		return 0;
+	}
+
+	return PRCTIM_TO_CMWCNT(compare - current);
+}
+
+/*
+ *  タイムウィンドウタイマの現在値の読出し
+ */
+Inline PRCTIM
+target_twdtimer_get_current(void)
+{
+	uint32_t current, compare;
+
+	/*
+	 *  現在のカウント値を読み
+	 */
+	current = sil_rew_mem((void*)CMTW1_CMWCNT_ADDR);
+	compare = sil_rew_mem((void*)CMTW1_CMWCOR_ADDR);
+
+	if (current >= compare) {
+		return 0;
+	}
+
+	return PRCTIM_TO_CMWCNT(compare - current);
+}
+
+/*
+ *  タイムウィンドウ割込みハンドラ
+ */
+extern void target_twdtimer_handler(void);
 
 #endif /* TOPPERS_MACRO_ONLY */
 #endif /* TOPPERS_PRC_TIMER_H */

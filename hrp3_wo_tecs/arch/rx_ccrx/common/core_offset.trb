@@ -29,6 +29,8 @@ TINIB_domid    .equ #{$offsetof_TINIB_domid}
 SVCINIB_svcrtn .equ #{$offsetof_SVCINIB_svcrtn}
 SVCINIB_stksz  .equ #{$offsetof_SVCINIB_stksz}
 DOMINIB_domptn .equ #{$offsetof_DOMINIB_domptn}
+DOMINIB_use_mpu_num .equ #{$offsetof_DOMINIB_use_mpu_num}
+DOMINIB_mpu_area_info .equ #{$offsetof_DOMINIB_mpu_area_info}
 
 ; macros
 IPL_LOCK .equ #{$IPL_LOCK}
@@ -45,5 +47,9 @@ TFN_EXT_KER .equ #{$TFN_EXT_KER}
 SVC_SERVICE_CALL .equ #{$SVC_SERVICE_CALL}
 TMIN_FNCD .equ #{$TMIN_FNCD}
 TDOM_KERNEL .equ #{$TDOM_KERNEL}
+MPU_RSPAGE0_ADDR .equ #{$MPU_RSPAGE0_ADDR}
+MPU_REPAGE0_ADDR .equ #{$MPU_REPAGE0_ADDR}
+MPU_RSPAGE1_ADDR .equ #{$MPU_RSPAGE1_ADDR}
+MPU_REPAGE1_ADDR .equ #{$MPU_REPAGE1_ADDR}
 
 EOS

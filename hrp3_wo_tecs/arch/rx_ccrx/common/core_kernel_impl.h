@@ -57,6 +57,11 @@
 #include "core_insn.h"
 
 /*
+ *  エラーチェック方法の指定
+ */
+#define CHECK_USTKSZ_ALIGN	16	/* ユーザスタックサイズのアライン単位 */
+
+/*
  *  トレースログに関する設定
  */
 #ifdef TOPPERS_ENABLE_TRACE
@@ -226,6 +231,46 @@ Inline void
 delay_for_interrupt(void)
 {
 }
+
+/*
+ *  保護ドメイン初期化コンテキストブロックを使う
+ */
+#define USE_DOMINICTXB
+
+typedef struct {
+	uint32_t rspage;
+	uint32_t repage;
+} MPU_INFO;
+
+/*
+ *  保護ドメイン初期化コンテキストブロックの定義
+ */
+typedef	struct domain_initialization_context_block {
+	uint8_t			use_mpu_num;
+	const MPU_INFO	*mpu_area_info;
+} DOMINICTXB;
+
+/*
+ *  共有MPU領域数（kernel_mem.c）
+ */
+extern const uint8_t shared_mpu_num;
+
+/*
+ *  ドメイン用MPU領域の最大数（kernel_mem.c）
+ */
+extern const uint8_t max_domain_mpu_num;
+
+/*
+ *  MPU情報テーブル（kernel_mem.c）
+ */
+extern const MPU_INFO mpu_info_table[];
+
+#if defined(TOPPERS_ML_AUTO)
+#define USE_LATERPASS_DOMINIB
+#if !defined(MPU_INFO_TABLE_SIZE)
+#define MPU_INFO_TABLE_SIZE (8)
+#endif
+#endif
 
 /*
  * （モデル上の）割込み優先度マスクの設定

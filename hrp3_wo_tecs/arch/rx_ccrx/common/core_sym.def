@@ -3,6 +3,8 @@ offsetof_TCB_sp,"offsetof(TCB,tskctxb.sp)"
 offsetof_TCB_pc,"offsetof(TCB,tskctxb.pc)"
 offsetof_TCB_svclevel,"offsetof(TCB,svclevel)"
 offsetof_TCB_p_dominib,"offsetof(TCB,p_dominib)"
+offsetof_DOMINIB_use_mpu_num,"offsetof(DOMINIB,domctxb.use_mpu_num)"
+offsetof_DOMINIB_mpu_area_info,"offsetof(DOMINIB,domctxb.mpu_area_info)"
 IPL_LOCK,,signed
 TIPM_LOCK,,signed
 TIPM_LOCK_ALL,,signed
@@ -16,3 +18,8 @@ TFN_EXT_TSK,,signed
 TFN_EXT_KER,,signed
 SVC_SERVICE_CALL
 TMIN_FNCD,,signed
+MPU_RSPAGE0_ADDR,"MPU_RSPAGEn_ADDR(0)"
+MPU_REPAGE0_ADDR,"MPU_REPAGEn_ADDR(0)"
+MPU_RSPAGE1_ADDR,"MPU_RSPAGEn_ADDR(1)"
+MPU_REPAGE1_ADDR,"MPU_REPAGEn_ADDR(1)"
+MPU_INFO_TABLE_SIZE,,,defined(MPU_INFO_TABLE_SIZE)

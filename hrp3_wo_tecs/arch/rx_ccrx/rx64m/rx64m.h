@@ -45,6 +45,7 @@
  */
 #define INT_SWINT	27
 #define INT_CMWI0	30
+#define INT_CMWI1	31
 #define INT_RXI1	60
 #define INT_TXI1	61
 #define INT_IRQ_MIN	64
@@ -89,6 +90,7 @@
 #define SYSTEM_SCKCR3_ADDR			( ( volatile uint16_t __evenaccess * )0x00080026 )
 #define SYSTEM_SCKCR3_CKSEL_SHIFT	( 8U )
 #define SYSTEM_MSTPCRA_ADDR			( ( volatile uint32_t __evenaccess * )0x00080010 )
+#define SYSTEM_MSTPCRA_MSTPA0_BIT	( 1UL << 0U )
 #define SYSTEM_MSTPCRA_MSTPA1_BIT	( 1UL << 1U )
 #define SYSTEM_MSTPCRB_ADDR			( ( volatile uint32_t __evenaccess * )0x00080014 )
 #define SYSTEM_MSTPCRB_MSTPB30_BIT	( 1UL << 30U )
@@ -159,5 +161,14 @@
 #define PORTn_PDR_B0_BIT		( 1UL << 0U )
 #define PORTn_PDR_B2_BIT		( 1UL << 2U )
 #define PORTF_PMR_ADDR			( ( volatile uint8_t __evenaccess * )0x0008C06F )
+
+/*
+ *  MPUモジュール
+ */
+#define MPU_RSPAGEn_ADDR(no)	( ( volatile uint32_t __evenaccess * )(0x00086400+(no)*8) )
+#define MPU_REPAGEn_ADDR(no)	( ( volatile uint32_t __evenaccess * )(0x00086404+(no)*8) )
+#define MPU_MPEN_ADDR			( ( volatile uint32_t __evenaccess * )0x00086500 )
+#define MPU_MPESTS_ADDR			( ( volatile uint32_t __evenaccess * )0x0008650C )
+#define MPU_MPDEA_ADDR			( ( volatile uint32_t __evenaccess * )0x00086514 )
 
 #endif	/* TOPPERS_RX64M_H */

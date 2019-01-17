@@ -60,9 +60,14 @@
 #endif
 
 /*
- *  タイマ割込みの優先度
+ *  タイムウィンドウタイマ／オーバランタイマのマクロ
  */
-#define INTPRI_TIMER	(-5)
+#if FREQ_CMTW1 == 7500000
+#define PRCTIM_TO_CMWCNT(prctim) ((prctim) * 7U + (prctim) / 2U)
+#define CMWCNT_TO_PRCTIM(cmwcnt) ((((cmwcnt) / 3U) * 2U) / 5U)
+#else
+#error Must modify definitions above if FREQ_CMTW1 is changed.
+#endif
 
 /*
  *  プロセッサで共通な定義（RX64M用）

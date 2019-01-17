@@ -16,7 +16,7 @@ TOOLDIR = $(SRCDIR)/arch/$(TOOL)
 #  コンパイルオプション
 #
 INCLUDES += -include=$(COREDIR) -include=$(TOOLDIR)
-COPTS += -lang=c -output=obj -obj_path=. -nologo -endian=little -dbl_size=8 -define=OMIT_INITIALIZE_SECTIONS
+COPTS += -lang=c -output=obj -obj_path=. -nologo -endian=little -dbl_size=8 -define=OMIT_INITIALIZE_SECTIONS -nostuff
 
 #
 #  カーネルに関する定義
