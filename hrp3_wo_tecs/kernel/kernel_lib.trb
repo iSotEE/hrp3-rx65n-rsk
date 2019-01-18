@@ -301,9 +301,11 @@ def GenerateMeminib
   $sortedMemtopList.each do |key|
     params = $memObj[key]
     if params[:linker]
-      $kernelMemC.add("extern char __start_#{params[:MLABEL]}[];")
+      sLabel = "__start_#{params[:MLABEL]}"
+      $kernelMemC.add("#define #{sLabel} ((void*)#{sprintf("0x%08x", SYMBOL(sLabel))}U)")
       if !params[:suppressend]
-        $kernelMemC.add("extern char __aend_#{params[:MAEND_MLABEL]}[];")
+        sLabel = "__aend_#{params[:MAEND_MLABEL]}"
+        $kernelMemC.add("#define #{sLabel} ((void*)#{sprintf("0x%08x", SYMBOL(sLabel))}U)")
       end
     end
   end

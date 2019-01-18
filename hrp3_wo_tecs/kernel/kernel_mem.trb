@@ -62,13 +62,6 @@ $kernelMemC.add("/* kernel_mem.c */")
 GenerateCFileHeader($kernelMemC)
 
 #
-#  保護ドメイン
-#
-if $USE_LATERPASS_DOMINIB
-  GenerateDominib($kernelMemC)
-end
-
-#
 #  シンボルと仮メモリオブジェクト初期化ブロックの読込み
 #
 # $memObj[key][:baseaddr]：メモリオブジェクトの先頭番地
@@ -145,6 +138,13 @@ end
 SortMemtopList()
 
 #
+#  保護ドメイン
+#
+if $USE_LATERPASS_DOMINIB
+  GenerateDominib($kernelMemC)
+end
+
+#
 #  メモリオブジェクト初期化ブロックの生成
 #
 if !$OMIT_STANDARD_MEMINIB
@@ -165,9 +165,12 @@ if !$OMIT_STANDARD_DATASECINIB && !$OMIT_IDATA
     # dataセクション初期化ブロックで使うシンボルのextern宣言
     $datasecList.each do |key|
       params = $memObj[key]
-      $kernelMemC.add("extern char __start_#{params[:SLABEL]}[];")
-      $kernelMemC.add("extern char __end_#{params[:SLABEL]}[];")
-      $kernelMemC.add("extern char __start_#{params[:ILABEL]}[];")
+      sLabel = "__start_#{params[:SLABEL]}"
+      $kernelMemC.add("#define #{sLabel} ((void*)#{sprintf("0x%08x", SYMBOL(sLabel))}U)")
+      sLabel = "__end_#{params[:SLABEL]}"
+      $kernelMemC.add("#define #{sLabel} ((void*)#{sprintf("0x%08x", SYMBOL(sLabel))}U)")
+      sLabel = "__start_#{params[:ILABEL]}"
+      $kernelMemC.add("#define #{sLabel} ((void*)#{sprintf("0x%08x", SYMBOL(sLabel))}U)")
     end
     $kernelMemC.add
 
@@ -212,8 +215,10 @@ if !$OMIT_STANDARD_BSSSECINIB
     # bssセクション初期化ブロックで使うシンボルのextern宣言
     $bsssecList.each do |key|
       params = $memObj[key]
-      $kernelMemC.add("extern char __start_#{params[:SLABEL]}[];")
-      $kernelMemC.add("extern char __end_#{params[:SLABEL]}[];")
+      sLabel = "__start_#{params[:SLABEL]}"
+      $kernelMemC.add("#define #{sLabel} ((void*)#{sprintf("0x%08x", SYMBOL(sLabel))}U)")
+      sLabel = "__end_#{params[:SLABEL]}"
+      $kernelMemC.add("#define #{sLabel} ((void*)#{sprintf("0x%08x", SYMBOL(sLabel))}U)")
     end
     $kernelMemC.add
 
