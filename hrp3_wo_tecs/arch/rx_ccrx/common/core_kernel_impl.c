@@ -43,6 +43,7 @@
  *		カーネルのコア依存部（RX用）
  */
 
+#include <sil.h>
 #include "kernel_impl.h"
 
 /*
@@ -63,7 +64,7 @@ uint32_t	saved_ipl;		/* 割込み優先度レベルを保存する変数 */
 void
 default_int_handler( uint32_t intno )
 {
-	syslog(LOG_EMERG, "Unregistered Interrupt %d occurs.", intno);
+	syslog(LOG_EMERG, "Unregistered interrupt %d occurs.", intno);
 }
 #endif /* OMIT_DEFAULT_INT_HANDLER */
 
@@ -72,8 +73,16 @@ default_int_handler( uint32_t intno )
  *  未登録の例外が発生した場合に呼び出される
  */
 void
-default_exc_handler( void )
+default_exc_handler( void *p_excinf )
 {
-	syslog(LOG_EMERG, "Unregistered Expect error occurs.");
+	uint32_t excno = *(uint32_t*)(p_excinf);
+	if (excno == 21) { // TODO: excno magic number
+		syslog(LOG_EMERG, "Access exception %d occurs.", excno);
+		syslog(LOG_EMERG, "MPDEA:  0x%x", sil_rew_mem((void *)MPU_MPDEA_ADDR));
+		syslog(LOG_EMERG, "MPESTS: 0x%x", sil_rew_mem((void *)MPU_MPESTS_ADDR));
+	} else {
+		syslog(LOG_EMERG, "Unregistered exception %d occurs.", excno);
+	}
+	ext_ker();
 }
 #endif /* OMIT_DEFAULT_EXC_HANDLER */
