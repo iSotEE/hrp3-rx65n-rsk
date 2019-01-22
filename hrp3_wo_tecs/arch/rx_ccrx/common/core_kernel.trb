@@ -46,30 +46,7 @@
 #
 $EXCNO_VALID = [ 20, 21, 23, 25, 30 ]
 
-#
-#  保護ドメイン初期化コンテキストブロック
-#
-
-# カーネルドメインの保護ドメイン初期化コンテキストブロック
-$kernelDominictxb = "{ 0U, &_kernel_mpu_info_table[0] }"
-
-# 保護ドメイン初期化コンテキストブロック生成の前処理
-def PrepareDominictxb(genFile)
-  # タイムイベントヒープ領域用extern宣言の生成
-  aTmevtHeapList = ["kernel", "idle"]
-  $udomainList.each{|key|
-    aTmevtHeapList.push("#{$domData[key][:domid]}")
-  }
-  aTmevtHeapList.each{|suffix|
-     genFile.add("extern TMEVTN _kernel_tmevt_heap_#{suffix}[];");
-  }
-  genFile.add()
-end
-
-# 保護ドメイン初期化コンテキストブロックの生成
-def GenerateDominictxb(key, params)
-    return "{ 0U, NULL }"
-end
+IncludeTrb("rx_mpu_lib.trb")
 
 #
 #  ユーザスタック領域のセクション名と確保方法
@@ -139,7 +116,7 @@ EOS
   #
   IncludeTrb("arch/ccrx/linker.trb")
 else
-  IncludeTrb("ccrx_mpu_mml.trb")
+  GenerateMpuInfoTable()
 end
 
 # 

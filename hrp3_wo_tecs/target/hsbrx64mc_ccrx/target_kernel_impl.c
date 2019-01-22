@@ -42,6 +42,7 @@
  */
 
 #include "kernel_impl.h"
+#include "kernel/memory.h"
 #include "task.h"
 #include "hsbrx64mc.h"
 
@@ -183,3 +184,23 @@ target_exit(void)
 {
 	while (true);
 }
+
+/*
+ *  セクション初期化ブロック（手動メモリ配置用）
+ */
+#if defined(TOPPERS_ML_MANUAL)
+
+const uint_t _kernel_tnum_datasec = 1;
+
+const DATASECINIB _kernel_datasecinib_table[1] = {
+	{__sectop("R"), __secend("R"), __sectop("D")}
+};
+
+const uint_t _kernel_tnum_bsssec = 2;
+
+const BSSSECINIB _kernel_bsssecinib_table[2] = {
+		{__sectop("B"), __secend("B")},
+		{__sectop("B_SHARED"), __secend("B_SHARED")}
+};
+
+#endif
