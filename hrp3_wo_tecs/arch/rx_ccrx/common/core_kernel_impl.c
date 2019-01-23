@@ -57,6 +57,24 @@ uint32_t	saved_ipl;		/* 割込み優先度レベルを保存する変数 */
 #endif	/* TIPM_LOCK != TIPM_LOCK_ALL */
 
 
+/*
+ *  コア依存の初期化
+ */
+void
+core_initialize(void)
+{
+	uint8_t i;
+
+	/*
+	 *  MPU有効化
+	 */
+	for (i = 0; i < shared_mpu_num; i++) {
+		sil_wrw_mem((void *)MPU_RSPAGEn_ADDR(7-i), mpu_info_table[i].rspage);
+		sil_wrw_mem((void *)MPU_REPAGEn_ADDR(7-i), mpu_info_table[i].repage);
+	}
+	sil_wrw_mem((void *)MPU_MPEN_ADDR, 0x1);
+}
+
 #ifndef OMIT_DEFAULT_INT_HANDLER
 /*
  *  未登録の割込みが発生した場合に呼び出される
@@ -76,12 +94,33 @@ void
 default_exc_handler( void *p_excinf )
 {
 	uint32_t excno = *(uint32_t*)(p_excinf);
-	if (excno == 21) { // TODO: excno magic number
-		syslog(LOG_EMERG, "Access exception %d occurs.", excno);
+	switch(excno) {
+	case EXCNO_PRIV_INST:
+		syslog(LOG_EMERG, "Privileged instruction exception occurs.");
+		break;
+	case EXCNO_ACCESS:
+		syslog(LOG_EMERG, "Access exception occurs.");
 		syslog(LOG_EMERG, "MPDEA:  0x%x", sil_rew_mem((void *)MPU_MPDEA_ADDR));
 		syslog(LOG_EMERG, "MPESTS: 0x%x", sil_rew_mem((void *)MPU_MPESTS_ADDR));
-	} else {
-		syslog(LOG_EMERG, "Unregistered exception %d occurs.", excno);
+		break;
+	case EXCNO_UNDEF:
+		syslog(LOG_EMERG, "Undefined instruction exception occurs.");
+		break;
+	case EXCNO_FLOAT:
+		syslog(LOG_EMERG, "Floating-point exception occurs.");
+		break;
+	case EXCNO_NMI:
+		syslog(LOG_EMERG, "Non-maskable interrupt occurs.");
+		break;
+	case EXCNO_SCYCOVR:
+		/*
+		 *  システム周期オーバラン例外の時は，エラーメッセージだけを出
+		 *  力してリターンする．
+		 */
+		syslog(LOG_ERROR, "System cycle overrun occurs.");
+		return;
+	default:
+		syslog(LOG_EMERG, "Unexpected exception %d occurs.", excno);
 	}
 	ext_ker();
 }

@@ -604,7 +604,7 @@ _kernel_interrupt_1:
 	;
 	;  カーネル管理の割込みを禁止する．
 	;
-	clrpsw	i							; 割込み禁止(CPUロック状態) TODO: should kernel only?
+	clrpsw	i							; NOTE: ここで割込み禁止(CPUロック状態)に、カーネル管理外割込みは後で許可する
 
 	;
 	;  例外ネストカウントをデクリメントする．
@@ -634,7 +634,6 @@ _kernel_interrupt_1:
 	;
 	add		#(8+52), sp					; rundomの番地と値、スクラッチレジスタ（PSWを除いて、13*4=52Bytes）等を捨てる
 
-	; TODO: check need this? why?
 .if	TIPM_LOCK == TIPM_LOCK_ALL
 	pop		r5							; 割込み/CPU例外発生前のIPL値取得
 	and		#PSW_IPL_MASK, r5
@@ -1076,7 +1075,6 @@ _kernel_service_call:
 	;  機能コードの下限値チェック
 	;
 	cmp		#TMIN_FNCD, r5
-ret_svc_rsfn: ; TODO: 処理
 	blt		ret_svc_rsfn
 
 	;
@@ -1089,7 +1087,7 @@ ret_svc_rsfn: ; TODO: 処理
 	mov.l	[r14], r14
 	bra		service_call_2
 service_call_1:
-	mov.l	8[sp], r14				; sp状態はPC, PSW, 第五パラメータ // TODO: PC before 第五パラメータ?
+	mov.l	8[sp], r14				; sp状態はPC, PSW, 第五パラメータ
 service_call_2:
 
 	;
@@ -1140,6 +1138,34 @@ service_call_return:
 ret_svc_1:
 	rte
 
+ret_svc_rsfn:
+	mov.l	#E_RSFN, r1
+	rte
+
+ret_extsvc_rsfn:
+	add		#8, sp			; 第5パラメータ等を捨てる
+.if	LOG_EXTSVC_ENTER + LOG_EXTSVC_LEAVE > 0
+	pop.l	r6				; r6を復帰
+.endif
+	mov.l	#E_RSFN, r1
+	rte
+
+ret_extsvc_nomem:
+	add		#8, sp			; 第5パラメータ等を捨てる
+.if	LOG_EXTSVC_ENTER + LOG_EXTSVC_LEAVE > 0
+	pop.l	r6				; r6を復帰
+.endif
+	mov.l	#E_NOMEM, r1
+	rte
+
+ret_extsvc_sys:
+	add		#8, sp			; 第5パラメータ等を捨てる
+.if	LOG_EXTSVC_ENTER + LOG_EXTSVC_LEAVE > 0
+	pop.l	r6				; r6を復帰
+.endif
+	mov.l	#E_SYS, r1
+	rte
+
 	;
 	;  拡張サービスコールの出入口処理
 	;
@@ -1154,6 +1180,10 @@ extsvc_entry:
 	;  をスタックに積むのは，第6パラメータ（cdmid）を置く領域を確保す
 	;  るためであり，積んでいる値には意味がない．
 	;
+.if	LOG_EXTSVC_ENTER + LOG_EXTSVC_LEAVE > 0
+	push.l	r6						; r6をスタックに保存
+	mov.l	r5, r6					; 機能コード → r6
+.endif
 	pushm	r14-r15					; r15はスペース確保のため
 
 	;
@@ -1162,7 +1192,6 @@ extsvc_entry:
 	mov.l	#__kernel_tmax_fncd, r14
 	mov.l	[r14], r14
 	cmp		r14, r5
-ret_extsvc_rsfn: ; TODO: impl
 	bgt		ret_extsvc_rsfn
 
 	;
@@ -1192,7 +1221,6 @@ ret_extsvc_rsfn: ; TODO: impl
 	mov.l	TCB_p_tinib[r5], r5
 	mov.l	TINIB_sstk[r5], r5		; スタックの先頭番地 → r5
 	sub		r5, sp, r5				; スタック残量 → r5
-ret_extsvc_nomem: ; TODO:
 	blt		ret_extsvc_nomem		; スタック残量 < 0 ならエラー
 	mov.l	SVCINIB_stksz[r14], r14	; p_svcinib->stksz → r14
 	cmp		r14, r5					; スタックの残量 < r14 ならエラー
@@ -1205,7 +1233,6 @@ ret_extsvc_nomem: ; TODO:
 	mov.l	[r5], r5
 	mov.b	TCB_svclevel[r5], r14
 	cmp		#255, r14				; svclevel == UINT8_MAX ならエラー
-ret_extsvc_sys: ; TODO:
 	beq		ret_extsvc_sys
 	add		#1, r14					; svclevelをインクリメント
 	mov.b	r14, TCB_svclevel[r5]
@@ -1239,21 +1266,21 @@ extsvc_entry_1:
 extsvc_entry_2:
 	mov.l	r5, 4[sp]			; cdmidをスタック上に置く（r15の場所）
 
-.if 0 ; TODO: support me!
-#ifdef LOG_EXTSVC_ENTER
-	push	{r0-r3,r4}				/* r4はアラインメントのため */
-	push	{lr}					/* cdmidをスタックに積む */
-	ldr		lr, [sp,#24]			/* 第5パラメータをスタックに積む */
-	push	{lr}
-	push	{r3}					/* 第4パラメータをスタックに積む */
-	ldr		r3, [sp,#20]			/* 第3パラメータ → r3 */
-	ldr		r2, [sp,#16]			/* 第2パラメータ → r2 */
-	ldr		r1, [sp,#12]			/* 第1パラメータ → r1 */
-	mov		r0, r5					/* 機能コード → r0 */
-	bl		log_extsvc_enter
-	add		sp, sp, #12				/* 3つのパラメータを捨てる */
-	pop		{r0-r3,r4}
-#endif /* LOG_EXTSVC_ENTER */
+.if	LOG_EXTSVC_ENTER == 1
+	mov.l	[sp], r14				; 第5パラメータを取得
+	push.l	r15
+	pushm	r1-r4
+	push.l	r5						; cdmidをスタックに積む
+	push.l	r14						; 第5パラメータをスタックに積む
+	push.l	r4						; 第4パラメータをスタックに積む
+	mov.l	r3, r4					; 第3パラメータ → r4
+	mov.l	r2, r3					; 第2パラメータ → r3
+	mov.l	r1, r2					; 第1パラメータ → r2
+	mov.l	r6, r1					; 機能コード → r1
+	bsr		_kernel_log_extsvc_enter
+	add		#12, sp					; 3つのパラメータを捨てる
+	popm	r1-r4
+	pop.l	r15
 .endif
 
 	;
@@ -1261,18 +1288,20 @@ extsvc_entry_2:
 	;
 	jsr		r15
 
-.if 0 ; TODO: support me
-#ifdef LOG_EXTSVC_LEAVE
-	push	{r0,r1}					/* r1はアラインメントのため */
-	mov		r1, r0					/* 拡張サービスコールの返り値 → r1 */
-	mov		r0, r5					/* 機能コード → r0 */
-	bl		log_extsvc_leave
-	pop		{r0,r1}
-#endif /* LOG_EXTSVC_LEAVE */
+
+.if	LOG_EXTSVC_LEAVE == 1
+	push.l	r1
+	mov.l	r1, r2					; 拡張サービスコールの返り値 → r2
+	mov.l	r6, r1					; 機能コード → r1
+	bsr		_kernel_log_extsvc_leave
+	pop.l	r1
 .endif
 
 ret_extsvc:
 	add		#8, sp				; 第5〜6パラメータを捨てる
+.if	LOG_EXTSVC_ENTER + LOG_EXTSVC_LEAVE > 0
+	pop.l	r6					; r6を復帰
+.endif
 
 	;
 	;  ソフトウェア割込みからのリターン後のシステム状態が，この時点での
@@ -1289,8 +1318,7 @@ ret_extsvc:
 	;
 	;  カーネル管理の割込みを禁止する．
 	;
-; TODO: mask カーネル管理の割込み ONLY
-	clrpsw	i
+	clrpsw	i							; NOTE: ここで割込み禁止(CPUロック状態)に、カーネル管理外割込みはリターン時許可する
 
 	;
 	;  非タスクコンテキストからの呼出しなら，リターン

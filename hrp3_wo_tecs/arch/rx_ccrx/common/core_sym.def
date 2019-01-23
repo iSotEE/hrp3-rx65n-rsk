@@ -8,7 +8,11 @@ offsetof_DOMINIB_mpu_area_info,"offsetof(DOMINIB,domctxb.mpu_area_info)"
 IPL_LOCK,,signed
 TIPM_LOCK,,signed
 TIPM_LOCK_ALL,,signed
+EXCNO_SCYCOVR
 EXC_GET_PSW_OFFSET
+E_NOMEM,,signed
+E_RSFN,,signed
+E_SYS,,signed
 PSW_I_MASK
 PSW_U_MASK
 PSW_IPL_MASK
@@ -16,6 +20,7 @@ LOG_DSP_ENTER
 LOG_DSP_LEAVE
 TFN_EXT_TSK,,signed
 TFN_EXT_KER,,signed
+SVC_SCYCOVR
 SVC_SERVICE_CALL
 TMIN_FNCD,,signed
 MPU_RSPAGE0_ADDR,"MPU_RSPAGEn_ADDR(0)"

@@ -66,6 +66,7 @@ CC_CONVERTER = $(E2STUDIODIR)\Utilities\ccrx\renesas_cc_converter.exe
 TOUCH = busybox touch
 CP = busybox cp
 DIFF = busybox diff
+MKDIR = busybox mkdir
 OBJ_LDFLAGS += -subcommand=section.clnk
 CFG2_OUT_LDFLAGS += -subcommand=section.clnk
 CFG2_OUT_LDSCRIPT = section.clnk section.csv
@@ -408,6 +409,7 @@ omit_svc.h:
 #
 cfg1_out.c cfg1_out.db: cfg1_out.timestamp ;
 cfg1_out.timestamp: $(APPL_CFG) $(TECSGEN_TIMESTAMP)
+	$(MKDIR) -p $(DEPDIR)
 	$(CFG) --pass 1 $(CFG_KERNEL) $(patsubst -include=%,-I%,$(INCLUDES)) $(CFG_TABS) \
 						-M $(DEPDIR)/cfg1_out_c.d $(TARGET_KERNEL_CFG) $<
 

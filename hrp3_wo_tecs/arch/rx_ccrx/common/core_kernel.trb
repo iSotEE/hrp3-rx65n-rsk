@@ -44,7 +44,7 @@
 #
 #  有効なCPU例外ハンドラ番号
 #
-$EXCNO_VALID = [ 20, 21, 23, 25, 30 ]
+$EXCNO_VALID = [ 20, 21, 23, 25, 30, 31 ]
 
 IncludeTrb("rx_mpu_lib.trb")
 
@@ -176,7 +176,7 @@ INHNO_RANGE.each do |inhno|
   elsif DEBUG_UNREG_INT
     inthdr = "__kernel_default_int_handler"
   end
-  if inthdr && inhno != $SVC_SERVICE_CALL
+  if inthdr && inhno != $SVC_SERVICE_CALL && inhno != $SVC_SCYCOVR
     kernelCfgAsm.add(<<EOS)
 	.glb	#{inthdr}
 	.glb	__kernel#{inthdr}_#{inhno}_entry
@@ -206,27 +206,32 @@ end
 
 # 
 #  CPU例外ハンドラ入口処理
-# 
+#
 $EXCNO_VALID.each do |excno|
   exchdr = nil
   if $cfgData[:DEF_EXC].has_key?(excno)
     exc = $cfgData[:DEF_EXC][excno]
     exchdr = "_#{exc[:exchdr]}"
-  elsif DEBUG_UNREG_EXC
+  elsif (excno == $EXCNO_SCYCOVR) || DEBUG_UNREG_EXC
     exchdr = "__kernel_default_exc_handler"
   end
 
-  if exchdr
-    kernelCfgAsm.add(<<EOS)
+  next if !exchdr
+  if excno == $EXCNO_SCYCOVR
+    entry = "_kernel_scyovr_handler"
+  else
+    entry = "__kernel#{exchdr}_#{excno}_entry"
+  end
+
+  kernelCfgAsm.add(<<EOS)
 	.glb	#{exchdr}
-	.glb	__kernel#{exchdr}_#{excno}_entry
-__kernel#{exchdr}_#{excno}_entry:
+	.glb	#{entry}
+#{entry}:
 	pushm	r1-r7						; スクラッチレジスタとr6-r7をタスクスタックへ退避
 	mov.l	##{excno}, r6			; CPU例外ハンドラ番号をr6へ
 	mov.l	##{exchdr}, r7		; ハンドラのアドレスをr7へ
 	bra.a	_kernel_exception			; 共通ルーチンへ
 EOS
-  end
 end
 
 # 
@@ -258,6 +263,10 @@ EOS
 INHNO_RANGE.each do |inhno|
   if inhno == $SVC_SERVICE_CALL
     kernelCfgAsm.add("\t.lword\t_kernel_service_call		; SVC_SERVICE_CALL")
+    next
+  end
+  if inhno == $SVC_SCYCOVR
+    kernelCfgAsm.add("\t.lword\t_kernel_scyovr_handler		; SVC_SCYCOVR")
     next
   end
   

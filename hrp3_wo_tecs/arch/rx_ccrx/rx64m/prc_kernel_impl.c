@@ -158,3 +158,21 @@ config_int( INTNO intno, ATR intatr, PRI intpri )
 		( void )enable_int( intno );
 	}
 }
+
+
+/*
+ *  プロセッサ依存の初期化
+ */
+void
+prc_initialize(void)
+{
+	/*
+	 *  コア依存の初期化
+	 */
+	core_initialize();
+
+	/*
+	 *  バナー出力のため、SIO初期化を呼び出す
+	 */
+	sio_initialize();
+}

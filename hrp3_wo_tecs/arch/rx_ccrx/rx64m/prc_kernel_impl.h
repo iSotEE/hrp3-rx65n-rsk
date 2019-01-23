@@ -137,6 +137,11 @@ probe_int( INTNO intno )
 	return ( *ICU_IRn_ADDR(intno) );
 }
 
+/*
+ *  プロセッサ依存の初期化
+ */
+extern void prc_initialize(void);
+
 #endif /* TOPPERS_MACRO_ONLY */
 
 #endif /* TOPPERS_PRC_KERNEL_IMPL_H */

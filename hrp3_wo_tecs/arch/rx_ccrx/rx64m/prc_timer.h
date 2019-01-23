@@ -176,7 +176,7 @@ target_twdtimer_stop(void)
 		return 0;
 	}
 
-	return PRCTIM_TO_CMWCNT(compare - current);
+	return CMWCNT_TO_PRCTIM(compare - current);
 }
 
 /*
@@ -197,7 +197,7 @@ target_twdtimer_get_current(void)
 		return 0;
 	}
 
-	return PRCTIM_TO_CMWCNT(compare - current);
+	return CMWCNT_TO_PRCTIM(compare - current);
 }
 
 /*

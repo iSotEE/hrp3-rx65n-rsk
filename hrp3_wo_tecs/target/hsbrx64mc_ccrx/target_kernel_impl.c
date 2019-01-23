@@ -78,7 +78,7 @@ hardware_init_hook(void)
 	sil_wrb_mem((void *)SYSTEM_MOFCR_ADDR, 0x0);
 
 	/* 2. MOSCWTCR.MSTS[7:0] ビットでメインクロック発振器の発振待機時間を設定 */
-	/* TODO: we don't know tMAINOSC (assume MAX) */
+	/* NOTE: exact tMAINOSC is unknown (assume MAX) */
 	sil_wrb_mem((void *)SYSTEM_MOSCWTCR_ADDR, 0xFF);
 
 	/* 3. MOSCCR レジスタの MOSTP ビットでメインクロック発振器を動作に設定 */
@@ -132,20 +132,10 @@ software_init_hook(void)
 void
 target_initialize(void)
 {
-	int i; // TODO: init_mpu()
 	/*
-	 *  TODO: MPU有効化
+	 *  プロセッサ依存の初期化
 	 */
-	for (i = 0; i < _kernel_shared_mpu_num; i++) {
-		sil_wrw_mem((void *)MPU_RSPAGEn_ADDR(7-i), _kernel_mpu_info_table[i].rspage);
-		sil_wrw_mem((void *)MPU_REPAGEn_ADDR(7-i), _kernel_mpu_info_table[i].repage);
-	}
-	sil_wrw_mem((void *)MPU_MPEN_ADDR, 0x1);
-
-	/*
-	 *  バナー出力のため、SIO初期化を呼び出す
-	 */
-	sio_initialize();
+	prc_initialize();
 
 	/*
 	 * SCI1用ポート設定

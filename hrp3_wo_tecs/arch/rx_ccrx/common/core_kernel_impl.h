@@ -62,6 +62,11 @@
 #define CHECK_USTKSZ_ALIGN	16	/* ユーザスタックサイズのアライン単位 */
 
 /*
+ *  システム周期オーバラン例外に使用するSVC番号
+ */
+#define SVC_SCYCOVR		2
+
+/*
  *  トレースログに関する設定
  */
 #ifdef TOPPERS_ENABLE_TRACE
@@ -547,6 +552,21 @@ exc_sense_intmask(void *p_excinf)
 	return((!exc_sense_context(p_excinf))
 			&& exc_sense_i(p_excinf)
 			&& (exc_get_ipl(p_excinf) == IPL_ENAALL));
+}
+
+/*
+ *  コア依存の初期化
+ */
+extern void core_initialize(void);
+
+/*
+ *  システム周期オーバラン例外の要求
+ */
+#pragma inline_asm raise_scycovr_exception
+static void
+raise_scycovr_exception(void)
+{
+	INT		#SVC_SCYCOVR
 }
 
 #endif /* TOPPERS_MACRO_ONLY */
