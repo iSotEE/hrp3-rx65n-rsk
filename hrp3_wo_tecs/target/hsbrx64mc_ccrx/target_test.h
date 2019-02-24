@@ -49,7 +49,7 @@
 /*
  *  サンプルプログラム／テストプログラムで使用する割込みに関する定義
  */
-#define INTNO1				INT_SWINT
+#define INTNO1				INT_SWINT2
 #define INTNO1_INTATR		TA_ENAINT
 #define INTNO1_INTPRI		-15
 #define intno1_clear()		// エッジなので不要

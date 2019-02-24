@@ -90,6 +90,7 @@ target_hrt_initialize(intptr_t exinf)
 	 * タイマ動作開始前の割込み要求をクリア
 	 */
 	clear_int(INTNO_TIMER);
+	clear_int(INTNO_TIMER_SWI);
 
 	/*
 	 * コンペアマッチ割り込み要求を許可
@@ -117,6 +118,7 @@ target_hrt_terminate(intptr_t exinf)
 	 * タイマ割込み要求をクリアする．
 	 */
 	clear_int(INTNO_TIMER);
+	clear_int(INTNO_TIMER_SWI);
 }
 
 /*
@@ -138,18 +140,9 @@ target_hrt_set_event(HRTCNT hrtcnt)
 	 *  上で現在のカウント値を読んで以降に，cnt以上カウントアップしてい
 	 *  た場合には，割込みを発生させる．
 	 */
-	if (sil_rew_mem((void*)CMTW0_CMWCNT_ADDR) - current >= cnt) {
-		raise_int(INTNO_TIMER);
+	if ((sil_rew_mem((void*)CMTW0_CMWCNT_ADDR) - current >= cnt) && !probe_int(INTNO_TIMER)) {
+		raise_int(INTNO_TIMER_SWI);
 	}
-}
-
-/*
- *  高分解能タイマ割込みの要求
- */
-void
-target_hrt_raise_event(void)
-{
-	raise_int(INTNO_TIMER);
 }
 
 /*
@@ -237,11 +230,6 @@ target_twdtimer_terminate(intptr_t exinf)
 void
 target_twdtimer_handler(void)
 {
-	/*
-	 * タイマ割込み要求をクリアする．
-	 */
-	clear_int(INTNO_TWDTIMER);
-
 	/*
 	 *  タイムウィンドウ切換え処理をする．
 	 */

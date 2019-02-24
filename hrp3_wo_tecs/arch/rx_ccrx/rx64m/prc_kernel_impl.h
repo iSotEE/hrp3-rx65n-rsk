@@ -56,54 +56,28 @@
 
 /*
  *  割込み番号の範囲の判定
- *
- *  割込み番号が有効な値か厳密にチェックするため,
- *  コンフィギュレータ出力テーブルを参照する.
  */
-#define VALID_INTNO( intno )	(intno <= TMAX_INTNO)
+#define VALID_INTNO( intno )		((intno) <= TMAX_INTNO)
+#define VALID_INTNO_RASINT(intno)	(((intno) == INT_SWINT) || ((intno) == INT_SWINT2))
 
 #ifndef TOPPERS_MACRO_ONLY
 
 /*
  *  割込み要求禁止フラグのセット
- *
- *  割込み属性が設定されていない割込み要求ラインに対して割込み要求禁止
- *  フラグをセットしようとした場合には，FALSEを返す．
  */
-Inline bool_t
+Inline void
 disable_int( INTNO intno )
 {
-	/*
-	 *  レベル定義が0である場合はCFG_INTされていない
-	 */
-	if( cfg_int_table[intno].intpri == 0 ){
-		return ( false );
-	}
-
 	*ICU_IERm_ADDR(intno / 8) &= ~(1U << (intno % 8));
-
-	return ( true );
 }
 
 /*
  *  割込み要求禁止フラグのクリア
- *
- *  割込み属性が設定されていない割込み要求ラインに対して割込み要求禁止
- *  フラグをクリアしようとした場合には，FALSEを返す．
  */
-Inline bool_t
+Inline void
 enable_int( INTNO intno )
 {
-	/*
-	 *  レベル定義が0である場合はCFG_INTされていない
-	 */
-	if( cfg_int_table[intno].intpri == 0 ){
-		return ( false );
-	}
-
 	*ICU_IERm_ADDR(intno / 8) |= (1U << (intno % 8));
-
-	return ( true );
 }
 
 /*
@@ -121,7 +95,14 @@ clear_int( INTNO intno )
 Inline void
 raise_int(INTNO intno)
 {
-	*ICU_IRn_ADDR(intno) = 1U;
+	switch(intno) {
+	case INT_SWINT:
+		*ICU_SWINTR_ADDR = 0x1U;
+		break;
+	case INT_SWINT2:
+		*ICU_SWINT2R_ADDR = 0x1U;
+		break;
+	}
 }
 
 /*

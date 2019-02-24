@@ -43,6 +43,7 @@
 /*
  *  割込み番号の定義(可変ベクタテーブル)
  */
+#define INT_SWINT2	26
 #define INT_SWINT	27
 #define INT_CMWI0	30
 #define INT_CMWI1	31
@@ -119,6 +120,8 @@
  */
 #define ICU_IRn_ADDR(no)		( ( volatile uint8_t __evenaccess * )(0x00087010+(no)-16) )
 #define ICU_IERm_ADDR(no)		( ( volatile uint8_t __evenaccess * )(0x00087202+(no)-2) )
+#define ICU_SWINTR_ADDR			( ( volatile uint8_t __evenaccess * )0x000872E0 )
+#define ICU_SWINT2R_ADDR		( ( volatile uint8_t __evenaccess * )0x000872E1 )
 #define ICU_IPRr_ADDR(no)		( ( volatile uint8_t __evenaccess * )(0x00087300+(no)) )
 #define ICU_DTCERn_ADDR(no)		( ( volatile uint8_t __evenaccess * )(0x0008711A+(no)-26) )
 #define ICU_IRQCRn_ADDR(no)		( ( volatile uint8_t __evenaccess * )(0x00087500+(no)) )

@@ -53,6 +53,8 @@
  */
 #define INHNO_TIMER		INT_CMWI0			/* 割込みハンドラ番号 */
 #define INTNO_TIMER		INT_CMWI0			/* 割込み番号 */
+#define INHNO_TIMER_SWI	INT_SWINT			/* 割込みハンドラ番号 （ソフトウエア割込み） */
+#define INTNO_TIMER_SWI	INT_SWINT			/* 割込み番号 （ソフトウエア割込み） */
 #define INTPRI_TIMER	(TMAX_INTPRI - 1)	/* 割込み優先度 */
 #define INTATR_TIMER	TA_NULL				/* 割込み属性 */
 
@@ -105,7 +107,11 @@ extern void target_hrt_set_event(HRTCNT hrtcnt);
 /*
  *  高分解能タイマ割込みの要求
  */
-extern  void target_hrt_raise_event(void);
+Inline void
+target_hrt_raise_event(void)
+{
+	raise_int(INTNO_TIMER_SWI);
+}
 
 /*
  *  高分解能タイマ割込みハンドラ
@@ -128,19 +134,17 @@ extern void target_twdtimer_terminate(intptr_t exinf);
 Inline void
 target_twdtimer_start(PRCTIM twdtim)
 {
-	if (twdtim != 0) {
-		/*
-		 * CMWCORを設定
-		 */
-		sil_wrw_mem((void*)CMTW1_CMWCOR_ADDR, PRCTIM_TO_CMWCNT(twdtim));
+	uint32_t cmwcnt = ((twdtim == 0) ? 1U : PRCTIM_TO_CMWCNT(twdtim));
 
-		/*
-		 * タイマ動作開始
-		 */
-		*CMTW1_CMWSTR_ADDR |= CMTWn_CMWSTR_STR_BIT;
-	} else {
-		raise_int(INTNO_TWDTIMER);
-	}
+	/*
+	 * CMWCORを設定
+	 */
+	sil_wrw_mem((void*)CMTW1_CMWCOR_ADDR, cmwcnt);
+
+	/*
+	 * タイマ動作開始
+	 */
+	*CMTW1_CMWSTR_ADDR |= CMTWn_CMWSTR_STR_BIT;
 }
 
 /*
