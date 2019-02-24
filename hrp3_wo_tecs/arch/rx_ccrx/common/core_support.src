@@ -458,13 +458,14 @@ start_utask_r_after_twd:
 	mov.l	TCB_p_tinib[r6], r1				; p_runtsk->p_tinib → r1
 	mov.l	TINIB_ustk[r1], r2				; p_tinib->ustk → r2
 	mov.l	TINIB_ustksz[r1], r3			; p_tinib->ustksz → r3
-	add		r3, r2							; ユーザスタックの初期値 → r2 → usp
-	mvtc	r2, usp
+	add		r3, r2							; ユーザスタックの初期値 → r2
+	sub		#4, r2
+	mov.l	#call_ext_tsk, [r2]
+	mvtc	r2, usp							; 戻り番地 をユーザスタックに積む
 
 	mov.l	TINIB_task[r1], r2				; タスク起動番地 → r2
 	mov.l	#00130000H, r3					; PSWの初期値（U、I、PM） → r3
-	mov.l	#call_ext_tsk, r4				; 戻り番地  → r4
-	pushm	r2-r4							; r4、r3、r2の順でスタックに積む
+	pushm	r2-r3							; r3、r2の順でスタックに積む
 
 .if	TIPM_LOCK != TIPM_LOCK_ALL
 	mov.l	#__kernel_lock_flag, r4
@@ -1069,6 +1070,7 @@ exception_nonkernel_2:
 ;  ・割込み発生時のH/W処理により,スタックに割込みからの復帰PCとPSWが
 ;    保存されている.
 ;  ・r5は機能コード
+;  ・r14は第5パラメータ
 ;
 _kernel_service_call:
 	;
@@ -1076,19 +1078,6 @@ _kernel_service_call:
 	;
 	cmp		#TMIN_FNCD, r5
 	blt		ret_svc_rsfn
-
-	;
-	;  第5パラメータを取得してr14に格納する
-	;
-	mov.l	4[sp], r15				; 元のPSWをr15に
-	tst		#PSW_U_MASK, r15
-	beq		service_call_1			; 呼び出し元は特権モードの場合は遷移
-	mvfc	usp, r14
-	mov.l	[r14], r14
-	bra		service_call_2
-service_call_1:
-	mov.l	8[sp], r14				; sp状態はPC, PSW, 第五パラメータ
-service_call_2:
 
 	;
 	;  機能コードが0より大きければ，拡張サービスコール処理へ
@@ -1099,11 +1088,12 @@ service_call_2:
 	;
 	;  ソフトウェア割込み前のシステム状態に戻す
 	;
+	mov.l	4[sp], r15				; 元のPSWをr15に
 	tst		#PSW_I_MASK, r15
-	beq		service_call_3
+	beq		service_call_1
 	setpsw	i
 
-service_call_3:
+service_call_1:
 	;
 	;  サービスコールを呼び出す
 	;
@@ -1170,7 +1160,7 @@ ret_extsvc_sys:
 	;  拡張サービスコールの出入口処理
 	;
 	;  呼び出し条件：
-	;  ・r5は機能コード、r14は第5パラメータ、r15は元のPSW
+	;  ・r5は機能コード、r14は第5パラメータ
 	;
 extsvc_entry:
 	;

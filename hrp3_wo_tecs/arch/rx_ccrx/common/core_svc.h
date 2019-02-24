@@ -93,16 +93,19 @@ _svc_service_call_4(intptr_t par1, intptr_t par2, intptr_t par3, intptr_t par4, 
 #pragma inline_asm _svc_service_call_5
 static ER_UINT
 _svc_service_call_5(intptr_t par1, intptr_t par2, intptr_t par3, intptr_t par4, intptr_t par5, FN fncd) {
+	MOV.L	0[SP], R14
 	MOV.L	4[SP], R5
 	INT		#SVC_SERVICE_CALL
 }
 
+#ifdef UINT64_MAX
 #pragma inline_asm _svc_service_call_1_systim
 static ER_UINT
 _svc_service_call_1_systim(SYSTIM par1, FN fncd) {
 	MOV.L	R3, R5
 	INT		#SVC_SERVICE_CALL
 }
+#endif
 
 #define CAL_SVC_0M(TYPE, FNCD) \
 		return ((TYPE)_svc_service_call_0(FNCD))
