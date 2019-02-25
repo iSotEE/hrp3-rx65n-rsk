@@ -74,7 +74,6 @@ sStdRomSections = ''
 sStdRomOption = ''
 sAlignedSection = ''
 aRegionKeys.each{|memreg|
-  base = $cfgData[:ATT_REG][memreg][:base].val.to_s(16)
   sections = ''
   $memObj.each{|key, params|
     # （リンカが配置する）セクションの場合
@@ -139,9 +138,16 @@ aRegionKeys.each{|memreg|
   end
   
   if sections != ''
-    $sectionClnk.add("-start=#{sections.chop}/#{base}")
+    base = $cfgData[:ATT_REG][memreg][:base].val
+    size = $cfgData[:ATT_REG][memreg][:size].val
+    type = ((($cfgData[:ATT_REG][memreg][:regatr] & $TA_NOWRITE) == 0) ? 'RAM' : 'ROM')
+
+    $sectionClnk.add("-start=#{sections.chop}/#{base.to_s(16)}")
+    $sectionClnk.add("-cpu=#{type}=#{base.to_s(16)}-#{(base+size-1).to_s(16)}")
   end
 }
+# EXTBASE用アドレス範囲
+$sectionClnk.add("-cpu=ROM=ffffff80-ffffffff")
 
 if sAlignedSection != ''
   $sectionClnk.add("-aligned_section=#{sAlignedSection.chop}")
