@@ -889,7 +889,13 @@ _kernel_exception_2:
 	;
 
 	mov.l	EXC_GET_PSW_OFFSET[r6], r5
-	mvtc	r5, psw						; CPU例外発生前の状態に戻す
+	and		#PSW_IPL_MASK, r5			; 割込み優先度マスクを，CPU例外発生時の値に設定する
+	mvtc	r5, psw						; PSWを元のIPLかつCPUロック状態(I=0、U=0、PM=0)に設定
+.if	TIPM_LOCK == TIPM_LOCK_ALL
+	setpsw	i							; 割込み許可(CPUロック解除状態)
+.else
+	TODO: 「setpsw i」だけで十分みたいが、要検討
+.endif
 
 .if	LOG_EXC_ENTER == 1
 	mov.l	[r6], r1					; 引数の割込み要因番号  → r1
