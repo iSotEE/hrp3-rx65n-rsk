@@ -70,6 +70,7 @@ MKDIR = busybox mkdir
 OBJ_LDFLAGS += -subcommand=section.clnk
 CFG2_OUT_LDFLAGS += -subcommand=section.clnk
 CFG2_OUT_LDSCRIPT = section.clnk section.csv
+KERNEL_SECTION_CFLGAS = -section=P=P_KERNEL,C=C_KERNEL,D=D_KERNEL,B=B_KERNEL
 
 #
 #  ターゲットの指定（Makefile.targetで上書きされるのを防ぐため）
@@ -248,7 +249,7 @@ SYSSVC_DIRS := $(TECSGENDIR) $(SRCDIR)/tecs_kernel \
 SYSSVC_ASMOBJS := $(SYSSVC_ASMOBJS)
 SYSSVC_COBJS := $(SYSSVC_COBJS) syslog.obj banner.obj serial.obj logtask.obj $(TECS_KERNEL_COBJS) \
 				$(INIT_TECS_COBJ) $(CXXRTS)
-SYSSVC_CFLAGS := $(SYSSVC_CFLAGS) -DTOPPERS_SVC_CALL
+SYSSVC_CFLAGS := $(SYSSVC_CFLAGS) -DTOPPERS_SVC_CALL $(KERNEL_SECTION_CFLGAS)
 INCLUDES := $(INCLUDES) -I$(TECSGENDIR) -I$(SRCDIR)/tecs_kernel \
 				-I$(TECSDIR)/tecs -I$(TECSDIR)/tecs/rpc
 
@@ -278,7 +279,7 @@ CFG_TABS := --api-table $(SRCDIR)/kernel/kernel_api.def \
 CFG_ASMOBJS := $(CFG_ASMOBJS)
 CFG_COBJS := kernel_cfg.obj kernel_mem.obj $(CFG_COBJS)
 CFG_OBJS := $(CFG_ASMOBJS) $(CFG_COBJS)
-CFG_CFLAGS := $(CFG_CFLAGS)
+CFG_CFLAGS := $(CFG_CFLAGS) $(KERNEL_SECTION_CFLGAS)
 
 CFG2_OUT_SRCS := kernel_cfg.h kernel_cfg.c kernel_mem2.c $(CFG2_OUT_SRCS)
 CFG2_COBJS := kernel_cfg.obj kernel_mem2.obj $(CFG2_COBJS)
@@ -303,7 +304,7 @@ CFG3_ASMOBJS := $(CFG3_ASMOBJS)
 KERNEL_DIRS := $(KERNEL_DIRS) $(SRCDIR)/kernel
 KERNEL_ASMOBJS := $(KERNEL_ASMOBJS)
 KERNEL_COBJS := $(KERNEL_COBJS) svc_table.obj
-KERNEL_CFLAGS := $(KERNEL_CFLAGS) -I$(SRCDIR)/kernel
+KERNEL_CFLAGS := $(KERNEL_CFLAGS) -I$(SRCDIR)/kernel $(KERNEL_SECTION_CFLGAS)
 
 #
 #  カーネルのファイル構成の定義

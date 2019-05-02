@@ -138,7 +138,7 @@ EOS
 # 
 
 kernelCfgAsm.add(<<EOS)
-	.section P, CODE
+	.section P_KERNEL, CODE
 	.glb	_start
 	.glb	_kernel_interrupt
 	.glb	_kernel_exception
