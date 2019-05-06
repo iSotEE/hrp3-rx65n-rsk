@@ -1345,6 +1345,7 @@ ret_extsvc:
 ;
 ;  タスクの終了処理
 ;
+	.section	P_SHARED, CODE
 call_ext_tsk:
 	mov.l	#TFN_EXT_TSK, r5
 	int		#SVC_SERVICE_CALL
