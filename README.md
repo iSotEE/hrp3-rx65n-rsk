@@ -129,3 +129,23 @@ RXの命令は常にリトルに固定。
 | map2syms.py | CCRXが生成したmapファイルをsymsに変換 |
 | sample1_mml.cfg | Sample1（手動メモリ配置）用cfgファイル |
 | section.clnk | セクション配置の定義 |
+
+
+### 6. セクションのメモリ保護設定
+
+CCRXはデフォルトでP/C/D/B/L/W六種類のセクションを出力する。  
+
+L（リテラル領域）とW（switch文分岐テーブル）は#pragma sectionで変更できない。  
+ユーザがATT_SECでこれらのセクションを共有読み出し専用に設定するのが良いと思う。  
+
+P/C/D/Bのセクション名は#pragma sectionで変更できる。  
+保護設定の明確化のために、P/C/D/Bのデフォルトセクション名は原則使用しない。  
+カーネル専用のオブジェクトファイル（ALL_CFG_COBJS、SYSSVC_COBJS、KERNEL_COBJS）に  
+対して、P/C/D/B_KERNELのセクション名を出力するようにMakefileが設定する。  
+それ以外のオブジェクトファイルのセクション名はユーザが#pragma sectionで設定する。  
+例えば、sample1.cの中で、P/C/D/B_SHAREDを出力する#pragmaが書かれている。  
+ユーザがATT_SECでこれらのセクションの保護情報を設定する。  
+
+注意点として、ATT_SECで空のセクション（例えば、switch文がなくWセクションが出力  
+されない時）を指定すると、エラーが出る場合がある。それに、B_USTACK_とR_から始まる  
+セクション名は、ジェネレータの内部で使用されているため、ユーザが使用しない方が良い。
