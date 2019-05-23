@@ -5,7 +5,7 @@
  * 
  *  Copyright (C) 2000-2003 by Embedded and Real-Time Systems Laboratory
  *                              Toyohashi Univ. of Technology, JAPAN
- *  Copyright (C) 2005-2016 by Embedded and Real-Time Systems Laboratory
+ *  Copyright (C) 2005-2019 by Embedded and Real-Time Systems Laboratory
  *              Graduate School of Information Science, Nagoya Univ., JAPAN
  * 
  *  上記著作権者は，以下の(1)〜(4)の条件を満たす場合に限り，本ソフトウェ
@@ -37,7 +37,7 @@
  *  アの利用により直接的または間接的に生じたいかなる損害に関しても，そ
  *  の責任を負わない．
  * 
- *  $Id: task.c 517 2018-10-31 09:59:48Z ertl-hiro $
+ *  $Id: task.c 656 2019-01-17 14:35:03Z ertl-hiro $
  */
 
 /*
@@ -321,9 +321,9 @@ make_active(TCB *p_tcb)
  *  実行すべきタスクを更新するのは，(1) p_tcbで指定されるタスクが実行
  *  すべきタスクであった場合には，優先度を下げた（または優先度が変わら
  *  なかった）時，(2) p_tcbで指定されるタスクが実行すべきタスクでなかっ
- *  た場合には，変更後の優先度が実行すべきタスクの優先度よりも高いか同
- *  じ時（同じ場合に更新が必要になるのは，実際には，mtxmodeがtrueの場
- *  合のみ）である．(1)の場合には，レディキューをサーチする必要がある．
+ *  た場合には，変更後の優先度が実行すべきタスクの優先度よりも高い時
+ *  （mtxmodeがtrueの場合には，高いか同じ時）である．(1)の場合には，レ
+ *  ディキューをサーチする必要がある．
  */
 #ifdef TOPPERS_tskpri
 
@@ -357,9 +357,14 @@ change_priority(TCB *p_tcb, uint_t newpri, bool_t mtxmode)
 		if (p_schedcb->p_predtsk == p_tcb) {
 			if (newpri >= oldpri) {
 				p_schedcb->p_predtsk = search_predtsk(p_schedcb);
-				if (dspflg) {
-					update_schedtsk();
-				}
+			}
+			/*
+			 *  最高優先順位タスクの優先度を変更した場合には，優先度を
+			 *  上げた場合も下げた場合も，p_schedtskの更新が必要になる
+			 *  可能性がある．
+			 */
+			if (dspflg) {
+				update_schedtsk();
 			}
 		}
 		else {

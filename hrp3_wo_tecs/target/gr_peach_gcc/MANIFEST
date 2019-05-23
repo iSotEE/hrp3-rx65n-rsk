@@ -8,10 +8,7 @@ gdb_rom.ini
 gr_peach.h
 renesas_rza1h_swd.cfg
 sf_boot.c
-tPutLogGRPeach.c
-tPutLogGRPeach.cdl
 tSIOPortGRPeach.cdl
-tSIOPortGRPeachMain_inline.h
 target.cdl
 target_cfg1_out.h
 target_check.trb
@@ -34,3 +31,4 @@ target_test.h
 target_timer.cfg
 target_timer.h
 target_unrename.h
+target_user.txt

@@ -34,7 +34,7 @@
  *  アの利用により直接的または間接的に生じたいかなる損害に関しても，そ
  *  の責任を負わない．
  * 
- *  $Id: uart_pl011.c 415 2018-07-27 09:06:40Z ertl-hiro $
+ *  $Id: uart_pl011.c 576 2018-11-28 00:57:26Z ertl-hiro $
  */
 
 /*
@@ -68,7 +68,7 @@ struct sio_port_control_block {
  *  SIOポート初期化ブロック
  */
 const SIOPINIB siopinib_table[TNUM_SIOP] = {
-	{ SIO_UART_BASE, UART_IBRD_DEF, UART_FBRD_DEF, UART_LCR_H_DEF }
+	{ SIO_UART_BASE, SIO_UART_IBRD, SIO_UART_FBRD, SIO_UART_LCR_H }
 };
 
 /*
@@ -97,6 +97,22 @@ uart_pl011_initialize(void)
 	for (p_siopcb = siopcb_table, i = 0; i < TNUM_SIOP; p_siopcb++, i++) {
 		p_siopcb->siopinib = &(siopinib_table[i]);
 		p_siopcb->opened = false;
+	}
+}
+
+/*
+ *  SIOドライバの終了処理
+ */
+void
+uart_pl011_terminate(void)
+{
+	uint_t	i;
+
+	/*
+	 *  オープンされているSIOポートのクローズ
+	 */
+	for (i = 0; i < TNUM_SIOP; i++) {
+		uart_pl011_cls_por(&(siopcb_table[i]));
 	}
 }
 
@@ -147,10 +163,10 @@ uart_pl011_opn_por(ID siopid, intptr_t exinf)
 		 */
 		sil_wrw_mem(UART_CR(p_siopcb->siopinib->base),
 						UART_CR_UARTEN|UART_CR_TXE|UART_CR_RXE);
-	}
 
+		p_siopcb->opened = true;
+	}
 	p_siopcb->exinf = exinf;
-	p_siopcb->opened = true;
 	return(p_siopcb);   
 }
 
@@ -160,10 +176,14 @@ uart_pl011_opn_por(ID siopid, intptr_t exinf)
 void
 uart_pl011_cls_por(SIOPCB *p_siopcb)
 {
-	/*
-	 *  UARTをディスエーブル
-	 */
-	sil_wrw_mem(UART_CR(p_siopcb->siopinib->base), 0U);
+	if (p_siopcb->opened) {
+		/*
+		 *  UARTをディスエーブル
+		 */
+		sil_wrw_mem(UART_CR(p_siopcb->siopinib->base), 0U);
+
+		p_siopcb->opened = false;
+	}
 }
 
 /*
@@ -255,7 +275,7 @@ uart_pl011_isr_siop(SIOPCB *p_siopcb)
  *  SIOの割込みサービスルーチン
  */
 void
-uart_pl011_isr(void)
+uart_pl011_isr(ID siopid)
 {
-	uart_pl011_isr_siop(&(siopcb_table[0]));
+	uart_pl011_isr_siop(get_siopcb(siopid));
 }

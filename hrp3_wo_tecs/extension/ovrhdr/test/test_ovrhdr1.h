@@ -2,7 +2,7 @@
  *  TOPPERS Software
  *      Toyohashi Open Platform for Embedded Real-Time Systems
  * 
- *  Copyright (C) 2014-2016 by Embedded and Real-Time Systems Laboratory
+ *  Copyright (C) 2018 by Embedded and Real-Time Systems Laboratory
  *              Graduate School of Information Science, Nagoya Univ., JAPAN
  * 
  *  上記著作権者は，以下の(1)〜(4)の条件を満たす場合に限り，本ソフトウェ
@@ -34,7 +34,7 @@
  *  アの利用により直接的または間接的に生じたいかなる損害に関しても，そ
  *  の責任を負わない．
  * 
- *  $Id: test_ovrhdr1.h 409 2018-05-31 08:13:31Z ertl-hiro $
+ *  $Id: test_ovrhdr1.h 595 2018-12-10 05:05:03Z ertl-hiro $
  */
 
 /* 
@@ -69,13 +69,17 @@
 #endif /* TEST_TIME_PROC */
 
 /*
+ *  テストの基準時間
+ */
+#define UNIT_TIME		(TEST_TIME_CP * 5)
+
+/*
  *  関数のプロトタイプ宣言
  */
 #ifndef TOPPERS_MACRO_ONLY
 
 extern void	task1(intptr_t exinf);
 extern void	task2(intptr_t exinf);
-extern void	task3(intptr_t exinf);
 extern void	alarm1_handler(intptr_t exinf);
 extern void overrun_handler(ID tskid, intptr_t exinf);
 

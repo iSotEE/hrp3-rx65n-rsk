@@ -37,7 +37,7 @@
  *  アの利用により直接的または間接的に生じたいかなる損害に関しても，そ
  *  の責任を負わない．
  * 
- *  $Id: time_event.c 531 2018-11-11 04:42:51Z ertl-hiro $
+ *  $Id: time_event.c 659 2019-01-29 14:38:05Z ertl-hiro $
  */
 
 /*
@@ -159,7 +159,8 @@ initialize_tmevt(void)
 	}
 	for (i = 0; i < tnum_udom; i++) {
 		p_tmevt_heap = dominib_table[i].p_tmevt_heap;
-		if (p_tmevt_heap != tmevt_heap_idle) {
+		if (p_tmevt_heap != tmevt_heap_kernel
+								 && p_tmevt_heap != tmevt_heap_idle) {
 			p_last_tmevtn(p_tmevt_heap) = p_tmevt_heap;
 		}
 	}
@@ -409,17 +410,6 @@ update_current_evttim(void)
 }
 
 #endif /* TOPPERS_tmecur */
-
-/*
- *  現在のイベント時刻を遅い方に丸めたイベント時刻の算出［ASPD1027］
- *
- *  現在のイベント時刻を更新した後に呼ぶことを想定している．
- */
-Inline EVTTIM
-calc_current_evttim_ub(void)
-{
-	return(current_evttim + ((EVTTIM) TSTEP_HRTCNT));
-}
 
 /*
  *  高分解能タイマ割込みの発生タイミングの設定

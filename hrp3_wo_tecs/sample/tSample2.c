@@ -5,7 +5,7 @@
  * 
  *  Copyright (C) 2015-2016 by Ushio Laboratory
  *              Graduate School of Engineering Science, Osaka Univ., JAPAN
- *  Copyright (C) 2015-2018 by Embedded and Real-Time Systems Laboratory
+ *  Copyright (C) 2015-2019 by Embedded and Real-Time Systems Laboratory
  *              Graduate School of Information Science, Nagoya Univ., JAPAN
  * 
  *  上記著作権者は，以下の(1)〜(4)の条件を満たす場合に限り，本ソフトウェ
@@ -37,7 +37,7 @@
  *  アの利用により直接的または間接的に生じたいかなる損害に関しても，そ
  *  の責任を負わない．
  * 
- *  $Id: tSample2.c 411 2018-07-21 18:43:23Z ertl-hiro $
+ *  $Id: tSample2.c 681 2019-03-13 04:03:02Z ertl-hiro $
  */
 
 /* 
@@ -141,7 +141,7 @@ svc_perror(const char *file, int_t line, const char *expr, ER ercd)
  *  プロセッサ時間の消費
  *
  *  ループによりプロセッサ時間を消費する．最適化ができないように，ルー
- *  プ内でvolatile変数に書き込む．
+ *  プ内でvolatile変数を読み込む．
  */
 static volatile long_t	volatile_var;
 
@@ -151,7 +151,7 @@ consume_time(ulong_t ctime)
 	ulong_t		i;
 
 	for (i = 0; i < ctime; i++) {
-		volatile_var = i;
+		(void) volatile_var;
 	}
 }
 

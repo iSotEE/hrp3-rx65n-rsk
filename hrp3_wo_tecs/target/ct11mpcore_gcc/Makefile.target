@@ -1,14 +1,13 @@
 #
 #		Makefileのターゲット依存部（CT11MPcore用）
 #
-#  $Id: Makefile.target 285 2018-03-21 02:55:49Z ertl-hiro $
+#  $Id: Makefile.target 545 2018-11-19 16:19:47Z ertl-hiro $
 # 
 
 #
 #  システム名，チップ名，コア名，開発環境名の定義
 #
 SYS = ct11mpcore
-CHIP = mpcore
 CORE = arm
 TOOL = gcc
 
@@ -24,22 +23,20 @@ TOOL = gcc
 #COPTS := $(COPTS) -DTOPPERS_OMIT_QEMU_SEMIHOSTING
 
 #
-#  MPCoreの種類の定義
-#
-MPCORE_TYPE = ARM11
-
-#
 #  コンパイルオプション
 #
 INCLUDES := $(INCLUDES) -I$(TARGETDIR)
-COPTS := $(COPTS) -mlittle-endian
-LDFLAGS := $(LDFLAGS) -mlittle-endian
+COPTS := $(COPTS) -mlittle-endian -mcpu=mpcore
+LDFLAGS := $(LDFLAGS) -mlittle-endian -mcpu=mpcore
+CDEFS := $(CDEFS) -D__TARGET_ARCH_ARM=6
 
 #
 #  カーネルに関する定義
 #
 KERNEL_DIRS := $(KERNEL_DIRS) $(TARGETDIR)
-KERNEL_COBJS := $(KERNEL_COBJS) target_kernel_impl.o target_timer.o
+KERNEL_ASMOBJS := $(KERNEL_ASMOBJS) gic_support.o
+KERNEL_COBJS := $(KERNEL_COBJS) target_kernel_impl.o mpcore_kernel_impl.o \
+							gic_kernel_impl.o target_timer.o mpcore_timer.o
 
 #
 #  システムサービスに関する定義
@@ -48,14 +45,6 @@ SYSSVC_DIRS := $(SYSSVC_DIRS) $(SRCDIR)/arch/arm_gcc/common
 SYSSVC_COBJS := $(SYSSVC_COBJS)
 
 #
-#  トレースログ記録のサンプルコードに関する定義
+#  コア依存部
 #
-ifdef ENABLE_TRACE
-	COPTS := $(COPTS) -DTOPPERS_ENABLE_TRACE
-	SYSSVC_DIRS := $(SYSSVC_DIRS) $(SRCDIR)/arch/tracelog
-endif
-
-#
-#  チップ依存部
-#
-include $(SRCDIR)/arch/arm_gcc/mpcore/Makefile.chip
+include $(SRCDIR)/arch/arm_gcc/common/Makefile.core

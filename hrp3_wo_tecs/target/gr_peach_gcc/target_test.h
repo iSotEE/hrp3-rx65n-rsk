@@ -35,7 +35,7 @@
  *  アの利用により直接的または間接的に生じたいかなる損害に関しても，そ
  *  の責任を負わない．
  * 
- *  $Id: target_test.h 285 2018-03-21 02:55:49Z ertl-hiro $
+ *  $Id: target_test.h 676 2019-03-11 04:52:04Z ertl-hiro $
  */
 
 /*
@@ -52,7 +52,7 @@
  */
 #define INTNO1				INTNO_IRQ5
 #define INTNO1_INTATR		TA_ENAINT|TA_NEGEDGE
-#define INTNO1_INTPRI		-15
+#define INTNO1_INTPRI		(-15)
 #define intno1_clear()		rza1_clear_irq(INTNO_IRQ5)
 
 /*

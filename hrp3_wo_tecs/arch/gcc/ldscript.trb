@@ -36,11 +36,11 @@
 #   アの利用により直接的または間接的に生じたいかなる損害に関しても，そ
 #   の責任を負わない．
 # 
-#   $Id: ldscript.trb 522 2018-11-04 09:25:59Z ertl-hiro $
+#   $Id: ldscript.trb 648 2019-01-14 05:26:19Z ertl-hiro $
 # 
 
 #
-#		仮のリンカスクリプト（cfg2_out.ld）の生成
+#		リンカスクリプトの生成
 #
 
 #
@@ -51,28 +51,23 @@ $PREFIX_END = $asmLabel + "__end_"
 $PREFIX_AEND = $asmLabel + "__aend_"
 
 #
-#  生成するファイルの指定
-#
-$ldscript = GenFile.new("cfg2_out.ld")
-
-#
 #  ターゲット依存のOUTPUT記述の生成
 #
 if defined? GenerateOutput()
-  GenerateOutput()
+  GenerateOutput($ldscript)
 end
 
 #
 #  MEMORY記述の生成
 #
 $ldscript.add("MEMORY {")
-$cfgData[:ATT_REG].each do |key, params|
+$cfgData[:ATT_REG].each do |_, params|
   $ldscript.add("\t#{params[:regname]} : " \
 					"ORIGIN = 0x#{params[:base].val.to_s(16)}, " \
 					"LENGTH = 0x#{params[:size].val.to_s(16)}")
 end
 if defined? GenerateMemory()
-  GenerateMemory()
+  GenerateMemory($ldscript)
 end
 $ldscript.add2("}")
 
@@ -80,7 +75,7 @@ $ldscript.add2("}")
 #  ターゲット依存のPROVIDE記述の生成
 #
 if defined? GenerateProvide()
-  GenerateProvide()
+  GenerateProvide($ldscript)
 end
 
 #
@@ -93,7 +88,7 @@ $ldscript.add("\t.discard (NOLOAD) : {")
 $ldscript.append("\t\t")
 $cfgData[:ATT_MOD].sort.each do |key, params|
   # ライブラリは最後
-  case params[:module].unquote
+  case params[:modname]
   when /^\-l/, /\.a$/
     params[:order] = [ 1 ]
   else
@@ -108,11 +103,11 @@ $cfgData[:ATT_MOD].sort.each do |key, params|
   # 元の順序を保存
   params[:order].push(key)
 end
-$cfgData[:ATT_MOD].sort_by {|key, params| params[:order]}.each do |key, params|
-  if params[:module].unquote == "kernel_mem.o"
-    $ldscript.append("kernel_mem2.o")
+$cfgData[:ATT_MOD].sort_by {|_, params| params[:order]}.each do |_, params|
+  if $modnameReplace.has_key?(params[:modname])
+    $ldscript.append($modnameReplace[params[:modname]])
   else
-    $ldscript.append(params[:module].unquote)
+    $ldscript.append(params[:modname])
   end
   $ldscript.append("(.discard) ")
 end
@@ -148,7 +143,7 @@ $memObj.each do |key, params|
   # ショートデータセクションの先頭の処理
   if params[:SDATA_TOP]
     if defined? GenerateGpLabel()
-      GenerateGpLabel(key, params)
+      GenerateGpLabel($ldscript, key, params)
     end
   end
 
@@ -181,10 +176,10 @@ $memObj.each do |key, params|
   sectionDscr = SectionDescription(params[:secname])
   case params[:type]
   when :ATTMOD
-    if params[:module] == "kernel_mem.o"
-      $ldscript.append("kernel_mem2.o")
+    if $modnameReplace.has_key?(params[:modname])
+      $ldscript.append($modnameReplace[params[:modname]])
     else
-      $ldscript.append(params[:module])
+      $ldscript.append(params[:modname])
     end
     $ldscript.append("(#{sectionDscr}) ")
   when :ATTSEC
@@ -260,8 +255,8 @@ $memObj.each do |key, params|
 
   # 標準共有リードオンリー領域の最後の特殊処理
   if endLabelHook
-    if defined? HookEndLabel()
-      HookEndLabel(commonStdromRegionName)
+    if defined? GenerateHookEndLabel()
+      GenerateHookEndLabel($ldscript, commonStdromRegionName)
     end
     $ldscript.add(endLabels)
   end

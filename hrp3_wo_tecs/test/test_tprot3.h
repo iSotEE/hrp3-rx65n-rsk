@@ -34,7 +34,7 @@
  *  アの利用により直接的または間接的に生じたいかなる損害に関しても，そ
  *  の責任を負わない．
  * 
- *  $Id: test_tprot3.h 508 2018-10-27 15:57:48Z ertl-hiro $
+ *  $Id: test_tprot3.h 612 2018-12-17 08:23:10Z ertl-hiro $
  */
 
 /*
@@ -65,6 +65,7 @@
 /*
  *  各タスクの優先度の定義
  */
+#define HIGH_PRIORITY	9
 #define MID_PRIORITY	10
 #define LOW_PRIORITY	11
 

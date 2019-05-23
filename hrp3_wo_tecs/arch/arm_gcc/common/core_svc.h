@@ -37,7 +37,7 @@
  *  アの利用により直接的または間接的に生じたいかなる損害に関しても，そ
  *  の責任を負わない．
  * 
- *  $Id: core_svc.h 524 2018-11-04 13:01:46Z ertl-hiro $
+ *  $Id: core_svc.h 592 2018-12-08 01:59:36Z ertl-hiro $
  */
 
 /*
@@ -66,7 +66,7 @@
 } while (false)
 
 #define CAL_SVC_1M(TYPE, FNCD, TYPE1, PAR1) do {				\
-	register intptr_t r0 asm("r0") = (intptr_t)(PAR1);			\
+	register TYPE1 r0 asm("r0") = (TYPE1)(PAR1);				\
 	register FN r5 asm("r5") = FNCD;							\
 	Asm("svc %1"												\
 	  : "=r"(r0)												\

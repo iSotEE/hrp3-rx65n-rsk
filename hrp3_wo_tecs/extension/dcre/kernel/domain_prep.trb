@@ -4,7 +4,7 @@
 #       Toyohashi Open Platform for Embedded Real-Time Systems/
 #       High Reliable system Profile Kernel
 # 
-#   Copyright (C) 2016-2018 by Embedded and Real-Time Systems Laboratory
+#   Copyright (C) 2016-2019 by Embedded and Real-Time Systems Laboratory
 #               Graduate School of Information Science, Nagoya Univ., JAPAN
 # 
 #   上記著作権者は，以下の(1)〜(4)の条件を満たす場合に限り，本ソフトウェ
@@ -36,7 +36,7 @@
 #   アの利用により直接的または間接的に生じたいかなる損害に関しても，そ
 #   の責任を負わない．
 #
-#   $Id: domain_prep.trb 502 2018-10-27 08:05:10Z ertl-hiro $
+#   $Id: domain_prep.trb 665 2019-02-03 17:06:18Z ertl-hiro $
 #
 
 #
@@ -46,7 +46,7 @@
 #
 #  保護ドメインのラベルの作成
 #
-$domData.each do |key, params|
+$domData.each do |_, params|
   case params[:domid]
   when $TDOM_KERNEL
     params[:label] = "kernel"
@@ -82,7 +82,7 @@ $udomainList.sort!
 #
 #  保護ドメイン毎の割り付け可能なオブジェクトIDの数の初期化
 #
-$domData.each do |key, params|
+$domData.each do |_, params|
   $tnum_aobjid_list.each do |tnum_aobjid|
     params[tnum_aobjid] = 0
   end
@@ -117,14 +117,14 @@ end
 #
 # LMT_DOMに関するエラーチェック
 $cfgData[:LMT_DOM].each do |key, params|
-  #	LDM_DOMが保護ドメイン中にない（E_RSATR）［NGKI3747］
+  #	保護ドメインの囲みの中に記述されていない場合（E_RSATR）［NGKI3747］
   if !params.has_key?(:domain) || params[:domain] == $TDOM_NONE
     error_ercd("E_RSATR", params, "%apiname must be within a protection domain")
     # 以降のエラーの抑止
     params[:domain] = $TDOM_NONE
   end
 
-  #	保護ドメイン中に複数のLMT_DOMがある（E_OBJ）［NGKI3444］
+  #	保護ドメイン中に複数のLMT_DOMがある場合（E_OBJ）［NGKI3444］
   $cfgData[:LMT_DOM].each do |key2, params2|
     break if key2 == key
     if params2[:domain] == params[:domain]
@@ -133,8 +133,8 @@ $cfgData[:LMT_DOM].each do |key, params|
     end
   end
 
-  #	(TMIN_TPRI <= mintpri && mintpri <= TMAX_TPRI)でない場合（E_PAR）
-  #［NGKI3445］
+  # mintpriが有効範囲外の場合（E_PAR）［NGKI3445］
+  #（TMIN_TPRI <= mintpri && mintpri <= TMAX_TPRIでない場合）
   if !($TMIN_TPRI <= params[:mintpri] && params[:mintpri] <= $TMAX_TPRI)
     error_illegal("E_PAR", params, :mintpri)
   end
@@ -164,23 +164,24 @@ end
 #
 # DEF_SCYに関するエラーチェック
 if $cfgData[:DEF_SCY].size > 0
-  # 静的API「DEF_SCY」が複数ある（E_OBJ）［NGKI5016］
+  # 静的API「DEF_SCY」が複数ある場合（E_OBJ）［NGKI5016］
   if $cfgData[:DEF_SCY].size > 1
     error("E_OBJ: too many DEF_SCY")
   end
 
   # DEF_SCYがある場合の処理
-  params = $cfgData[:DEF_SCY][1]
+  params0 = $cfgData[:DEF_SCY][1]
 
-  # 保護ドメインの囲みの中に記述されている（E_RSATR）［NGKI5013］
-  if params.has_key?(:domain)
-    error_ercd("E_RSATR", params, \
+  # 保護ドメインの囲みの中に記述されている場合（E_RSATR）［NGKI5013］
+  if params0.has_key?(:domain)
+    error_ercd("E_RSATR", params0, \
 						"%apiname must be outside of protection domains")
   end
 
-  # (0 < scyctim && scyctim <= TMAX_RELTIM)でない（E_PAR）［NGKI5015］
-  if !(0 < params[:scyctim] && params[:scyctim] <= $TMAX_RELTIM)
-    error_illegal("E_PAR", params, :scyctim)
+  # scyctimが有効範囲外の場合（E_PAR）［NGKI5015］
+  #（0 < scyctim && scyctim <= TMAX_RELTIMでない場合）
+  if !(0 < params0[:scyctim] && params0[:scyctim] <= $TMAX_RELTIM)
+    error_illegal("E_PAR", params0, :scyctim)
   end
 end
 
@@ -188,20 +189,20 @@ end
 #  システム動作モードの生成（CRE_SOM）
 #
 # CRE_SOMに関するエラーチェックと前処理
-$cfgData[:CRE_SOM].each do |key, params|
+$cfgData[:CRE_SOM].each do |_, params|
   # システム周期が設定されていない場合［NGKI5039］
   if $cfgData[:DEF_SCY].size == 0
     warning_api(params, "%apiname is ignored")
     next
   end
 
-  # 保護ドメインの囲みの中に記述されている（E_RSATR）［NGKI5022］
+  # 保護ドメインの囲みの中に記述されている場合（E_RSATR）［NGKI5022］
   if params.has_key?(:domain)
     error_ercd("E_RSATR", params, \
 						"%apiname must be outside of protection domains")
   end
 
-  # somatrが無効の場合（E_RSATR）［NGKI5021］
+  # somatrが無効の場合（E_RSATR）［NGKI5021］［NGKI5004］
   #（TA_INISOM以外のビットがセットされている場合）
   if (params[:somatr] & ~$TA_INISOM) != 0
     error_illegal_id("E_RSATR", params, :somatr, :somid)
@@ -211,8 +212,8 @@ $cfgData[:CRE_SOM].each do |key, params|
   params[:nxtsom] ||= params[:somid]
 
   if (params[:somatr] & $TA_INISOM) != 0
-    # TA_INISOM属性のシステム動作モードが複数ある（E_OBJ）［NGKI5025］
-    if !$inisom.nil?
+    # TA_INISOM属性のシステム動作モードが複数ある場合（E_OBJ）［NGKI5025］
+    if defined?($inisom)
       error_ercd("E_OBJ", params, "more than one system operation modes " \
 					                 "with TA_INISOM attribute in %apiname")
     else
@@ -238,19 +239,19 @@ $cfgData[:ATT_TWD].each do |key, params|
     next
   end
 
-  # 保護ドメインの囲みの中に記述されている（E_RSATR）［NGKI5041］
+  # 保護ドメインの囲みの中に記述されている場合（E_RSATR）［NGKI5041］
   if params.has_key?(:domain)
     error_ercd("E_RSATR", params, \
 						"%apiname must be outside of protection domains")
   end
 
-  # domidが無効の場合（E_ID）［NGKI5043］
+  # domidが有効範囲外の場合（E_ID）［NGKI5043］
   tmax_domid = $TMIN_DOMID + $udomainList.size - 1
   if !($TMIN_DOMID <= params[:domid] && params[:domid] <= tmax_domid)
     error_illegal("E_ID", params, :domid)
   end
 
-  # twdlenが0，またはTMAX_TWDTIMより大きい（E_PAR）［NGKI5045］
+  # twdlenが0，またはTMAX_TWDTIMより大きい場合（E_PAR）［NGKI5045］
   if !(0 < params[:twdlen] && params[:twdlen] <= $TMAX_TWDTIM)
     error_illegal("E_PAR", params, :twdlen)
   end
@@ -265,7 +266,7 @@ end
 # まずシステム動作モード順にソートし，同じシステム動作モードの中では，
 # システム周期内での順序にソートする．
 #
-$twdList = Hash[$twdList.sort_by.with_index {|(key, params), index| \
+$twdList = Hash[$twdList.sort_by.with_index {|(_, params), index| \
 							[ params[:somid].val, params[:twdord], index ]}]
 
 #
@@ -287,7 +288,7 @@ $cfgData[:CRE_SOM].sort.each do |key, params|
     end
   end
 
-  # タイムウィンドウ長の合計が長すぎる（E_PAR）［NGKI5049］
+  # タイムウィンドウ長の合計が長すぎる場合（E_PAR）［NGKI5049］
   if totalLength >= $cfgData[:DEF_SCY][1][:scyctim]
     error("E_PAR: total time window length #{totalLength} of " \
 				"system operation mode `#{params[:somid]}' " \
@@ -327,32 +328,32 @@ $udomainList.each do |domain|
   end
   params[:tmevtCount] = 0
 end
-$cfgData[:CRE_TSK].each do |key, params|
+$cfgData[:CRE_TSK].each do |_, params|
   if params.has_key?(:domain)		# タスクに関するエラー処理前のため必要
     $domData[params[:domain]][:tmevtCount] += 1
   end
 end
-$cfgData[:AID_TSK].each do |key, params|
+$cfgData[:AID_TSK].each do |_, params|
   if params.has_key?(:domain)		# タスクに関するエラー処理前のため必要
     $domData[params[:domain]][:tmevtCount] += params[:notsk]
   end
 end
-$cfgData[:CRE_CYC].each do |key, params|
+$cfgData[:CRE_CYC].each do |_, params|
   if params.has_key?(:domain)		# 周期通知に関するエラー処理前のため必要
     $domData[params[:domain]][:tmevtCount] += 1
   end
 end
-$cfgData[:AID_CYC].each do |key, params|
+$cfgData[:AID_CYC].each do |_, params|
   if params.has_key?(:domain)		# 周期通知に関するエラー処理前のため必要
     $domData[params[:domain]][:tmevtCount] += params[:nocyc]
   end
 end
-$cfgData[:CRE_ALM].each do |key, params|
+$cfgData[:CRE_ALM].each do |_, params|
   if params.has_key?(:domain)		# アラーム通知に関するエラー処理前のため必要
     $domData[params[:domain]][:tmevtCount] += 1
   end
 end
-$cfgData[:AID_ALM].each do |key, params|
+$cfgData[:AID_ALM].each do |_, params|
   if params.has_key?(:domain)		# アラーム通知に関するエラー処理前のため必要
     $domData[params[:domain]][:tmevtCount] += params[:noalm]
   end

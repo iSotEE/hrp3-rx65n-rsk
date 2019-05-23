@@ -34,6 +34,21 @@ xlog_fsr
 default_int_handler
 default_exc_handler
 
+# mpcore_kernel_impl.c
+mpcore_initialize
+mpcore_terminate
+
+# mpcore_timer.c
+target_hrt_initialize
+target_hrt_terminate
+target_hrt_handler
+target_twdtimer_initialize
+target_twdtimer_terminate
+target_twdtimer_handler
+target_ovrtimer_initialize
+target_ovrtimer_terminate
+target_ovrtimer_handler
+
 # gic_kernel_impl.c
 gicc_initialize
 gicc_terminate

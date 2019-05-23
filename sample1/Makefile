@@ -228,13 +228,13 @@ APPL_CDL = sample1.cdl
 APPL_DIRS := $(APPLDIRS) $(SRCDIR)/library
 APPL_ASMOBJS :=
 ifdef USE_CXX
-	APPL_CXXOBJS := sample1.obj
+	APPL_CXXOBJS := ccrx_sample1.obj
 	APPL_COBJS :=
 else
-	APPL_COBJS := sample1.obj
+	APPL_COBJS := ccrx_sample1.obj
 endif
 APPL_COBJS := $(APPL_COBJS) $(TECS_USER_COBJS) $(TECS_OUTOFDOMAIN_COBJS) \
-				log_output.obj vasyslog.obj t_perror.obj strerror.obj
+				ccrx_log_output.obj ccrx_vasyslog.obj ccrx_t_perror.obj ccrx_strerror.obj
 APPL_CFLAGS := $(APPL_CFLAGS)
 ifdef APPLDIRS
 	INCLUDES := $(INCLUDES) $(foreach dir,$(APPLDIRS),-I$(dir))

@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 #
-#		パス3の生成スクリプトのターゲット依存部（GR-PEACH用）
+#		パス3の生成スクリプトのターゲット依存部（ダミーターゲット用）
 #
-#   $Id: target_opt.trb 300 2018-03-25 23:13:32Z ertl-hiro $
+#   $Id: target_opt.trb 626 2018-12-29 02:51:02Z ertl-hiro $
 # 
 
 #
@@ -16,3 +16,10 @@ $OPTIMIZE_BSSSEC_LIST = true
 #  ターゲット非依存部のインクルード
 #
 IncludeTrb("kernel/kernel_opt.trb")
+
+#
+#  仮のリンカスクリプトの生成
+#
+$ldscript = GenFile.new("cfg3_out.ld")
+$modnameReplace = { "kernel_mem.o" => "kernel_mem3.o" }
+IncludeTrb("target_ldscript.trb")

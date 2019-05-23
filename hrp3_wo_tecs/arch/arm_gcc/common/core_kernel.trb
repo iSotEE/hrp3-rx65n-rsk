@@ -37,7 +37,7 @@
 #   アの利用により直接的または間接的に生じたいかなる損害に関しても，そ
 #   の責任を負わない．
 # 
-#   $Id: core_kernel.trb 487 2018-10-23 14:48:52Z ertl-hiro $
+#   $Id: core_kernel.trb 648 2019-01-14 05:26:19Z ertl-hiro $
 # 
 
 #
@@ -227,7 +227,11 @@ def TargetMemoryObject()
     params[:domain] = $TDOM_KERNEL
     params[:memreg] = $standardMemreg[$TDOM_KERNEL][:stdram]
     params[:secname] = ".system_stack"
-    params[:mematr] = $targetMematrSstack || $mematrNoinitSec
+    if defined?($targetMematrSstack)
+      params[:mematr] = $targetMematrSstack
+    else
+      params[:mematr] = $mematrNoinitSec
+    end
     params[:acptn1] = $defaultAcptn[$TDOM_KERNEL]
     params[:acptn2] = $defaultAcptn[$TDOM_KERNEL]
     params[:acptn4] = $defaultAcptn[$TDOM_KERNEL]
@@ -334,18 +338,20 @@ if $TOPPERS_ML_AUTO
   # ドメイン毎に確保しておくページテーブル数の計算
   $globalVars.push("maxNumPageTable")
   $maxNumPageTable = 0
-  prev_endaddr = 0
-  $cfgData[:ATT_REG].sort_by {|key, params| params[:base].val}.each \
-														do |key, params|
-    base = params[:base] / $ARM_SECTION_SIZE
-    endaddr = (params[:base] + params[:size] + $ARM_SECTION_SIZE - 1) \
+  prev_limitsec = 0
+  $cfgData[:ATT_REG].sort_by {|_, params| params[:base].val}.each \
+														do |_, params|
+    basesec = params[:base] / $ARM_SECTION_SIZE
+    limitsec = (params[:base] + params[:size] + $ARM_SECTION_SIZE - 1) \
 													/ $ARM_SECTION_SIZE
-    if prev_endaddr < base
-      $maxNumPageTable += (endaddr - base)
+    if prev_limitsec < basesec
+      $maxNumPageTable += (limitsec - basesec)
     else
-      $maxNumPageTable += (endaddr - prev_endaddr)
+      $maxNumPageTable += (limitsec - prev_limitsec)
     end
+    prev_limitsec = limitsec
   end
+  $maxNumPageTable += $cfgData[:ATT_MEM].size * 2
 
   # 仮アドレス変換テーブルの生成
   if $udomainList.empty?
@@ -362,97 +368,21 @@ if $TOPPERS_ML_AUTO
 #define ARM_PAGE_TABLE_RATIO	100
 #endif /* ARM_PAGE_TABLE_RATIO */
 
-#define ARM_PAGE_TABLE_NUM		(#{$maxNumPageTable} * ARM_PAGE_TABLE_RATIO / 100)
+#ifndef ARM_PAGE_TABLE_NUM
+#define ARM_PAGE_TABLE_NUM		((#{$maxNumPageTable} * ARM_PAGE_TABLE_RATIO + 99) / 100)
+#endif /* ARM_PAGE_TABLE_NUM */
 
 const uint32_t _kernel_section_table[#{numSectionTable}][ARM_SECTION_TABLE_ENTRY] __attribute__((aligned(ARM_SECTION_TABLE_ALIGN),section(".page_table"),nocommon)) = {{ 0U }};
 
 const uint32_t _kernel_page_table[ARM_PAGE_TABLE_NUM][ARM_PAGE_TABLE_ENTRY] __attribute__((aligned(ARM_PAGE_TABLE_ALIGN),section(".page_table"),nocommon)) = {{ 0U }};
 EOS
 
-  # 
-  #  セクションのアライン単位（文字列）
-  # 
-  $TARGET_SEC_ALIGN_STR = "4"
-
-  # 
-  #  メモリ保護単位のアライン単位（文字列）
-  # 
-  $TARGET_MP_ALIGN_STR = "4K"
-
-  #
-  #  ターゲット依存のOUTPUT記述の生成
-  #
-  def GenerateOutput()
-    $ldscript.add(<<EOS)
-OUTPUT_FORMAT("elf32-littlearm", "elf32-bigarm","elf32-littlearm")
-OUTPUT_ARCH(arm)
-EOS
-  end
-
-  #
-  #  ターゲット依存のPROVIDE記述の生成
-  #
-  def GenerateProvide()
-    $ldscript.add(<<EOS)
-PROVIDE(_gp = 0);
-PROVIDE(hardware_init_hook = 0);
-PROVIDE(software_init_hook = 0);
-PROVIDE(software_term_hook = 0);
-EOS
-  end
-
-  #
-  #  リンカのためのセクション記述の生成
-  #
-  def SectionDescription(secname)
-    case secname
-    when ".text"
-      return(".text .text.*")
-    when ".rodata"
-      return(".rodata .rodata.*")
-    when ".data"
-      return(".data .data.*")
-    when ".bss"
-      return(".bss .bss.* COMMON")
-    else
-      return(secname)
-    end
-  end
-
-  def HookEndLabel(regname)
-    $ldscript.add(<<EOS)
-	.preinit_array ALIGN(4) : {
-		PROVIDE_HIDDEN (__preinit_array_start = .);
-		KEEP (*(.preinit_array))
-		PROVIDE_HIDDEN (__preinit_array_end = .);
-	} > #{regname}
-	.init_array ALIGN(4) : {
-		PROVIDE_HIDDEN (__init_array_start = .);
-		KEEP (*(SORT(.init_array.*)))
-		KEEP (*(.init_array))
-		PROVIDE_HIDDEN (__init_array_end = .);
-	} > #{regname}
-	.fini_array ALIGN(4) : {
-		PROVIDE_HIDDEN (__fini_array_start = .);
-		KEEP (*(SORT(.fini_array.*)))
-		KEEP (*(.fini_array))
-		PROVIDE_HIDDEN (__fini_array_end = .);
-	} > #{regname}
-	.ARM.exidx ALIGN(4) : {
-		__exidx_start = .;
-		*(.ARM.exidx* .gnu.linkonce.armexidx.*)
-		__exidx_end = .;
-	} > #{regname}
-	.jcr ALIGN(4) : {
-		KEEP (*(.jcr))
-	} > #{regname}
-EOS
-  end
-
   #
   #  仮のリンカスクリプトの生成
   #
-  IncludeTrb("arch/gcc/ldscript.trb")
+  $ldscript = GenFile.new("cfg2_out.ld")
+  $modnameReplace = { "kernel_mem.o" => "kernel_mem2.o" }
+  IncludeTrb("core_ldscript.trb")
 else
   #
   #  手動メモリ配置の場合

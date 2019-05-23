@@ -3,7 +3,7 @@
  *      Toyohashi Open Platform for Embedded Real-Time Systems/
  *      High Reliable system Profile Kernel
  * 
- *  Copyright (C) 2008-2018 by Embedded and Real-Time Systems Laboratory
+ *  Copyright (C) 2008-2019 by Embedded and Real-Time Systems Laboratory
  *              Graduate School of Information Science, Nagoya Univ., JAPAN
  * 
  *  上記著作権者は，以下の(1)〜(4)の条件を満たす場合に限り，本ソフトウェ
@@ -35,7 +35,7 @@
  *  アの利用により直接的または間接的に生じたいかなる損害に関しても，そ
  *  の責任を負わない．
  * 
- *  $Id: domain.c 531 2018-11-11 04:42:51Z ertl-hiro $
+ *  $Id: domain.c 711 2019-03-29 14:06:10Z ertl-hiro $
  */
 
 /*
@@ -50,6 +50,14 @@
 /*
  *  トレースログマクロのデフォルト定義
  */
+#ifndef LOG_SCYC_START
+#define LOG_SCYC_START(p_sominib)
+#endif /* LOG_SCYC_START */
+
+#ifndef LOG_TWD_START
+#define LOG_TWD_START(p_twdinib)
+#endif /* LOG_TWD_START */
+
 #ifndef LOG_CHG_SOM_ENTER
 #define LOG_CHG_SOM_ENTER(somid)
 #endif /* LOG_CHG_SOM_ENTER */
@@ -294,11 +302,11 @@ scyc_start(void)
 		 *  システム周期オーバラン
 		 */
 		twdtimer_stop();
-		pending_twdswitch = false;
 		raise_scycovr_exception();
 	}
 
 	p_cursom = p_nxtsom;
+	LOG_SCYC_START(p_cursom);
 	if (p_cursom == NULL) {
 		/*
 		 *  システム周期を停止させる場合
@@ -387,6 +395,7 @@ twd_start(void)
 		p_twdsched = p_runtwd->p_dominib->p_schedcb;
 		p_idlesched = &schedcb_idle;
 		p_tmevt_heap = p_runtwd->p_dominib->p_tmevt_heap;
+		LOG_TWD_START(p_runtwd);
 		twdtimer_enable = true;
 		left_twdtim = p_runtwd->twdlen;
 		twdtimer_start();
@@ -399,6 +408,7 @@ twd_start(void)
 		p_twdsched = &schedcb_idle;
 		p_idlesched = &schedcb_idle;
 		p_tmevt_heap = tmevt_heap_idle;
+		LOG_TWD_START(p_runtwd);
 		twdtimer_enable = false;
 	}
 
@@ -522,28 +532,29 @@ chg_som(ID somid)
 	CHECK_ACPTN(sysstat_acvct.acptn1);			/*［NGKI5034］*/
 
 	lock_cpu();
+	p_nxtsom = p_sominib;						/*［NGKI5036］*/
 	if (p_cursom == NULL) {
+		/*
+		 *  現在のシステム動作モードがシステム周期停止モードの場合［NGKI5037］
+		 */
 		if (p_sominib != NULL) {
-			p_cursom = p_sominib;				/*［NGKI5037］*/
-			tmevtb_enqueue_reltim(&scyc_tmevtb, system_cyctim,
-												tmevt_heap_kernel);
-			p_nxtsom = p_cursom->p_nxtsom;
+			update_current_evttim();
+			scyc_tmevtb.evttim = calc_current_evttim_ub();
 
-			/*
-			 *  システム周期の最初のタイムウィンドウの開始
-			 */
-			p_runtwd = p_cursom->p_twdinib;
-			twd_start();
 			if (dspflg) {
+				/*
+				 *  システム周期の開始
+				 */
+				scyc_start();
 				update_schedtsk();
 				if (p_runtsk != p_schedtsk) {
 					dispatch();
 				}
 			}
+			else {
+				pending_scycswitch = true;
+			}
 		}
-	}
-	else {
-		p_nxtsom = p_sominib;					/*［NGKI5036］*/
 	}
 	ercd = E_OK;
 	unlock_cpu();

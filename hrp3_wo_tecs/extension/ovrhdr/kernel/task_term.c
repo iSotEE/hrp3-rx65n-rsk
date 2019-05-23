@@ -37,7 +37,7 @@
  *  アの利用により直接的または間接的に生じたいかなる損害に関しても，そ
  *  の責任を負わない．
  * 
- *  $Id: task_term.c 409 2018-05-31 08:13:31Z ertl-hiro $
+ *  $Id: task_term.c 595 2018-12-10 05:05:03Z ertl-hiro $
  */
 
 /*
@@ -147,7 +147,6 @@ ext_tsk(void)
 #ifdef TOPPERS_SUPPORT_OVRHDR
 	if (p_runtsk->staovr) {
 		(void) target_ovrtimer_stop();
-		ovrtimer_flag = false;
 	}
 #endif /* TOPPERS_SUPPORT_OVRHDR */
 	task_terminate(p_runtsk);				/* ［NGKI3449］*/
@@ -261,7 +260,6 @@ ena_ter(void)
 #ifdef TOPPERS_SUPPORT_OVRHDR
 		if (p_runtsk->staovr) {
 			(void) target_ovrtimer_stop();
-			ovrtimer_flag = false;
 		}
 #endif /* TOPPERS_SUPPORT_OVRHDR */
 		task_terminate(p_runtsk);

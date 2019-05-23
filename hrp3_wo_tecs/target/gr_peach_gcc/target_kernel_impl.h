@@ -5,7 +5,7 @@
  * 
  *  Copyright (C) 2000-2003 by Embedded and Real-Time Systems Laboratory
  *                              Toyohashi Univ. of Technology, JAPAN
- *  Copyright (C) 2006-2016 by Embedded and Real-Time Systems Laboratory
+ *  Copyright (C) 2006-2018 by Embedded and Real-Time Systems Laboratory
  *              Graduate School of Information Science, Nagoya Univ., JAPAN
  * 
  *  上記著作権者は，以下の(1)〜(4)の条件を満たす場合に限り，本ソフトウェ
@@ -37,7 +37,7 @@
  *  アの利用により直接的または間接的に生じたいかなる損害に関しても，そ
  *  の責任を負わない．
  * 
- *  $Id: target_kernel_impl.h 285 2018-03-21 02:55:49Z ertl-hiro $
+ *  $Id: target_kernel_impl.h 544 2018-11-19 15:39:12Z ertl-hiro $
  */
 
 /*
@@ -56,22 +56,10 @@
 #include "gr_peach.h"
 
 /*
- *  トレースログに関する設定
- */
-#ifdef TOPPERS_ENABLE_TRACE
-#include "arch/tracelog/trace_log.h"
-#endif /* TOPPERS_ENABLE_TRACE */
-
-/*
- *  デフォルトの非タスクコンテキスト用のスタック領域の定義
- */
-#define DEFAULT_ISTKSZ  0x2000U		/* 8KB */
-
-/*
  *  微少時間待ちのための定義（本来はSILのターゲット依存部）
  */
-#define SIL_DLY_TIM1    110
-#define SIL_DLY_TIM2    72
+#define SIL_DLY_TIM1	110
+#define SIL_DLY_TIM2	72
 
 /*
  *  チップ依存部（RZ/A1用）

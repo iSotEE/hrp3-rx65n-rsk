@@ -34,7 +34,7 @@
  *  アの利用により直接的または間接的に生じたいかなる損害に関しても，そ
  *  の責任を負わない．
  * 
- *  $Id: test_tprot1.c 195 2016-04-10 09:30:59Z ertl-hiro $
+ *  $Id: test_tprot1.c 614 2018-12-20 12:30:12Z ertl-hiro $
  */
 
 /* 
@@ -85,10 +85,16 @@
  *
  *	// タイムウィンドウ for DOM1
  *	== TASK1 ==
- *	1:	DO(WAIT(task1_flag))
+ *	1:	get_tid(&tskid)
+ *		assert(tskid == TASK1)
+ *		get_did(&domid)
+ *		assert(domid == DOM1)
+ *		DO(WAIT(task1_flag))
  *	== CYC1-1 ==
  *	2:	get_tid(&tskid)
  *		assert(tskid == TASK1)
+ *		get_did(&domid)
+ *		assert(domid == DOM1)
  *		RETURN
  *	// タイムウィンドウ for DOM2									... (A-1)
  *	== TASK2 ==
@@ -96,6 +102,8 @@
  *	== CYC1-2 ==
  *	4:	get_tid(&tskid)
  *		assert(tskid == TASK2)
+ *		get_did(&domid)
+ *		assert(domid == DOM2)
  *		RETURN
  *	// アイドルウィンドウ											... (B-1)
  *	== TASK3 ==
@@ -107,6 +115,8 @@
  *	== CYC1-4 ==
  *	6:	get_tid(&tskid)
  *		assert(tskid == TASK3)
+ *		get_did(&domid)
+ *		assert(domid == DOM3)
  *		RETURN
  *	// タイムウィンドウ for DOM1									... (C-1)
  *	== TASK1 ==
@@ -116,6 +126,8 @@
  *	== CYC1-5 ==
  *	8:	get_tid(&tskid)
  *		assert(tskid == TASK1)
+ *		get_did(&domid)
+ *		assert(domid == DOM1)
  *		RETURN
  *	// タイムウィンドウ for DOM2									... (A-2)
  *	== TASK3 ==
@@ -124,6 +136,8 @@
  *	== CYC1-6 ==
  *	10:	get_tid(&tskid)
  *		assert(tskid == TASK3)
+ *		get_did(&domid)
+ *		assert(domid == DOM3)
  *		RETURN
  *	// アイドルウィンドウ											... (B-3)
  *	== CYC1-7 ==
@@ -131,6 +145,8 @@
  *	== CYC1-8 ==
  *	11:	get_tid(&tskid)
  *		assert(tskid == TASK3)
+ *		get_did(&domid)
+ *		assert(domid == DOM3)
  *		RETURN
  *	// タイムウィンドウ for DOM1									... (C-1)
  *	== TASK1 ==
@@ -140,11 +156,15 @@
  *	== CYC1-9 ==
  *	13:	get_tid(&tskid)
  *		assert(tskid == TASK1)
+ *		get_did(&domid)
+ *		assert(domid == DOM1)
  *		RETURN
  *	// タイムウィンドウ for DOM2									... (A-3)
  *	== CYC1-10 ==
  *	14:	get_tid(&tskid)
  *		assert(tskid == TSK_NONE)
+ *		get_did(&domid)
+ *		assert(domid == TDOM_NONE)
  *		RETURN
  *	// アイドルウィンドウ											... (B-4)
  *	== CYC1-11 ==
@@ -152,6 +172,8 @@
  *	== CYC1-12 ==
  *	15:	get_tid(&tskid)
  *		assert(tskid == TSK_NONE)
+ *		get_did(&domid)
+ *		assert(domid == TDOM_NONE)
  *		DO(SET(task1_flag))
  *		RETURN
  *	// タイムウィンドウ for DOM1									... (C-3)
@@ -164,6 +186,8 @@
  *	== CYC1-13 ==
  *	18:	get_tid(&tskid)
  *		assert(tskid == TASK3)
+ *		get_did(&domid)
+ *		assert(domid == DOM3)
  *		RETURN
  *	// タイムウィンドウ for DOM2									... (A-4)
  *	== TASK2 ==
@@ -173,6 +197,8 @@
  *	== CYC1-14 ==
  *	20:	get_tid(&tskid)
  *		assert(tskid == TASK2)
+ *		get_did(&domid)
+ *		assert(domid == DOM2)
  *		RETURN
  *	// アイドルウィンドウ											... (B-2)
  *	== CYC1-15 ==
@@ -180,11 +206,15 @@
  *	== CYC1-16 ==
  *	21:	get_tid(&tskid)
  *		assert(tskid == TSK_NONE)
+ *		get_did(&domid)
+ *		assert(domid == TDOM_NONE)
  *		RETURN
  *	// タイムウィンドウ for DOM1									... (C-4)
  *	== CYC1-17 ==
  *	22:	get_tid(&tskid)
  *		assert(tskid == TSK_NONE)
+ *		get_did(&domid)
+ *		assert(domid == TDOM_NONE)
  *		DO(SET(task2_flag))
  *		RETURN
  *	// タイムウィンドウ for DOM2									... (A-6)
@@ -196,6 +226,8 @@
  *	== CYC1-18 ==
  *	25:	get_tid(&tskid)
  *		assert(tskid == TASK3)
+ *		get_did(&domid)
+ *		assert(domid == DOM3)
  *		RETURN
  *	// アイドルウィンドウ											... (B-3)
  *	== CYC1-19 ==
@@ -203,16 +235,22 @@
  *	== CYC1-20 ==
  *	26:	get_tid(&tskid)
  *		assert(tskid == TASK3)
+ *		get_did(&domid)
+ *		assert(domid == DOM3)
  *		RETURN
  *	// タイムウィンドウ for DOM1									... (C-2)
  *	== CYC1-21 ==
  *	27:	get_tid(&tskid)
  *		assert(tskid == TASK3)
+ *		get_did(&domid)
+ *		assert(domid == DOM3)
  *		RETURN
  *	// タイムウィンドウ for DOM2									... (A-5)
  *	== CYC1-22 ==
  *	28:	get_tid(&tskid)
  *		assert(tskid == TASK3)
+ *		get_did(&domid)
+ *		assert(domid == DOM3)
  *		RETURN
  *	// アイドルウィンドウ											... (B-3)
  *	== CYC1-23 ==
@@ -220,6 +258,8 @@
  *	== CYC1-24 ==
  *	29:	get_tid(&tskid)
  *		assert(tskid == TASK3)
+ *		get_did(&domid)
+ *		assert(domid == DOM3)
  *		wup_tsk(TASK1)
  *		RETURN
  *	// タイムウィンドウ for DOM1									... (C-1)
@@ -230,11 +270,15 @@
  *	== CYC1-25 ==
  *	31:	get_tid(&tskid)
  *		assert(tskid == TSK_NONE)
+ *		get_did(&domid)
+ *		assert(domid == TDOM_NONE)
  *		RETURN
  *	// タイムウィンドウ for DOM2									... (A-7)
  *	== CYC1-26 ==
  *	32:	get_tid(&tskid)
  *		assert(tskid == TSK_NONE)
+ *		get_did(&domid)
+ *		assert(domid == TDOM_NONE)
  *	33:	END
  */
 
@@ -260,6 +304,7 @@ cyclic1_handler(intptr_t exinf)
 {
 	ER_UINT	ercd;
 	ID		tskid;
+	ID		domid;
 
 	switch (++cyclic1_count) {
 	case 1:
@@ -269,9 +314,14 @@ cyclic1_handler(intptr_t exinf)
 
 		check_assert(tskid == TASK1);
 
+		ercd = get_did(&domid);
+		check_ercd(ercd, E_OK);
+
+		check_assert(domid == DOM1);
+
 		return;
 
-		check_point(0);
+		check_assert(false);
 
 	case 2:
 		check_point(4);
@@ -280,14 +330,19 @@ cyclic1_handler(intptr_t exinf)
 
 		check_assert(tskid == TASK2);
 
+		ercd = get_did(&domid);
+		check_ercd(ercd, E_OK);
+
+		check_assert(domid == DOM2);
+
 		return;
 
-		check_point(0);
+		check_assert(false);
 
 	case 3:
 		return;
 
-		check_point(0);
+		check_assert(false);
 
 	case 4:
 		check_point(6);
@@ -296,9 +351,14 @@ cyclic1_handler(intptr_t exinf)
 
 		check_assert(tskid == TASK3);
 
+		ercd = get_did(&domid);
+		check_ercd(ercd, E_OK);
+
+		check_assert(domid == DOM3);
+
 		return;
 
-		check_point(0);
+		check_assert(false);
 
 	case 5:
 		check_point(8);
@@ -307,9 +367,14 @@ cyclic1_handler(intptr_t exinf)
 
 		check_assert(tskid == TASK1);
 
+		ercd = get_did(&domid);
+		check_ercd(ercd, E_OK);
+
+		check_assert(domid == DOM1);
+
 		return;
 
-		check_point(0);
+		check_assert(false);
 
 	case 6:
 		check_point(10);
@@ -318,14 +383,19 @@ cyclic1_handler(intptr_t exinf)
 
 		check_assert(tskid == TASK3);
 
+		ercd = get_did(&domid);
+		check_ercd(ercd, E_OK);
+
+		check_assert(domid == DOM3);
+
 		return;
 
-		check_point(0);
+		check_assert(false);
 
 	case 7:
 		return;
 
-		check_point(0);
+		check_assert(false);
 
 	case 8:
 		check_point(11);
@@ -334,9 +404,14 @@ cyclic1_handler(intptr_t exinf)
 
 		check_assert(tskid == TASK3);
 
+		ercd = get_did(&domid);
+		check_ercd(ercd, E_OK);
+
+		check_assert(domid == DOM3);
+
 		return;
 
-		check_point(0);
+		check_assert(false);
 
 	case 9:
 		check_point(13);
@@ -345,9 +420,14 @@ cyclic1_handler(intptr_t exinf)
 
 		check_assert(tskid == TASK1);
 
+		ercd = get_did(&domid);
+		check_ercd(ercd, E_OK);
+
+		check_assert(domid == DOM1);
+
 		return;
 
-		check_point(0);
+		check_assert(false);
 
 	case 10:
 		check_point(14);
@@ -356,14 +436,19 @@ cyclic1_handler(intptr_t exinf)
 
 		check_assert(tskid == TSK_NONE);
 
+		ercd = get_did(&domid);
+		check_ercd(ercd, E_OK);
+
+		check_assert(domid == TDOM_NONE);
+
 		return;
 
-		check_point(0);
+		check_assert(false);
 
 	case 11:
 		return;
 
-		check_point(0);
+		check_assert(false);
 
 	case 12:
 		check_point(15);
@@ -372,11 +457,16 @@ cyclic1_handler(intptr_t exinf)
 
 		check_assert(tskid == TSK_NONE);
 
+		ercd = get_did(&domid);
+		check_ercd(ercd, E_OK);
+
+		check_assert(domid == TDOM_NONE);
+
 		SET(task1_flag);
 
 		return;
 
-		check_point(0);
+		check_assert(false);
 
 	case 13:
 		check_point(18);
@@ -385,9 +475,14 @@ cyclic1_handler(intptr_t exinf)
 
 		check_assert(tskid == TASK3);
 
+		ercd = get_did(&domid);
+		check_ercd(ercd, E_OK);
+
+		check_assert(domid == DOM3);
+
 		return;
 
-		check_point(0);
+		check_assert(false);
 
 	case 14:
 		check_point(20);
@@ -396,14 +491,19 @@ cyclic1_handler(intptr_t exinf)
 
 		check_assert(tskid == TASK2);
 
+		ercd = get_did(&domid);
+		check_ercd(ercd, E_OK);
+
+		check_assert(domid == DOM2);
+
 		return;
 
-		check_point(0);
+		check_assert(false);
 
 	case 15:
 		return;
 
-		check_point(0);
+		check_assert(false);
 
 	case 16:
 		check_point(21);
@@ -412,9 +512,14 @@ cyclic1_handler(intptr_t exinf)
 
 		check_assert(tskid == TSK_NONE);
 
+		ercd = get_did(&domid);
+		check_ercd(ercd, E_OK);
+
+		check_assert(domid == TDOM_NONE);
+
 		return;
 
-		check_point(0);
+		check_assert(false);
 
 	case 17:
 		check_point(22);
@@ -423,11 +528,16 @@ cyclic1_handler(intptr_t exinf)
 
 		check_assert(tskid == TSK_NONE);
 
+		ercd = get_did(&domid);
+		check_ercd(ercd, E_OK);
+
+		check_assert(domid == TDOM_NONE);
+
 		SET(task2_flag);
 
 		return;
 
-		check_point(0);
+		check_assert(false);
 
 	case 18:
 		check_point(25);
@@ -436,14 +546,19 @@ cyclic1_handler(intptr_t exinf)
 
 		check_assert(tskid == TASK3);
 
+		ercd = get_did(&domid);
+		check_ercd(ercd, E_OK);
+
+		check_assert(domid == DOM3);
+
 		return;
 
-		check_point(0);
+		check_assert(false);
 
 	case 19:
 		return;
 
-		check_point(0);
+		check_assert(false);
 
 	case 20:
 		check_point(26);
@@ -452,9 +567,14 @@ cyclic1_handler(intptr_t exinf)
 
 		check_assert(tskid == TASK3);
 
+		ercd = get_did(&domid);
+		check_ercd(ercd, E_OK);
+
+		check_assert(domid == DOM3);
+
 		return;
 
-		check_point(0);
+		check_assert(false);
 
 	case 21:
 		check_point(27);
@@ -463,9 +583,14 @@ cyclic1_handler(intptr_t exinf)
 
 		check_assert(tskid == TASK3);
 
+		ercd = get_did(&domid);
+		check_ercd(ercd, E_OK);
+
+		check_assert(domid == DOM3);
+
 		return;
 
-		check_point(0);
+		check_assert(false);
 
 	case 22:
 		check_point(28);
@@ -474,14 +599,19 @@ cyclic1_handler(intptr_t exinf)
 
 		check_assert(tskid == TASK3);
 
+		ercd = get_did(&domid);
+		check_ercd(ercd, E_OK);
+
+		check_assert(domid == DOM3);
+
 		return;
 
-		check_point(0);
+		check_assert(false);
 
 	case 23:
 		return;
 
-		check_point(0);
+		check_assert(false);
 
 	case 24:
 		check_point(29);
@@ -490,12 +620,17 @@ cyclic1_handler(intptr_t exinf)
 
 		check_assert(tskid == TASK3);
 
+		ercd = get_did(&domid);
+		check_ercd(ercd, E_OK);
+
+		check_assert(domid == DOM3);
+
 		ercd = wup_tsk(TASK1);
 		check_ercd(ercd, E_OK);
 
 		return;
 
-		check_point(0);
+		check_assert(false);
 
 	case 25:
 		check_point(31);
@@ -504,9 +639,14 @@ cyclic1_handler(intptr_t exinf)
 
 		check_assert(tskid == TSK_NONE);
 
+		ercd = get_did(&domid);
+		check_ercd(ercd, E_OK);
+
+		check_assert(domid == TDOM_NONE);
+
 		return;
 
-		check_point(0);
+		check_assert(false);
 
 	case 26:
 		check_point(32);
@@ -515,23 +655,40 @@ cyclic1_handler(intptr_t exinf)
 
 		check_assert(tskid == TSK_NONE);
 
+		ercd = get_did(&domid);
+		check_ercd(ercd, E_OK);
+
+		check_assert(domid == TDOM_NONE);
+
 		check_finish(33);
-		check_point(0);
+		check_assert(false);
 
 	default:
-		check_point(0);
+		check_assert(false);
 	}
-	check_point(0);
+	check_assert(false);
 }
 
 void
 task1(intptr_t exinf)
 {
 	ER_UINT	ercd;
+	ID		tskid;
+	ID		domid;
 
 	test_start(__FILE__);
 
 	check_point(1);
+	ercd = get_tid(&tskid);
+	check_ercd(ercd, E_OK);
+
+	check_assert(tskid == TASK1);
+
+	ercd = get_did(&domid);
+	check_ercd(ercd, E_OK);
+
+	check_assert(domid == DOM1);
+
 	WAIT(task1_flag);
 
 	check_point(7);
@@ -569,7 +726,7 @@ task1(intptr_t exinf)
 	ercd = slp_tsk();
 	check_ercd(ercd, E_OK);
 
-	check_point(0);
+	check_assert(false);
 }
 
 void
@@ -595,7 +752,7 @@ task2(intptr_t exinf)
 	ercd = slp_tsk();
 	check_ercd(ercd, E_OK);
 
-	check_point(0);
+	check_assert(false);
 }
 
 void
@@ -620,5 +777,5 @@ task3(intptr_t exinf)
 	check_point(24);
 	WAIT(task3_flag);
 
-	check_point(0);
+	check_assert(false);
 }

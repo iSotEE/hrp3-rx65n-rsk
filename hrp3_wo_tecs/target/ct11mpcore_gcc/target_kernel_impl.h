@@ -5,7 +5,7 @@
  * 
  *  Copyright (C) 2000-2003 by Embedded and Real-Time Systems Laboratory
  *                              Toyohashi Univ. of Technology, JAPAN
- *  Copyright (C) 2006-2017 by Embedded and Real-Time Systems Laboratory
+ *  Copyright (C) 2006-2018 by Embedded and Real-Time Systems Laboratory
  *              Graduate School of Information Science, Nagoya Univ., JAPAN
  * 
  *  上記著作権者は，以下の(1)〜(4)の条件を満たす場合に限り，本ソフトウェ
@@ -37,7 +37,7 @@
  *  アの利用により直接的または間接的に生じたいかなる損害に関しても，そ
  *  の責任を負わない．
  * 
- *  $Id: target_kernel_impl.h 285 2018-03-21 02:55:49Z ertl-hiro $
+ *  $Id: target_kernel_impl.h 574 2018-11-27 08:39:05Z ertl-hiro $
  */
 
 /*
@@ -56,17 +56,11 @@
 #include "ct11mpcore.h"
 
 /*
- *  トレースログに関する設定
- */
-#ifdef TOPPERS_ENABLE_TRACE
-#include "arch/tracelog/trace_log.h"
-#endif /* TOPPERS_ENABLE_TRACE */
-
-/*
  *  GIC依存部を使用するための定義
  */
+#define GIC_TNUM_INTNO			DIC_TNUM_INTNO
 #define GIC_ARM11MPCORE
-#define GIC_TNUM_INTNO	DIC_TNUM_INTNO
+#define GIC_SUPPORT_DISABLE_SGI
 
 /*
  *  デフォルトの非タスクコンテキスト用のスタック領域の定義
@@ -80,17 +74,9 @@
 #define SIL_DLY_TIM2	2
 
 /*
- *  semihostingの時は，bssセクションとdataセクションの初期化を行わない．
+ *  MPCore依存部
  */
-#ifdef TOPPERS_ENABLE_SEMIHOSTING
-#define TOPPERS_OMIT_BSS_INIT
-#define TOPPERS_OMIT_DATA_INIT
-#endif /* TOPPERS_ENABLE_SEMIHOSTING */
-
-/*
- *  チップ依存部（MPCore用）
- */
-#include "chip_kernel_impl.h"
+#include "mpcore_kernel_impl.h"
 
 #ifndef TOPPERS_MACRO_ONLY
 

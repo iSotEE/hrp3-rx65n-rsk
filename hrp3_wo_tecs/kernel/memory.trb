@@ -36,7 +36,7 @@
 #   アの利用により直接的または間接的に生じたいかなる損害に関しても，そ
 #   の責任を負わない．
 # 
-#   $Id: memory.trb 438 2018-08-12 17:30:50Z ertl-hiro $
+#   $Id: memory.trb 648 2019-01-14 05:26:19Z ertl-hiro $
 # 
 
 #
@@ -83,7 +83,7 @@ $MEMATR_INI = ($MEMATR_MLO|$TA_MEMINI|$TA_MEMZERO)
 #						（TA_NOWRITE属性のメモリオブジェクトが，TA_NOWRITE
 #						  属性でないメモリリージョンに登録された場合）
 #
-$memObj.each do |key, params|
+$memObj.each do |_, params|
   if (params[:mematr] & $MEMATR_INI) != 0
     accatr = params[:mematr] & ~($MEMATR_INI)
     params[:accatr] = NumStr.new(accatr, "0x" + accatr.to_s(16))
@@ -272,7 +272,7 @@ end
 #
 #  メモリオブジェクトのソート
 #
-$memObj = Hash[$memObj.sort_by {|key, params| params[:order]}]
+$memObj = Hash[$memObj.sort_by {|_, params| params[:order]}]
 
 #
 #  メモリオブジェクトの統合処理

@@ -36,7 +36,7 @@
 #   アの利用により直接的または間接的に生じたいかなる損害に関しても，そ
 #   の責任を負わない．
 # 
-#   $Id: svc_manage.trb 461 2018-09-24 11:43:34Z ertl-hiro $
+#   $Id: svc_manage.trb 665 2019-02-03 17:06:18Z ertl-hiro $
 # 
 
 #
@@ -48,7 +48,7 @@
 #
 # 拡張サービスコール番号の最大値をtmax_fncdに求める
 tmax_fncd = 0
-$cfgData[:DEF_SVC].each do |key, params|
+$cfgData[:DEF_SVC].each do |_, params|
   if params[:fncd] > tmax_fncd
     tmax_fncd = params[:fncd]
   end
@@ -84,7 +84,8 @@ $cfgData[:DEF_SVC].each do |key, params|
     error_wrong("E_OBJ", params, :fncd, "duplicated")
   end
 
-  # svcatrが（TA_NULL）でない場合（E_RSATR）［NGKI3172］
+  # svcatrが無効の場合（E_RSATR）［NGKI3172］［NGKI3686］［NGKI3687］
+  #（TA_NULLでない場合）
   if (params[:svcatr] & ~($TARGET_SVCATR)) != 0
     error_illegal_sym("E_RSATR", params, :svcatr, :fncd)
   end
@@ -109,7 +110,7 @@ if $cfgData[:DEF_SVC].size > 0
     $kernelCfgC.add(",") if index > 0
     if $svcList.has_key?(fncd)
       params = $cfgData[:DEF_SVC][$svcList[fncd]]
-      $kernelCfgC.append("\t{ (EXTSVC)(#{params[:svcrtn]}), " \
+      $kernelCfgC.append("\t{ (EXTSVC)(#{params[:extsvc]}), " \
 											"#{params[:stksz]} }")
     else
       $kernelCfgC.append("\t{ NULL, 0 }")

@@ -5,7 +5,7 @@
 #       High Reliable system Profile Kernel
 # 
 #   Copyright (C) 2015 by FUJI SOFT INCORPORATED, JAPAN
-#   Copyright (C) 2015-2018 by Embedded and Real-Time Systems Laboratory
+#   Copyright (C) 2015-2019 by Embedded and Real-Time Systems Laboratory
 #               Graduate School of Information Science, Nagoya Univ., JAPAN
 # 
 #   上記著作権者は，以下の(1)〜(4)の条件を満たす場合に限り，本ソフトウェ
@@ -37,7 +37,7 @@
 #   アの利用により直接的または間接的に生じたいかなる損害に関しても，そ
 #   の責任を負わない．
 # 
-#   $Id: task.trb 502 2018-10-27 08:05:10Z ertl-hiro $
+#   $Id: task.trb 665 2019-02-03 17:06:18Z ertl-hiro $
 # 
 
 #
@@ -66,18 +66,20 @@ class TaskObject < KernelObject
     end
     params[:sstk] ||= "NULL"
 
-    # tskatrが無効の場合（E_RSATR）［NGKI1028］
+    # tskatrが無効の場合（E_RSATR）［NGKI1028］［NGKI3526］［HRPS0005］
+    # ［NGKI1016］
     #（TA_ACT，TA_NOACTQUE，TARGET_TSKATR以外のビットがセットされている場合）
     if (params[:tskatr] & ~($TA_ACT|$TA_NOACTQUE|$TARGET_TSKATR)) != 0
       error_illegal_id("E_RSATR", params, :tskatr, :tskid)
     end
 
-    # (TMIN_TPRI <= itskpri && itskpri <= TMAX_TPRI)でない場合［NGKI1034］
+    # itskpriが有効範囲外の場合（E_PAR）［NGKI1034］
+    #（TMIN_TPRI <= itskpri && itskpri <= TMAX_TPRIでない場合）
     if !($TMIN_TPRI <= params[:itskpri] && params[:itskpri] <= $TMAX_TPRI)
       error_illegal_id("E_PAR", params, :itskpri, :tskid)
     end
 
-	if params[:domain] == $TDOM_KERNEL
+    if params[:domain] == $TDOM_KERNEL
       #
       #  システムタスクのスタック領域の生成とエラーチェック
       #
@@ -121,15 +123,16 @@ class TaskObject < KernelObject
 											"in %apiname of `%tskid'")
         end
 
-        # stkszがターゲット定義の最小値よりも小さい（E_PAR）［NGKI1042］
+        # stkszがターゲット定義の最小値（TARGET_MIN_SSTKSZ，未定義の場
+        # 合は1）よりも小さい場合（E_PAR）［NGKI1042］
         checkMinSystemStksz(params[:stksz], params)
 
-        # stkszがスタック領域サイズの制約を満たしていない（E_PAR）［NGKI1056］
+        # stkszがターゲット定義の制約に合致しない場合（E_PAR）［NGKI1056］
         if (params[:stksz] & ($CHECK_SSTKSZ_ALIGN - 1)) != 0
           error_wrong_id("E_PAR", params, :stksz, :tskid, "not aligned")
         end
 
-        # stkがスタック領域の先頭番地の制約を満たしていない（E_PAR）［NGKI1056］
+        # stkがターゲット定義の制約に合致しない場合（E_PAR）［NGKI1056］
         if $TOPPERS_ML_MANUAL
           if (params[:stk] & ($CHECK_SSTACK_ALIGN - 1)) != 0
             error_wrong_id("E_PAR", params, :stksz, :tskid, "not aligned")
@@ -172,14 +175,15 @@ class TaskObject < KernelObject
         #  sstkがNULLでない場合の処理
         #
 		# sstkszが省略されている場合
-        if params[:sstksz].nil?
+        if !params.has_key?(:sstksz)
           error_api(params, "sstksz must be specified in %apiname of %tskid")
         end
 
-        # sstkszがターゲット定義の最小値よりも小さい（E_PAR）［NGKI1044］
+        # sstkszがターゲット定義の最小値（TARGET_MIN_SSTKSZ，未定義の
+        # 場合は1）よりも小さい場合（E_PAR）［NGKI1044］
         checkMinSystemStksz(params[:sstksz], params)
 
-        # sstkszがスタック領域サイズの制約を満たしていない（E_PAR）［NGKI1065］
+        # sstkszがターゲット定義の制約に合致しない場合（E_PAR）［NGKI1065］
         if (params[:sstksz] & ($CHECK_SSTKSZ_ALIGN - 1)) != 0
           error_wrong_id("E_PAR", params, :sstksz, :tskid, "not aligned")
         end
@@ -192,7 +196,8 @@ class TaskObject < KernelObject
       #
       #  ユーザタスクのユーザスタック領域の生成とエラーチェック
       #
-      # stkszがターゲット定義の最小値よりも小さい（E_PAR）［NGKI1042］
+      # stkszがターゲット定義の最小値（TARGET_MIN_USTKSZ，未定義の場合
+      # は1）よりも小さい場合（E_PAR）［NGKI1042］
       if params[:stksz] < $TARGET_MIN_USTKSZ
         error_wrong_id("E_PAR", params, :stksz, :tskid, "too small")
       end
@@ -218,12 +223,12 @@ class TaskObject < KernelObject
         #  stkがNULLでないの場合の処理
         #
 
-        # stkszがスタック領域サイズの制約を満たしていない（E_PAR）［NGKI1056］
+        # stkszがターゲット定義の制約に合致しない場合（E_PAR）［NGKI1056］
         if (params[:stksz] & ($CHECK_USTKSZ_ALIGN - 1)) != 0
           error_wrong_id("E_PAR", params, :stksz, :tskid, "not aligned")
         end
 
-        # stkがスタック領域の先頭番地の制約を満たしていない（E_PAR）［NGKI1056］
+        # stkがターゲット定義の制約に合致しない場合（E_PAR）［NGKI1056］
         if $TOPPERS_ML_MANUAL
           if (params[:stk] & ($CHECK_USTACK_ALIGN - 1)) != 0
             error_wrong_id("E_PAR", params, :stk, :tskid, "not aligned")
@@ -249,7 +254,11 @@ class TaskObject < KernelObject
         params2[:base] = params[:stk]
         params2[:linker] = false
       end
-      params2[:mematr] = $targetMematrUstack || $mematrNoinitSec
+      if defined?($targetMematrUstack)
+        params2[:mematr] = $targetMematrUstack
+      else
+        params2[:mematr] = $mematrNoinitSec
+      end
       params2[:acptn1] = $defaultAcptn[params[:domain]]
       params2[:acptn2] = $defaultAcptn[params[:domain]]
       params2[:acptn4] = params[:acptn4] || $defaultAcptn[params[:domain]]
@@ -265,7 +274,7 @@ class TaskObject < KernelObject
       end
     end
 
-    # ターゲット依存の処理
+    # ターゲット依存の処理（ターゲット依存のエラーチェックを含む）
     if defined? TargetTaskPrepare()
       TargetTaskPrepare(key, params)
     end
@@ -285,19 +294,21 @@ class TaskObject < KernelObject
   end
 end
 
+# タスクが1つも登録されていない場合［NGKI0033］
+if $cfgData[:CRE_TSK].size() == 0
+  error("no task is registered")
+end
+
 #
 #  タスク管理に関する情報の生成
 #
 $kernelCfgC.comment_header("Task Management Functions")
-if $cfgData[:CRE_TSK].size() == 0
-  error("no task is registered")
-end
 TaskObject.new.generate()
 
 # タスク生成順序テーブルの生成
 $kernelCfgC.add("const ID _kernel_torder_table[TNUM_STSKID] = { ")
 $kernelCfgC.append("\t")
-$cfgData[:CRE_TSK].each_with_index do |(key, params), index|
+$cfgData[:CRE_TSK].each_with_index do |(_, params), index|
   $kernelCfgC.append(", ") if index > 0
   $kernelCfgC.append("#{params[:tskid]}")
 end
@@ -373,7 +384,11 @@ if $USE_REDZONE && $ustackListLinker.size > 0
         params2[:domain] = $TDOM_NONE
         params2[:memreg] = memreg
         params2[:secname] = ustkSecname
-        params2[:mematr] = $targetMematrUstack || $mematrNoinitSec
+        if defined?($targetMematrUstack)
+          params2[:mematr] = $targetMematrUstack
+        else
+          params2[:mematr] = $mematrNoinitSec
+        end
         params2[:acptn1] = $acptnKernel
         params2[:acptn2] = $acptnKernel
         params2[:acptn4] = $acptnKernel

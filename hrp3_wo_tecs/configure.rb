@@ -38,7 +38,7 @@
 #  アの利用により直接的または間接的に生じたいかなる損害に関しても，そ
 #  の責任を負わない．
 # 
-#  $Id: configure.rb 487 2018-10-23 14:48:52Z ertl-hiro $
+#  $Id: configure.rb 650 2019-01-14 07:57:07Z ertl-hiro $
 # 
 
 Encoding.default_external = 'utf-8'
@@ -56,10 +56,11 @@ require "shell"
 #  -c <cfgfile>			システムコンフィギュレーションファイル（.cfgファイ
 #						ル名）名
 #  -C <cdlflle>			コンポーネント記述ファイル（.cdlファイル）名
-#  -U <applobjs>		他のアプリケーションプログラムファイル
+#  -U <applobjs>		アプリケーションの追加のオブジェクトファイル
 #						（.oファイル名で指定．複数指定可）
-#  -S <syssvcobjs>		システムサービスのプログラムファイル
+#  -S <syssvcobjs>		システムサービスのオブジェクトファイル
 #						（.oファイル名で指定．複数指定可）
+#  -B <bannerobj>		バナー表示のオブジェクトファイル（.oファイル名で指定）
 #  -L <kernel_lib>		カーネルライブラリ（libkernel.a）のディレクトリ名
 #						（省略した場合，カーネルライブラリもmakeする）
 #  -f					カーネルを関数単位でコンパイルするかどうかの指定
@@ -107,16 +108,26 @@ require "shell"
 #
 $target = nil
 $appldirs = []
+$applname = nil
+$option_t = false
+$cfgfile = nil
+$cdlfile = nil
 $applobjs = []
 $syssvcobjs = []
+$bannerobj = nil
 $kernel_lib = ""
 $kernel_funcobjs = ""
+$srcdir = nil
 $srclang = "c"
+$tempmakefile = nil
 $objdir = "objs"
 $omit_tecs = ""
+$tecsdir = nil
 $enable_trace = ""
 $devtooldir = ""
 $ruby = "ruby"
+$cfg = nil
+$tecsgen = nil
 $copts = []
 $cdefs = []
 $ldflags = []
@@ -149,11 +160,14 @@ OptionParser.new(nil, 22) do |opt|
   opt.on("-S syssvcobjs",	"system service object files") do |val|
     $syssvcobjs += val.split(/\s+/)
   end
+  opt.on("-B bannerobj",	"banner display object file") do |val|
+    $bannerobj = val
+  end
   opt.on("-L kernel_lib",	"directory of built kernel library") do |val|
     $kernel_lib = val
   end
   opt.on("-f", "each function is complied separately in kernel") do |val|
-    $kernel_funcobjs = true
+    $kernel_funcobjs = "true"
   end
   opt.on("-D srcdir",		"path of source code directory") do |val|
     $srcdir = val
@@ -168,13 +182,13 @@ OptionParser.new(nil, 22) do |opt|
     $objdir = val
   end
   opt.on("-w",				"TECS is not used at all") do |val|
-    $omit_tecs = true
+    $omit_tecs = "true"
   end
   opt.on("-W tecsdir",		"path of TECS file directory") do |val|
     $tecsdir = val
   end
   opt.on("-r",				"use the sample code for trace log") do |val|
-    $enable_trace = true
+    $enable_trace = "true"
   end
   opt.on("-V devtooldir",	"development tools directory") do |val|
     $devtooldir = val
@@ -212,17 +226,16 @@ def GetObjectExtension
 end
 
 #
-#  変数のデフォルト値
+#  変数のデフォルト値（文字列変数のデフォルト値は初期化で与える）
 #
 if $appldirs.empty?
   $appldirs.push("\$(SRCDIR)/sample")
 end
 $applname ||= "sample1"
-if $option_t.nil?
-  $applobjs.unshift($applname + ".o")
-end
 $cfgfile ||= $applname + ".cfg"
 $cdlfile ||= $applname + ".cdl"
+$applobjs.unshift($applname + ".o") if !$option_t
+$bannerobj ||= ($omit_tecs == "") ? "tBannerMain.o" : "banner.o"
 if $srcdir.nil?
   # ソースディレクトリ名を取り出す
   if /(.*)\/configure/ =~ $0
@@ -237,8 +250,8 @@ else
   $srcabsdir = Shell.new.cwd + "/" + $srcdir
 end
 $tempmakefile ||= $srcdir + "/sample/Makefile"
-$cfg ||= $ruby + " \$(SRCDIR)/cfg/cfg.rb"
 $tecsdir ||= "\$(SRCDIR)/tecsgen"
+$cfg ||= $ruby + " \$(SRCDIR)/cfg/cfg.rb"
 $tecsgen ||= $ruby + " \$(TECSDIR)/tecsgen.rb"
 
 #
@@ -271,6 +284,7 @@ $vartable["CFGFILE"] = $cfgfile
 $vartable["CDLFILE"] = $cdlfile
 $vartable["APPLOBJS"] = $applobjs.join(" ")
 $vartable["SYSSVCOBJS"] = $syssvcobjs.join(" ")
+$vartable["BANNEROBJ"] = $bannerobj
 $vartable["KERNEL_LIB"] = $kernel_lib
 $vartable["KERNEL_FUNCOBJS"] = $kernel_funcobjs
 $vartable["SRCDIR"] = $srcdir

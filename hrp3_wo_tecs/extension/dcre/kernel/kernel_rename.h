@@ -24,14 +24,12 @@
 #define p_cursom					_kernel_p_cursom
 #define p_nxtsom					_kernel_p_nxtsom
 #define scyc_tmevtb					_kernel_scyc_tmevtb
-#define proc_scycswitch				_kernel_proc_scycswitch
 #define pending_scycswitch			_kernel_pending_scycswitch
 #define p_runtwd					_kernel_p_runtwd
-#define newscyc_twdswitch			_kernel_newscyc_twdswitch
 #define pending_twdswitch			_kernel_pending_twdswitch
 #define twdtimer_enable				_kernel_twdtimer_enable
-#define left_twdtim					_kernel_left_twdtim
 #define twdtimer_flag				_kernel_twdtimer_flag
+#define left_twdtim					_kernel_left_twdtim
 #define rundom						_kernel_rundom
 #define p_ctxdom					_kernel_p_ctxdom
 #define initialize_domain			_kernel_initialize_domain
@@ -290,8 +288,10 @@
 #define tmevt_heap_kernel			_kernel_tmevt_heap_kernel
 #define tmevt_heap_idle				_kernel_tmevt_heap_idle
 #define initialize_object			_kernel_initialize_object
-#define call_inirtn					_kernel_call_inirtn
-#define call_terrtn					_kernel_call_terrtn
+#define tnum_inirtn					_kernel_tnum_inirtn
+#define inirtnb_table				_kernel_inirtnb_table
+#define tnum_terrtn					_kernel_tnum_terrtn
+#define terrtnb_table				_kernel_terrtnb_table
 #define system_cyctim				_kernel_system_cyctim
 #define tnum_schedcb				_kernel_tnum_schedcb
 #define schedcb_table				_kernel_schedcb_table
@@ -317,6 +317,16 @@
 #define datasecinib_table			_kernel_datasecinib_table
 #define tnum_bsssec					_kernel_tnum_bsssec
 #define bsssecinib_table			_kernel_bsssecinib_table
+
+/*
+ *  tTraceLog.c
+ */
+#define log_dsp_enter				_kernel_log_dsp_enter
+#define log_dsp_leave				_kernel_log_dsp_leave
+#define log_inh_enter				_kernel_log_inh_enter
+#define log_inh_leave				_kernel_log_inh_leave
+#define log_exc_enter				_kernel_log_exc_enter
+#define log_exc_leave				_kernel_log_exc_leave
 
 
 #include "target_rename.h"

@@ -4,8 +4,6 @@ MANIFEST
 Makefile.target
 dummy.h
 start.c
-tPutLogDummy.c
-tPutLogDummy.cdl
 tSIOPortDummy.cdl
 tSIOPortDummyMain.c
 target.cdl
@@ -16,6 +14,7 @@ target_kernel.h
 target_kernel.trb
 target_kernel_impl.c
 target_kernel_impl.h
+target_ldscript.trb
 target_mem.cfg
 target_mem.trb
 target_offset.trb

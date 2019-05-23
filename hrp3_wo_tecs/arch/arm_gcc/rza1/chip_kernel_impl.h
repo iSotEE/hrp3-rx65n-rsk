@@ -37,7 +37,7 @@
  *  アの利用により直接的または間接的に生じたいかなる損害に関しても，そ
  *  の責任を負わない．
  * 
- *  $Id: chip_kernel_impl.h 244 2018-01-17 23:37:20Z ertl-hiro $
+ *  $Id: chip_kernel_impl.h 543 2018-11-19 15:03:31Z ertl-hiro $
  */
 
 /*
@@ -57,10 +57,11 @@
 #include "rza1.h"
 
 /*
- *  MMUの使用に関する設定
+ *  デフォルトの非タスクコンテキスト用のスタック領域の定義
  */
-#define USE_ARM_MMU
-#define USE_ARM_SSECTION
+#ifndef DEFAULT_ISTKSZ
+#define DEFAULT_ISTKSZ  0x2000U			/* 8KB */
+#endif /* DEFAULT_ISTKSZ */
 
 /*
  *  GICのディストリビュータの割込みコンフィギュレーションレジスタに設定
@@ -69,21 +70,19 @@
 #define GIC_ARM11MPCORE
 
 /*
- *  GIC 390 Errataへの対策を実施する．
+ *  GIC 390 Errataへの対策を実施
  */
 #define GIC_PL390_ERRATA
 
 /*
- *  GIC依存部の割込み管理機能の初期化は使用しない．
+ *  GIC依存部の割込み管理機能の初期化は使用しない
  */
 #define OMIT_GIC_INITIALIZE_INTERRUPT
 
 /*
- *  GICに関する定義，コアで共通な定義
- *
- *  core_kernel_impl.hは，gic_kernel_impl.hからインクルードされる．
+ *  MPCoreで共通な定義
  */
-#include "gic_kernel_impl.h"
+#include "mpcore_kernel_impl.h"
 
 #ifndef TOPPERS_MACRO_ONLY
 

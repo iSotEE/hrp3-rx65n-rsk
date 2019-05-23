@@ -5,7 +5,7 @@
 #       High Reliable system Profile Kernel
 # 
 #   Copyright (C) 2015 by FUJI SOFT INCORPORATED, JAPAN
-#   Copyright (C) 2015-2018 by Embedded and Real-Time Systems Laboratory
+#   Copyright (C) 2015-2019 by Embedded and Real-Time Systems Laboratory
 #               Graduate School of Information Science, Nagoya Univ., JAPAN
 # 
 #   上記著作権者は，以下の(1)〜(4)の条件を満たす場合に限り，本ソフトウェ
@@ -37,7 +37,7 @@
 #   アの利用により直接的または間接的に生じたいかなる損害に関しても，そ
 #   の責任を負わない．
 # 
-#   $Id: mempfix.trb 461 2018-09-24 11:43:34Z ertl-hiro $
+#   $Id: mempfix.trb 665 2019-02-03 17:06:18Z ertl-hiro $
 # 
 
 #
@@ -54,7 +54,7 @@ class MempfixObject < KernelObject
     params[:mpf] ||= "NULL"
     params[:mpfmb] ||= "NULL"
 
-    # mpfatrが無効の場合（E_RSATR）［NGKI2225］
+    # mpfatrが無効の場合（E_RSATR）［NGKI2225］［NGKI2218］
     #（TA_TPRI以外のビットがセットされている場合）
     if (params[:mpfatr] & ~($TA_TPRI)) != 0
       error_illegal_id("E_RSATR", params, :mpfatr, :mpfid)
@@ -101,7 +101,11 @@ class MempfixObject < KernelObject
         params2[:domain] = params[:domain]
         params2[:memreg] = $standardMemreg[params[:domain]][:stdram]
         params2[:secname] = mpfSecname
-        params2[:mematr] = $targetMematrMpfarea || $mematrNoinitSec
+        if defined?($targetMematrMpfarea)
+          params2[:mematr] = $targetMematrMpfarea
+        else
+          params2[:mematr] = $mematrNoinitSec
+        end
         params2[:acptn1] = params[:acptn1] || $defaultAcptn[params[:domain]]
         params2[:acptn2] = params[:acptn2] || $defaultAcptn[params[:domain]]
         params2[:acptn4] = params[:acptn4] || $defaultAcptn[params[:domain]]

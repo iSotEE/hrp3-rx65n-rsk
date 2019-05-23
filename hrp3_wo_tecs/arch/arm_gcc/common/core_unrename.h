@@ -49,6 +49,25 @@
 #undef default_exc_handler
 
 /*
+ *  mpcore_kernel_impl.c
+ */
+#undef mpcore_initialize
+#undef mpcore_terminate
+
+/*
+ *  mpcore_timer.c
+ */
+#undef target_hrt_initialize
+#undef target_hrt_terminate
+#undef target_hrt_handler
+#undef target_twdtimer_initialize
+#undef target_twdtimer_terminate
+#undef target_twdtimer_handler
+#undef target_ovrtimer_initialize
+#undef target_ovrtimer_terminate
+#undef target_ovrtimer_handler
+
+/*
  *  gic_kernel_impl.c
  */
 #undef gicc_initialize

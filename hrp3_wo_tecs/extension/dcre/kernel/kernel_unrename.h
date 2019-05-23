@@ -25,14 +25,12 @@
 #undef p_cursom
 #undef p_nxtsom
 #undef scyc_tmevtb
-#undef proc_scycswitch
 #undef pending_scycswitch
 #undef p_runtwd
-#undef newscyc_twdswitch
 #undef pending_twdswitch
 #undef twdtimer_enable
-#undef left_twdtim
 #undef twdtimer_flag
+#undef left_twdtim
 #undef rundom
 #undef p_ctxdom
 #undef initialize_domain
@@ -291,8 +289,10 @@
 #undef tmevt_heap_kernel
 #undef tmevt_heap_idle
 #undef initialize_object
-#undef call_inirtn
-#undef call_terrtn
+#undef tnum_inirtn
+#undef inirtnb_table
+#undef tnum_terrtn
+#undef terrtnb_table
 #undef system_cyctim
 #undef tnum_schedcb
 #undef schedcb_table
@@ -318,6 +318,16 @@
 #undef datasecinib_table
 #undef tnum_bsssec
 #undef bsssecinib_table
+
+/*
+ *  tTraceLog.c
+ */
+#undef log_dsp_enter
+#undef log_dsp_leave
+#undef log_inh_enter
+#undef log_inh_leave
+#undef log_exc_enter
+#undef log_exc_leave
 
 
 #include "target_unrename.h"

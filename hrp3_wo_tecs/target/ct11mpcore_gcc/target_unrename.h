@@ -23,17 +23,7 @@
 #undef target_ovrtimer_get_current
 #undef target_totimer_handler
 
-/*
- *  tTraceLog.c
- */
-#undef log_dsp_enter
-#undef log_dsp_leave
-#undef log_inh_enter
-#undef log_inh_leave
-#undef log_exc_enter
-#undef log_exc_leave
 
-
-#include "chip_unrename.h"
+#include "core_unrename.h"
 
 #endif /* TOPPERS_TARGET_RENAME_H */

@@ -3,7 +3,7 @@
 		ユーザーズマニュアル
 
 		対応バージョン: Release 3.1.0
-		最終更新: 2018年10月28日
+		最終更新: 2019年2月28日
 
 このドキュメントは，TOPPERS/HRP3カーネルを使用するために必要な事項を説
 明するものである．
@@ -27,7 +27,7 @@ ASP3カーネルのマニュアルもあわせて読むこと．
      Toyohashi Open Platform for Embedded Real-Time Systems/
      High Reliable system Profile Kernel
 
- Copyright (C) 2016-2018 by Embedded and Real-Time Systems Laboratory
+ Copyright (C) 2016-2019 by Embedded and Real-Time Systems Laboratory
              Graduate School of Information Science, Nagoya Univ., JAPAN
  
  上記著作権者は，以下の(1)〜(4)の条件を満たす場合に限り，本ソフトウェ
@@ -59,7 +59,7 @@ ASP3カーネルのマニュアルもあわせて読むこと．
  アの利用により直接的または間接的に生じたいかなる損害に関しても，そ
  の責任を負わない．
  
- $Id: user.txt 531 2018-11-11 04:42:51Z ertl-hiro $
+ $Id: user.txt 707 2019-03-27 21:09:22Z ertl-hiro $
 ----------------------------------------------------------------------
 
 ○目次
@@ -67,6 +67,7 @@ ASP3カーネルのマニュアルもあわせて読むこと．
 １．TOPPERS/HRP3カーネルの概要
 	1.1 TOPPERS/HRP3カーネルの位置付け
 	1.2 TOPPERS/HRP3カーネルの仕様
+	1.3 制限事項
 ２．ターゲット依存部
 ３．クイックスタートガイド
 	3.1 開発環境の準備
@@ -80,7 +81,11 @@ ASP3カーネルのマニュアルもあわせて読むこと．
 ７．コンフィギュレータの使い方
 ８．システムサービス
 ９．サポートライブラリ
+	9.1 prb_str関数
 １０．テストプログラム
+	10.1 機能テストプログラム
+	10.2 タイマドライバシミュレータを用いたテストプログラム
+	10.3 性能評価プログラム
 １１．使用上の注意とヒント
 	11.1 メモリ配置結果の確認
 	11.2 ユーザスタック領域の保護
@@ -118,10 +123,20 @@ HRP3カーネルの仕様は，ASP3カーネルに対して，次の機能を追
 
 HRP3カーネルを含むTOPPERS第3世代カーネル（ITRON系）の仕様の詳細について
 は，別途PDFファイルの形で配布している「TOPPERS第3世代カーネル（ITRON系）
-統合仕様書（Release 3.2.0）」を参照すること．
+統合仕様書（Release 3.3.0）」を参照すること．
 
 カーネル仕様の中で，ターゲット定義事項については，ターゲット依存部ディ
 レクトリにあるターゲット依存部のユーザーズマニュアルを参照すること．
+
+1.3 制限事項
+
+現在の実装（標準的なターゲット依存部）では，タスク間のセキュリティ確保
+の観点で，次の課題がある．現在の標準的なターゲット依存部では，タスク切
+換えを高速化するために，タスク切換え時に必要最小限のレジスタしか保存・
+復帰しない実装としている．そのため，タスク切換えの直後に，前に実行して
+いたタスクの一部のレジスタの値を参照できてしまう．これが問題になる場合
+には，ターゲット依存部を改造して，タスク切換え時に，レジスタの値をクリ
+アするコードを追加する必要がある．
 
 
 ２．ターゲット依存部
@@ -617,7 +632,17 @@ HRP3カーネルで追加した機能テストプログラムは次の通り．
 (14) test_twdnfy			タイムウィンドウ通知に関するテスト
 (15) test_prbstr			prb_strのテスト
 
-10.2 性能評価プログラム
+10.2 タイマドライバシミュレータを用いたテストプログラム
+
+HRP3カーネルで追加したタイマドライバシミュレータを用いたテストプログラ
+ムは次の通り．
+
+(1) simt_twd1				タイムウィンドウ管理機能のテスト(1)
+
+simt_twd1は-DHRT_CONFIG1をつけ，-DHOOK_HRT_EVENTはつけずにコンパイルす
+ること．
+
+10.3 性能評価プログラム
 
 HRP3カーネルで追加した性能評価プログラムは次の通り．
 
@@ -629,7 +654,7 @@ perf0uとperf1uは，それぞれperf0とperf1と同じ性能評価を，ユー�
 同じものを使用し，システムコンフィギュレーションファイルのみを提供して
 いる．構築する場合には，-Aオプションでperf0／perf1を指定し，-cオプショ
 ンでperf0u.cfg／perf1u.cfgを指定する．具体的には，perf0uを構築する場合
-には，次のコマンドを実行すればよい（構築用のディレクトリが，ASP3カーネ
+には，次のコマンドを実行すればよい（構築用のディレクトリが，HRP3カーネ
 ルのソースファイルを展開したディレクトリの直下にあると仮定している）．
 
 	% ruby ../configure.rb -T <ターゲット略称> -a ../test \
@@ -778,6 +803,11 @@ HRP3カーネルの配布パッケージに含まれるシステムサービス�
 このような事態を避けたい場合には，各拡張サービスコールに，それを呼び出
 せる保護ドメイン（または処理単位）を制限する処理を追加する必要がある．
 
+なお，TECSジェネレータにより拡張サービスコールを生成する場合には，コン
+ポーネント記述ファイルに適切な記述を行うことで，TECSジェネレータが生成
+する拡張サービスコールに，それを呼び出せる保護ドメインを制限する処理を
+追加することができる．
+
 11.7 カーネルからのシステムログ出力
 
 カーネルからシステムログに出力されるメッセージと，出力される状況は以下
@@ -885,6 +915,16 @@ HRP3カーネルの開発支援のためのTRAC（バグトラッキングシス
 	ER ercd = unl_mtx(ID mtxid)
 	ER ercd = ini_mtx(ID mtxid)
 	ER ercd = ref_mtx(ID mtxid, T_RMTX *pk_rmtx)
+
+	ER ercd = snd_mbf(ID mbfid, const void *msg, uint_t msgsz)
+	ER ercd = psnd_mbf(ID mbfid, const void *msg, uint_t msgsz)
+	ER ercd = tsnd_mbf(ID mbfid, const void *msg,
+										uint_t msgsz, TMO tmout)
+	ER_UINT msgsz = rcv_mbf(ID mbfid, void *msg)
+	ER_UINT msgsz = prcv_mbf(ID mbfid, void *msg)
+	ER_UINT msgsz = trcv_mbf(ID mbfid, void *msg, TMO tmout)
+	ER ercd = ini_mbf(ID mbfid)
+	ER ercd = ref_mbf(ID mbfid, T_RMBF *pk_rmbf)
 
 (5) メモリプール管理機能
 
@@ -1011,12 +1051,12 @@ HRP3カーネルの開発支援のためのTRAC（バグトラッキングシス
 									ACPTN acptn3, ACPTN acptn4 })
 (8) メモリオブジェクト管理機能
 
-	ATT_REG("メモリリージョン名", { ATR regatr, void *base, SIZE size })
-	DEF_SRG("標準ROMリージョン名", "標準RAMリージョン名",
-			"標準ショートROMリージョン名", "標準ショートRAMリージョン名")
-	ATT_SEC("セクション名", { ATR mematr, "メモリリージョン名" },
+	ATT_REG(char *regname, { ATR regatr, void *base, size_t size })
+	DEF_SRG(char *stdrom, char *stdram,
+									char *stdsrom, char *stdsram)
+	ATT_SEC(char *secname, { ATR mematr, char *regname },
 		{ ACPTN acptn1, ACPTN acptn2, ACPTN acptn3, ACPTN acptn4 })
-	ATT_MOD("オブジェクトモジュール名",
+	ATT_MOD(char *modname,
 		{ ACPTN acptn1, ACPTN acptn2, ACPTN acptn3, ACPTN acptn4 })
 	ATT_MEM({ ATR accatr, void *base, SIZE size },
 		{ ACPTN acptn1, ACPTN acptn2, ACPTN acptn3, ACPTN acptn4 })
@@ -1036,7 +1076,7 @@ HRP3カーネルの開発支援のためのTRAC（バグトラッキングシス
 
 (11) 拡張サービスコール管理機能
 
-	DEF_SVC(FN fncd, { ATR svcatr, EXTSVC svcrtn, size_t stksz })
+	DEF_SVC(FN fncd, { ATR svcatr, EXTSVC extsvc, size_t stksz })
 
 (12) 保護ドメイン管理機能
 
@@ -1057,6 +1097,6 @@ HRP3カーネルの開発支援のためのTRAC（バグトラッキングシス
 
 	2016年3月14日	Release	3.B.0		最初の早期リリース（β版）
 	2018年4月20日	Release 3.0.0		最初の一般公開
-	2018年_月__日	Release 3.1.0
+	2019年3月20日	Release 3.1.0
 
 以上

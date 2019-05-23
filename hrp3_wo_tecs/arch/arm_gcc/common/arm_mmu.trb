@@ -36,7 +36,7 @@
 #   アの利用により直接的または間接的に生じたいかなる損害に関しても，そ
 #   の責任を負わない．
 # 
-#   $Id: arm_mmu.trb 471 2018-10-14 16:28:42Z ertl-hiro $
+#   $Id: arm_mmu.trb 648 2019-01-14 05:26:19Z ertl-hiro $
 # 
 
 #
@@ -84,7 +84,7 @@ ptEntry = 0
 params = $memProt[mpkey = 1]
 1.upto($ARM_SECTION_TABLE_ENTRY).each do |sEntry|
   endaddr = sEntry * $ARM_SECTION_SIZE
-  baseaddr = endaddr - $ARM_SECTION_SIZE
+  # baseaddr = endaddr - $ARM_SECTION_SIZE
 
   if params[:aendaddr] < endaddr
     # セクション中に複数のメモリ保護単位がある場合
@@ -136,17 +136,21 @@ if $TOPPERS_ML_AUTO
 #define ARM_PAGE_TABLE_RATIO	100
 #endif /* ARM_PAGE_TABLE_RATIO */
 
-#define ARM_PAGE_TABLE_NUM		(#{$maxNumPageTable} * ARM_PAGE_TABLE_RATIO / 100)
+#ifndef ARM_PAGE_TABLE_NUM
+#define ARM_PAGE_TABLE_NUM		((#{$maxNumPageTable} * ARM_PAGE_TABLE_RATIO + 99) / 100)
+#endif /* ARM_PAGE_TABLE_NUM */
 EOS
 
   # ページテーブル領域の使用状況の表示
-  numPageTable = $maxNumPageTable * ($ARM_PAGE_TABLE_RATIO || 100) / 100
-  STDERR.puts(sprintf("== %.1f%% of the allocated page table area is used ==",
-										ptEntry.to_f * 100 / numPageTable))
+  numPageTable = ($maxNumPageTable * $ARM_PAGE_TABLE_RATIO + 99) / 100
+  STDERR.puts("== Number of used page tables: #{ptEntry} ==")
+  STDERR.puts(sprintf("== %.1f%% of the allocated page table area is used. ==",
+											ptEntry.to_f * 100 / numPageTable))
 
   # ページテーブル領域が足りない場合のエラー処理
   if ptEntry > numPageTable
-    error("increase ARM_PAGE_TABLE_RATIO and build again")
+    error("increase ARM_PAGE_TABLE_RATIO or ARM_PAGE_TABLE_NUM " \
+													"and build again.")
   end
 
   # ページテーブル領域の先頭番地の取得
@@ -155,7 +159,11 @@ else
   #
   #  手動メモリ配置の場合
   #
-  $kernelMemC.add2("#define ARM_PAGE_TABLE_NUM\t#{ptEntry}")
+  $kernelMemC.add(<<EOS)
+#ifndef ARM_PAGE_TABLE_NUM
+#define ARM_PAGE_TABLE_NUM		#{ptEntry}
+#endif /* ARM_PAGE_TABLE_NUM */
+EOS
 end
 
 # セクションテーブルのサイズ

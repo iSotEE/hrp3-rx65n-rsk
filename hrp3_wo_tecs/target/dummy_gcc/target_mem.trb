@@ -2,7 +2,7 @@
 #
 #		パス4の生成スクリプトのターゲット依存部（ダミーターゲット用）
 #
-#   $Id: target_mem.trb 313 2018-04-02 21:18:56Z ertl-hiro $
+#   $Id: target_mem.trb 648 2019-01-14 05:26:19Z ertl-hiro $
 # 
 
 #
@@ -22,7 +22,7 @@ GenerateMemProt()
 # ように，以下のエラーチェックをスキップする．
 #
 if !$errorFlag
-  $memProt.each do |key, params|
+  $memProt.each do |_, params|
     # メモリ保護単位の境界のチェック
     if (params[:baseaddr] & ($DUMMY_PAGE_SIZE - 1)) != 0 \
 				|| (params[:aendaddr] & ($DUMMY_PAGE_SIZE - 1)) != 0
@@ -36,3 +36,10 @@ end
 #  エラーチェック処理
 #
 IncludeTrb("target_check.trb")
+
+#
+#  リンカスクリプトの生成
+#
+$ldscript = GenFile.new("ldscript.ld")
+$modnameReplace = {}
+IncludeTrb("target_ldscript.trb")

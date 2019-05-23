@@ -26,7 +26,7 @@ TINIB_sstksz   .equ #{$offsetof_TINIB_sstksz}
 TINIB_ustk     .equ #{$offsetof_TINIB_ustk}
 TINIB_ustksz   .equ #{$offsetof_TINIB_ustksz}
 TINIB_domid    .equ #{$offsetof_TINIB_domid}
-SVCINIB_svcrtn .equ #{$offsetof_SVCINIB_svcrtn}
+SVCINIB_extsvc .equ #{$offsetof_SVCINIB_extsvc}
 SVCINIB_stksz  .equ #{$offsetof_SVCINIB_stksz}
 DOMINIB_domptn .equ #{$offsetof_DOMINIB_domptn}
 DOMINIB_use_mpu_num .equ #{$offsetof_DOMINIB_use_mpu_num}

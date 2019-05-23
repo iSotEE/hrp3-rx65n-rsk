@@ -5,7 +5,7 @@
  * 
  *  Copyright (C) 2000-2003 by Embedded and Real-Time Systems Laboratory
  *                              Toyohashi Univ. of Technology, JAPAN
- *  Copyright (C) 2005-2018 by Embedded and Real-Time Systems Laboratory
+ *  Copyright (C) 2005-2019 by Embedded and Real-Time Systems Laboratory
  *              Graduate School of Information Science, Nagoya Univ., JAPAN
  * 
  *  上記著作権者は，以下の(1)〜(4)の条件を満たす場合に限り，本ソフトウェ
@@ -37,7 +37,7 @@
  *  アの利用により直接的または間接的に生じたいかなる損害に関しても，そ
  *  の責任を負わない．
  * 
- *  $Id: mem_manage.c 352 2018-04-12 15:57:15Z ertl-hiro $
+ *  $Id: mem_manage.c 679 2019-03-12 19:34:49Z ertl-hiro $
  */
 
 /*
@@ -104,10 +104,31 @@ probe_memory(const void *base, size_t size, TCB *p_tcb, MODE pmmode)
 		 */
 		ercd = E_OK;
 	}
-	else if ((accatr & TA_USTACK) == 0U) {
+#ifndef OMIT_USTACK_PROTECT
+	else if ((accatr & TA_USTACK) != 0U) {
 		/*
-		 *  通常のメモリオブジェクト（タスクのユーザスタック領域以外）
-		 *  の場合
+		 *  タスクのユーザスタック領域の場合（ユーザスタック領域をタス
+		 *  ク毎に保護する場合）
+		 *
+		 *  ユーザスタック領域が読出し禁止や書込み禁止になっていること
+		 *  はあり得ないため，メモリオブジェクト属性のTA_NOWRITEと
+		 *  TA_NOREADはチェックしていない．
+		 */
+		if (!within_ustack(base, size, p_tcb)) {
+			ercd = E_MACV;
+		}
+		else if ((pmmode & TPM_EXEC) != 0U && ((accatr & TA_EXEC) == 0U)) {
+			ercd = E_MACV;
+		}
+		else {
+			ercd = E_OK;
+		}
+	}
+#endif /* OMIT_USTACK_PROTECT */
+	else {
+		/*
+		 *  通常のメモリオブジェクト（ユーザスタック領域をタスク毎に保
+		 *  護する場合は，ユーザスタック領域以外）の場合
 		 *
 		 *  メモリオブジェクト属性がTA_NOWRITEの場合には，acptn1が0Uに
 		 *  なっているので，メモリオブジェクト属性のTA_NOWRITEはチェッ
@@ -123,24 +144,6 @@ probe_memory(const void *base, size_t size, TCB *p_tcb, MODE pmmode)
 		}
 		else if ((pmmode & TPM_EXEC) != 0U && ((accatr & TA_EXEC) == 0U
 						|| (domptn & meminib_table[meminib].acptn2) == 0U)) {
-			ercd = E_MACV;
-		}
-		else {
-			ercd = E_OK;
-		}
-	}
-	else {
-		/*
-		 *  タスクのユーザスタック領域の場合
-		 *
-		 *  ユーザスタック領域が読出し禁止や書込み禁止になっていること
-		 *  はあり得ないため，メモリオブジェクト属性のTA_NOWRITEと
-		 *  TA_NOREADはチェックしていない．
-		 */
-		if (!within_ustack(base, size, p_tcb)) {
-			ercd = E_MACV;
-		}
-		else if ((pmmode & TPM_EXEC) != 0U && ((accatr & TA_EXEC) == 0U)) {
 			ercd = E_MACV;
 		}
 		else {

@@ -5,7 +5,7 @@
  * 
  *  Copyright (C) 2000-2003 by Embedded and Real-Time Systems Laboratory
  *                              Toyohashi Univ. of Technology, JAPAN
- *  Copyright (C) 2005-2018 by Embedded and Real-Time Systems Laboratory
+ *  Copyright (C) 2005-2019 by Embedded and Real-Time Systems Laboratory
  *              Graduate School of Information Science, Nagoya Univ., JAPAN
  * 
  *  上記著作権者は，以下の(1)〜(4)の条件を満たす場合に限り，本ソフトウェ
@@ -37,7 +37,7 @@
  *  アの利用により直接的または間接的に生じたいかなる損害に関しても，そ
  *  の責任を負わない．
  * 
- *  $Id: memory.c 502 2018-10-27 08:05:10Z ertl-hiro $
+ *  $Id: memory.c 679 2019-03-12 19:34:49Z ertl-hiro $
  */
 
 /*
@@ -110,7 +110,11 @@ probe_mem_write(const void *base, size_t size)
 					memtop_table[meminib + 1] : 0)) - ((char *) base);
 
 	if (accatr == TA_NOEXS) {
+#ifndef OMIT_USTACK_PROTECT
+		return(within_ustack(base, size, p_runtsk));
+#else /* OMIT_USTACK_PROTECT */
 		return(false);
+#endif /* OMIT_USTACK_PROTECT */
 	}
 	else if (size > memsize) {
 		/*
@@ -119,15 +123,17 @@ probe_mem_write(const void *base, size_t size)
 		 */
 		return(false);
 	}
-	else if ((accatr & TA_USTACK) == 0U) {
+#ifndef OMIT_USTACK_PROTECT
+	else if ((accatr & TA_USTACK) != 0U) {
+		return(within_ustack(base, size, p_runtsk));
+	}
+#endif /* OMIT_USTACK_PROTECT */
+	else {
 		/*
 		 *  ((accatr & TA_NOWRITE) != 0U)の時は，acptn1を0にしているた
 		 *  め，acptn1のチェックのみを行えばよい．
 		 */
 		return((rundom & meminib_table[meminib].acptn1) != 0U);
-	}
-	else {
-		return(within_ustack(base, size, p_runtsk));
 	}
 }
 
@@ -153,7 +159,11 @@ probe_mem_read(const void *base, size_t size)
 					memtop_table[meminib + 1] : 0)) - ((char *) base);
 
 	if (accatr == TA_NOEXS) {
+#ifndef OMIT_USTACK_PROTECT
+		return(within_ustack(base, size, p_runtsk));
+#else /* OMIT_USTACK_PROTECT */
 		return(false);
+#endif /* OMIT_USTACK_PROTECT */
 	}
 	else if (size > memsize) {
 		/*
@@ -162,12 +172,14 @@ probe_mem_read(const void *base, size_t size)
 		 */
 		return(false);
 	}
-	else if ((accatr & TA_USTACK) == 0U) {
+#ifndef OMIT_USTACK_PROTECT
+	else if ((accatr & TA_USTACK) != 0U) {
+		return(within_ustack(base, size, p_runtsk));
+	}
+#endif /* OMIT_USTACK_PROTECT */
+	else {
 		return((accatr & TA_NOREAD) == 0U
 					&& (rundom & meminib_table[meminib].acptn2) != 0U);
-	}
-	else {
-		return(within_ustack(base, size, p_runtsk));
 	}
 }
 
@@ -309,6 +321,7 @@ valid_memobj_kernel(const void *base, size_t size)
  *  可されているメモリオブジェクトに含まれているかのチェック
  */
 #ifdef TOPPERS_validmemobjd
+#ifndef OMIT_VALID_MEMOBJ_DOM
 
 bool_t
 valid_memobj_dom(const void *base, size_t size, ACPTN domptn)
@@ -327,12 +340,14 @@ valid_memobj_dom(const void *base, size_t size, ACPTN domptn)
 			&& (meminib_table[meminib].acptn2 & domptn) != 0U);
 }
 
+#endif /* OMIT_VALID_MEMOBJ_DOM */
 #endif /* TOPPERS_validmemobjd */
 
 /*
  *  ユーザスタック領域として妥当かのチェック
  */
 #ifdef TOPPERS_validustack
+#ifndef OMIT_VALID_USTACK
 
 bool_t
 valid_ustack(const void *base, size_t size)
@@ -348,6 +363,7 @@ valid_ustack(const void *base, size_t size)
 	return(accatr == TA_NOEXS && size <= memsize);
 }
 
+#endif /* OMIT_VALID_USTACK */
 #endif /* TOPPERS_validustack */
 
 /*

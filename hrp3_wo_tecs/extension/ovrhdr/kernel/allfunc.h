@@ -35,7 +35,7 @@
  *  アの利用により直接的または間接的に生じたいかなる損害に関しても，そ
  *  の責任を負わない．
  * 
- *  $Id: allfunc.h 509 2018-10-27 16:22:39Z ertl-hiro $
+ *  $Id: allfunc.h 595 2018-12-10 05:05:03Z ertl-hiro $
  */
 
 /*
@@ -254,7 +254,6 @@
 #define TOPPERS_almcal
 
 /* overrun.c */
-#define TOPPERS_ovrini
 #define TOPPERS_ovrsta
 #define TOPPERS_ovrstp
 #define TOPPERS_sta_ovr

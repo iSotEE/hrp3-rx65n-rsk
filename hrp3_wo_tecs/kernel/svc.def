@@ -37,7 +37,7 @@
 #  アの利用により直接的または間接的に生じたいかなる損害に関しても，そ
 #  の責任を負わない．
 # 
-#  $Id: svc.def 524 2018-11-04 13:01:46Z ertl-hiro $
+#  $Id: svc.def 572 2018-11-27 08:35:22Z ertl-hiro $
 # 
 
 #
@@ -262,7 +262,7 @@
 		S				ER		ref_cyc(ID cycid, T_RCYC *pk_rcyc)
 		S				ER		ref_alm(ID almid, T_RALM *pk_ralm)
 		-				ER		ref_isr(ID isrid, T_RISR *pk_risr)
--189	-				ER		ref_spn(ID spnid, T_RALM *pk_rspn)
+-189	-				ER		ref_spn(ID spnid, T_RSPN *pk_rspn)
 		-
 		-
 		-

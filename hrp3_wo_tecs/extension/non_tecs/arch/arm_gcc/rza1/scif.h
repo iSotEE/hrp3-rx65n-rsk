@@ -36,7 +36,7 @@
  *  アの利用により直接的または間接的に生じたいかなる損害に関しても，そ
  *  の責任を負わない．
  * 
- *  $Id: scif.h 415 2018-07-27 09:06:40Z ertl-hiro $
+ *  $Id: scif.h 576 2018-11-28 00:57:26Z ertl-hiro $
  */
 
 /*
@@ -69,10 +69,15 @@
 /*
  *  シリアルモードレジスタ（SCIF_SCSMR）の設定値
  */
+#define SCIF_SCSMR_ASYNC	0x0000U		/* 調歩同期式モード */
 #define SCIF_SCSMR_SYNC		0x0080U		/* クロック同期式モード */
+#define SCIF_SCSMR_8BIT		0x0000U		/* 8ビットデータ */
 #define SCIF_SCSMR_7BIT		0x0040U		/* 7ビットデータ */
+#define SCIF_SCSMR_NOPARITY	0x0000U		/* パリティビットなし */
 #define SCIF_SCSMR_PARITY	0x0020U		/* パリティビットの付加 */
+#define SCIF_SCSMR_EVEN		0x0000U		/* 偶数パリティ */
 #define SCIF_SCSMR_ODD		0x0010U		/* 奇数パリティ */
+#define SCIF_SCSMR_1STOP	0x0000U		/* 1ストッピビット */
 #define SCIF_SCSMR_2STOP	0x0008U		/* 2ストッピビット */
 #define SCIF_SCSMR_CKS1		0x0000U		/* P1φクロック1 */
 #define SCIF_SCSMR_CKS4		0x0001U		/* P1φ/4クロック */
@@ -215,7 +220,7 @@ scif_putready(uintptr_t base)
 /*
  *  受信した文字の取出し
  */
-Inline char
+Inline bool_t
 scif_getchar(uintptr_t base, char *p_c)
 {
 	uint16_t	fsr;
@@ -256,15 +261,20 @@ scif_putchar(uintptr_t base, char c)
  */
 
 /*
- *  SIOドライバの初期化ルーチン
+ *  SIOドライバの初期化
  */
 extern void		scif_initialize(void);
 
 /*
+ *  SIOドライバの終了処理
+ */
+extern void		scif_terminate(void);
+
+/*
  *  SIOの割込みサービスルーチン
  */
-extern void		scif_rx_isr(void);
-extern void		scif_tx_isr(void);
+extern void		scif_isr_rx(ID siopid);
+extern void		scif_isr_tx(ID siopid);
 
 /*
  *  SIOポートのオープン

@@ -34,7 +34,7 @@
  *  アの利用により直接的または間接的に生じたいかなる損害に関しても，そ
  *  の責任を負わない．
  * 
- *  $Id: test_mprot2.c 370 2018-04-15 05:43:33Z ertl-hiro $
+ *  $Id: test_mprot2.c 597 2018-12-12 00:32:54Z ertl-hiro $
  */
 
 /* 
@@ -175,6 +175,7 @@ func2(void)
 	Asm("nop; nop; nop; nop");
 	Asm("nop; nop; nop; nop");
 	Asm("nop; nop; nop; nop");
+	Asm("nop; nop; nop; nop");
 #endif /* TOPPERS_ARM */
 }
 
@@ -191,6 +192,7 @@ func4(void)
 
 #ifdef TOPPERS_ARM
 	/* ARM MMUでは，これがないとうまくいかない．原因不明 */
+	Asm("nop; nop; nop; nop");
 	Asm("nop; nop; nop; nop");
 	Asm("nop; nop; nop; nop");
 	Asm("nop; nop; nop; nop");

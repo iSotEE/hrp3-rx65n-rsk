@@ -2,7 +2,7 @@
 #
 #		オフセットファイル生成用Rubyテンプレート（ARM用）
 #
-#  $Id: core_offset.trb 412 2018-07-25 09:38:09Z ertl-hiro $
+#  $Id: core_offset.trb 606 2018-12-13 16:13:01Z ertl-hiro $
 #
 
 #
@@ -29,7 +29,7 @@ $offsetH.append(<<EOS)
 #define TINIB_ustk		#{$offsetof_TINIB_ustk}
 #define DOMINIB_domptn	#{$offsetof_DOMINIB_domptn}
 #define DOMINIB_p_section_table	#{$offsetof_DOMINIB_p_section_table}
-#define SVCINIB_svcrtn	#{$offsetof_SVCINIB_svcrtn}
+#define SVCINIB_extsvc	#{$offsetof_SVCINIB_extsvc}
 #define SVCINIB_stksz	#{$offsetof_SVCINIB_stksz}
 #define T_EXCINF_rundom	#{$offsetof_T_EXCINF_rundom}
 #define T_EXCINF_cpsr	#{$offsetof_T_EXCINF_cpsr}

@@ -37,7 +37,7 @@
  *  アの利用により直接的または間接的に生じたいかなる損害に関しても，そ
  *  の責任を負わない．
  * 
- *  $Id: time_event.h 498 2018-10-25 13:57:41Z ertl-hiro $
+ *  $Id: time_event.h 631 2019-01-02 09:20:29Z ertl-hiro $
  */
 
 /*
@@ -162,6 +162,17 @@ extern TMEVTN	*tmevt_down(TMEVTN *p_tmevtn, EVTTIM evttim,
  *  current_evttimとcurrent_hrtcntを，現在の値に更新する．
  */
 extern void		update_current_evttim(void);
+
+/*
+ *  現在のイベント時刻を遅い方に丸めたイベント時刻の算出［ASPD1027］
+ *
+ *  現在のイベント時刻を更新した後に呼ぶことを想定している．
+ */
+Inline EVTTIM
+calc_current_evttim_ub(void)
+{
+	return(current_evttim + ((EVTTIM) TSTEP_HRTCNT));
+}
 
 /*
  *  高分解能タイマ割込みの発生タイミングの設定

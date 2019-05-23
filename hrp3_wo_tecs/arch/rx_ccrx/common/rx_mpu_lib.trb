@@ -189,3 +189,10 @@ def GenerateMpuInfoTable
   $kernelMemC.add("const uint8_t _kernel_shared_mpu_num = #{$aSharedMemObj.size}U;")
   $kernelMemC.add("const uint8_t _kernel_max_domain_mpu_num = #{$nMaxDomainMpuNum}U;")
 end
+
+#
+#  メモリオブジェクトの先頭／終了ラベルの宣言のマクロを生成
+#
+def GenerateDeclareLabel(genFile, label)
+  genFile.add("#define #{label} ((void*)#{sprintf("0x%08x", SYMBOL(label))}U)")
+end

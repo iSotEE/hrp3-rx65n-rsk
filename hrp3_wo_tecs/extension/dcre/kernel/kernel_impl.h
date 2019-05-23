@@ -37,7 +37,7 @@
  *  アの利用により直接的または間接的に生じたいかなる損害に関しても，そ
  *  の責任を負わない．
  * 
- *  $Id: kernel_impl.h 502 2018-10-27 08:05:10Z ertl-hiro $
+ *  $Id: kernel_impl.h 627 2018-12-31 16:52:32Z ertl-hiro $
  */
 
 /*
@@ -77,6 +77,13 @@
  *  システムログ機能のための定義
  */
 #include <t_syslog.h>
+
+/*
+ *  トレースログに関する設定
+ */
+#ifdef TOPPERS_ENABLE_TRACE
+#include "arch/tracelog/trace_log.h"
+#endif /* TOPPERS_ENABLE_TRACE */
 
 /*
  *  ターゲット依存情報の定義
@@ -196,14 +203,28 @@ extern void initialize_tecs(void);
 extern void	initialize_object(void);
 
 /*
- *  初期化ルーチンの実行（kernel_cfg.c）
+ *  初期化ルーチン関係の定義（kernel_cfg.c）
  */
-extern void	call_inirtn(void);
+typedef struct initialization_routine_block {
+	INIRTN		inirtn;					/* 初期化ルーチンの先頭番地 */
+	intptr_t	exinf;					/* 初期化ルーチンの拡張情報 */
+} INIRTNB;
+
+extern const uint_t	tnum_inirtn;		/* 初期化ルーチンの数 */
+
+extern const INIRTNB inirtnb_table[];	/* 初期化ルーチンブロックテーブル */
 
 /*
- *  終了処理ルーチンの実行（kernel_cfg.c）
+ *  終了処理ルーチン関係の定義（kernel_cfg.c）
  */
-extern void	call_terrtn(void);
+typedef struct termination_routine_block {
+	TERRTN		terrtn;					/* 終了処理ルーチンの先頭番地 */
+	intptr_t	exinf;					/* 終了処理ルーチンの拡張情報 */
+} TERRTNB;
+
+extern const uint_t	tnum_terrtn;		/* 終了処理ルーチンの数 */
+
+extern const TERRTNB terrtnb_table[];	/* 終了処理ルーチンブロックテーブル */
 
 /*
  *  システム状態に対するアクセス許可ベクタ（kernel_cfg.c）

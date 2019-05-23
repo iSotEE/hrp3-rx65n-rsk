@@ -1,7 +1,6 @@
 /*
- *  TOPPERS/HRP Kernel
- *      Toyohashi Open Platform for Embedded Real-Time Systems/
- *      High Reliable system Profile Kernel
+ *  TOPPERS Software
+ *      Toyohashi Open Platform for Embedded Real-Time Systems
  * 
  *  Copyright (C) 2000-2003 by Embedded and Real-Time Systems Laboratory
  *                              Toyohashi Univ. of Technology, JAPAN
@@ -37,7 +36,7 @@
  *  アの利用により直接的または間接的に生じたいかなる損害に関しても，そ
  *  の責任を負わない．
  * 
- *  $Id: target_serial.c 415 2018-07-27 09:06:40Z ertl-hiro $
+ *  $Id: target_serial.c 576 2018-11-28 00:57:26Z ertl-hiro $
  */
 
 /*
@@ -47,6 +46,7 @@
 
 #include <kernel.h>
 #include <t_syslog.h>
+#include "target_syssvc.h"
 #include "target_serial.h"
 
 /*
@@ -64,7 +64,7 @@ sio_initialize(intptr_t exinf)
 void
 sio_terminate(intptr_t exinf)
 {
-	/* 何もしない */
+	uart_pl011_terminate();
 }
 
 /*
@@ -73,7 +73,7 @@ sio_terminate(intptr_t exinf)
 void
 sio_isr(intptr_t exinf)
 {
-	uart_pl011_isr();
+	uart_pl011_isr((ID) exinf);
 }
 
 /*
@@ -117,36 +117,36 @@ sio_cls_por(SIOPCB *p_siopcb)
  *  SIOポートへの文字送信
  */
 bool_t
-sio_snd_chr(SIOPCB *siopcb, char c)
+sio_snd_chr(SIOPCB *p_siopcb, char c)
 {
-	return(uart_pl011_snd_chr(siopcb, c));
+	return(uart_pl011_snd_chr(p_siopcb, c));
 }
 
 /*
  *  SIOポートからの文字受信
  */
 int_t
-sio_rcv_chr(SIOPCB *siopcb)
+sio_rcv_chr(SIOPCB *p_siopcb)
 {
-	return(uart_pl011_rcv_chr(siopcb));
+	return(uart_pl011_rcv_chr(p_siopcb));
 }
 
 /*
  *  SIOポートからのコールバックの許可
  */
 void
-sio_ena_cbr(SIOPCB *siopcb, uint_t cbrtn)
+sio_ena_cbr(SIOPCB *p_siopcb, uint_t cbrtn)
 {
-	uart_pl011_ena_cbr(siopcb, cbrtn);
+	uart_pl011_ena_cbr(p_siopcb, cbrtn);
 }
 
 /*
  *  SIOポートからのコールバックの禁止
  */
 void
-sio_dis_cbr(SIOPCB *siopcb, uint_t cbrtn)
+sio_dis_cbr(SIOPCB *p_siopcb, uint_t cbrtn)
 {
-	uart_pl011_dis_cbr(siopcb, cbrtn);
+	uart_pl011_dis_cbr(p_siopcb, cbrtn);
 }
 
 /*
@@ -165,46 +165,4 @@ void
 uart_pl011_irdy_rcv(intptr_t exinf)
 {
 	sio_irdy_rcv(exinf);
-}
-
-/*
- *		システムログの低レベル出力（本来は別のファイルにすべき）
- */
-
-/*
- *  低レベル出力用のSIOポート管理ブロック
- */
-static SIOPCB	*p_siopcb_target_fput;
-
-/*
- *  SIOポートの初期化
- */
-void
-target_fput_initialize(void)
-{
-	p_siopcb_target_fput = uart_pl011_opn_por(SIOPID_FPUT, 0);
-}
-
-/*
- *  SIOポートへのポーリング出力
- */
-static void
-ct11mpcore_uart_fput(char c)
-{
-	/*
-	 *  送信できるまでポーリング
-	 */
-	while (!(uart_pl011_snd_chr(p_siopcb_target_fput, c))) ;
-}
-
-/*
- *  SIOポートへの文字出力
- */
-void
-target_fput_log(char c)
-{
-	if (c == '\n') {
-		ct11mpcore_uart_fput('\r');
-	}
-	ct11mpcore_uart_fput(c);
 }

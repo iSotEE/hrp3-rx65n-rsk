@@ -5,7 +5,7 @@
  * 
  *  Copyright (C) 2000-2003 by Embedded and Real-Time Systems Laboratory
  *                              Toyohashi Univ. of Technology, JAPAN
- *  Copyright (C) 2005-2018 by Embedded and Real-Time Systems Laboratory
+ *  Copyright (C) 2005-2019 by Embedded and Real-Time Systems Laboratory
  *              Graduate School of Information Science, Nagoya Univ., JAPAN
  * 
  *  上記著作権者は，以下の(1)〜(4)の条件を満たす場合に限り，本ソフトウェ
@@ -37,7 +37,7 @@
  *  アの利用により直接的または間接的に生じたいかなる損害に関しても，そ
  *  の責任を負わない．
  * 
- *  $Id: syslog.c 415 2018-07-27 09:06:40Z ertl-hiro $
+ *  $Id: syslog.c 691 2019-03-24 00:59:11Z ertl-hiro $
  */
 
 /*
@@ -163,13 +163,10 @@ _syslog_wri_log(uint_t prio, const SYSLOG *p_syslog)
  *
  *  CPUロック状態や実行コンテキストによらず動作できるように実装してある．
  */
-ER_UINT
-_syslog_rea_log(SYSLOG *p_syslog)
+static ER_UINT
+read_log(SYSLOG *p_syslog)
 {
 	ER_UINT	ercd;
-	SIL_PRE_LOC;
-
-	SIL_LOC_INT();
 
 	/*
 	 *  ログバッファからの取出し
@@ -187,7 +184,17 @@ _syslog_rea_log(SYSLOG *p_syslog)
 	else {
 		ercd = E_OBJ;
 	}
+	return(ercd);
+}
 
+ER_UINT
+_syslog_rea_log(SYSLOG *p_syslog)
+{
+	ER_UINT	ercd;
+	SIL_PRE_LOC;
+
+	SIL_LOC_INT();
+	ercd = read_log(p_syslog);
 	SIL_UNL_INT();
 	return(ercd);
 }
@@ -236,7 +243,7 @@ _syslog_fls_log(void)
 
 	SIL_LOC_INT();
 
-	while ((rercd = syslog_rea_log(&logbuf)) >= 0) {
+	while ((rercd = read_log(&logbuf)) >= 0) {
 		if (((uint_t) rercd) > 0U) {
 			syslog_lostmsg((uint_t) rercd, target_fput_log);
 		}

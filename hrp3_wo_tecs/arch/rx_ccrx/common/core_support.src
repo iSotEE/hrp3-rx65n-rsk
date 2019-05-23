@@ -1196,8 +1196,8 @@ extsvc_entry:
 	mov.l	#__kernel_svcinib_table-8, r14
 	rotl	#3, r5
 	add		r5, r14						; p_svcinibを取得
-	mov.l	SVCINIB_svcrtn[r14], r15	; p_svcinib->svcrtnを取得
-	cmp		#0, r15						; p_svcinib->svcrtnがNULLか？
+	mov.l	SVCINIB_extsvc[r14], r15	; p_svcinib->extsvcを取得
+	cmp		#0, r15						; p_svcinib->extsvcがNULLか？
 	beq		ret_extsvc_rsfn
 
 	;

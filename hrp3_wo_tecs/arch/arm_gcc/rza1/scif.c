@@ -34,7 +34,7 @@
  *  アの利用により直接的または間接的に生じたいかなる損害に関しても，そ
  *  の責任を負わない．
  * 
- *  $Id: scif.c 415 2018-07-27 09:06:40Z ertl-hiro $
+ *  $Id: scif.c 576 2018-11-28 00:57:26Z ertl-hiro $
  */
 
 /*
@@ -53,7 +53,8 @@
  */
 typedef struct sio_port_initialization_block {
 	uintptr_t	base;			/* SCIFレジスタのベースアドレス */
-	uint32_t	baudrate;		/* ボーレートの設定値 */
+	uint16_t	mode;			/* モードレジスタの設定値 */
+	uint32_t	baudrate;		/* ボーレート */
 } SIOPINIB;
 
 /*
@@ -69,7 +70,7 @@ struct sio_port_control_block {
  *  SIOポート初期化ブロック
  */
 const SIOPINIB siopinib_table[TNUM_SIOP] = {
-	{ SIO_SCIF_BASE, SIO_SCIF_BAUDRATE }
+	{ SIO_SCIF_BASE, SIO_SCIF_MODE, SIO_SCIF_BAUDRATE }
 };
 
 /*
@@ -102,6 +103,22 @@ scif_initialize(void)
 }
 
 /*
+ *  SIOドライバの終了処理
+ */
+void
+scif_terminate(void)
+{
+	uint_t	i;
+
+	/*
+	 *  オープンされているSIOポートのクローズ
+	 */
+	for (i = 0; i < TNUM_SIOP; i++) {
+		scif_cls_por(&(siopcb_table[i]));
+	}
+}
+
+/*
  *  SIOポートのオープン
  */
 SIOPCB *
@@ -129,7 +146,8 @@ scif_opn_por(ID siopid, intptr_t exinf)
 		sil_wrh_mem(SCIF_SCFSR(base), 0U);
 		sil_wrh_mem(SCIF_SCLSR(base), 0U);
 		sil_wrh_mem(SCIF_SCSCR(base), SCIF_SCSCR_INTCLK);
-		sil_wrh_mem(SCIF_SCSMR(base), SCIF_SCSMR_CKS1);
+		sil_wrh_mem(SCIF_SCSMR(base),
+				SCIF_SCSMR_ASYNC|p_siopcb->p_siopinib->mode|SCIF_SCSMR_CKS1);
 		sil_wrh_mem(SCIF_SCEMR(base), 0U);
 		sil_wrb_mem(SCIF_SCBRR(base), (uint8_t) brr);
 		sil_wrh_mem(SCIF_SCFCR(base),
@@ -142,10 +160,10 @@ scif_opn_por(ID siopid, intptr_t exinf)
 			sil_wrh_mem(SCIF_SCFSR(base), (uint16_t) ~(SCIF_SCFSR_RDF));
 		}
 		sil_wrh_mem(SCIF_SCFSR(base), 0U);
-	}
 
+		p_siopcb->opened = true;
+	}
 	p_siopcb->exinf = exinf;
-	p_siopcb->opened = true;
 	return(p_siopcb);   
 }
 
@@ -155,7 +173,11 @@ scif_opn_por(ID siopid, intptr_t exinf)
 void
 scif_cls_por(SIOPCB *p_siopcb)
 {
-	sil_wrh_mem(SCIF_SCSCR(p_siopcb->p_siopinib->base), 0U);
+	if (p_siopcb->opened) {
+		sil_wrh_mem(SCIF_SCSCR(p_siopcb->p_siopinib->base), 0U);
+
+		p_siopcb->opened = false;
+	}
 }
 
 /*
@@ -231,7 +253,7 @@ scif_dis_cbr(SIOPCB *p_siopcb, uint_t cbrtn)
  *  SIOポートに対する受信割込み処理
  */
 static void
-scif_rx_isr_siop(SIOPCB *p_siopcb)
+scif_isr_rx_siop(SIOPCB *p_siopcb)
 {
 	if (scif_getready(p_siopcb->p_siopinib->base)) {
 		/*
@@ -245,7 +267,7 @@ scif_rx_isr_siop(SIOPCB *p_siopcb)
  *  SIOポートに対する送信割込み処理
  */
 static void
-scif_tx_isr_siop(SIOPCB *p_siopcb)
+scif_isr_tx_siop(SIOPCB *p_siopcb)
 {
 	if (scif_putready(p_siopcb->p_siopinib->base)) {
 		/*
@@ -259,16 +281,16 @@ scif_tx_isr_siop(SIOPCB *p_siopcb)
  *  SIOの受信割込みサービスルーチン
  */
 void
-scif_rx_isr(void)
+scif_isr_rx(ID siopid)
 {
-	scif_rx_isr_siop(&(siopcb_table[0]));
+	scif_isr_rx_siop(get_siopcb(siopid));
 }
 
 /*
  *  SIOの送信割込みサービスルーチン
  */
 void
-scif_tx_isr(void)
+scif_isr_tx(ID siopid)
 {
-	scif_tx_isr_siop(&(siopcb_table[0]));
+	scif_isr_tx_siop(get_siopcb(siopid));
 }

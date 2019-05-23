@@ -1,7 +1,7 @@
 /*
  *		全静的APIのテスト(1)
  * 
- *  $Id: cfg_all1.h 465 2018-09-30 11:03:02Z ertl-hiro $
+ *  $Id: cfg_all1.h 676 2019-03-11 04:52:04Z ertl-hiro $
  */
 
 #include <kernel.h>
@@ -13,7 +13,7 @@
 #define MID_PRIORITY	10		/* 中優先度 */
 #define LOW_PRIORITY	11		/* 低優先度 */
 
-#define MAX_INT_PRIORITY	-1
+#define MAX_INT_PRIORITY	(-1)
 #define MIN_INT_PRIORITY	TMIN_INTPRI
 
 /*

@@ -4,7 +4,7 @@
  * 
  *  Copyright (C) 2000-2003 by Embedded and Real-Time Systems Laboratory
  *                              Toyohashi Univ. of Technology, JAPAN
- *  Copyright (C) 2007-2016 by Embedded and Real-Time Systems Laboratory
+ *  Copyright (C) 2007-2018 by Embedded and Real-Time Systems Laboratory
  *              Graduate School of Information Science, Nagoya Univ., JAPAN
  * 
  *  上記著作権者は，以下の(1)〜(4)の条件を満たす場合に限り，本ソフトウェ
@@ -36,7 +36,7 @@
  *  アの利用により直接的または間接的に生じたいかなる損害に関しても，そ
  *  の責任を負わない．
  * 
- *  $Id: test_dlynse.c 186 2016-04-05 15:49:42Z ertl-hiro $
+ *  $Id: test_dlynse.c 593 2018-12-08 02:17:08Z ertl-hiro $
  */
 
 /*
@@ -56,7 +56,9 @@
  *  SIL_DLY_TIM1とSIL_DLY_TIM2を参照するために，カーネル用のヘッダファ
  *  イルをインクルードする．
  */
+#define TOPPERS_MACRO_ONLY
 #include "target_kernel_impl.h"
+#undef TOPPERS_MACRO_ONLY
 
 #define	NO_LOOP		1000000UL
 

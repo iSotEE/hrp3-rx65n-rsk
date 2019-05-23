@@ -4,8 +4,7 @@ E_PACKAGE
 MANIFEST
 Makefile.target
 ct11mpcore.h
-tPutLogCT11MPCore.c
-tPutLogCT11MPCore.cdl
+sp804.h
 tSIOPortCT11MPCore.cdl
 tSIOPortCT11MPCoreMain_inline.h
 target.cdl
@@ -30,3 +29,4 @@ target_timer.c
 target_timer.cfg
 target_timer.h
 target_unrename.h
+target_user.txt

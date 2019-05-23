@@ -1,7 +1,6 @@
 /*
- *  TOPPERS/HRP Kernel
- *      Toyohashi Open Platform for Embedded Real-Time Systems/
- *      High Reliable system Profile Kernel
+ *  TOPPERS Software
+ *      Toyohashi Open Platform for Embedded Real-Time Systems
  * 
  *  Copyright (C) 2018 by Embedded and Real-Time Systems Laboratory
  *                  Graduate School of Informatics, Nagoya Univ., JAPAN
@@ -35,7 +34,7 @@
  *  アの利用により直接的または間接的に生じたいかなる損害に関しても，そ
  *  の責任を負わない．
  * 
- *  $Id: test_prbstr.c 373 2018-04-16 06:25:01Z ertl-hiro $
+ *  $Id: test_prbstr.c 667 2019-02-13 07:42:11Z ertl-hiro $
  */
 
 /* 

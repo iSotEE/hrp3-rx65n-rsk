@@ -1,5 +1,5 @@
 PACKAGE hrp3
-VERSION 3.0.0
+VERSION 3.1.0
 
 configure.rb
 MANIFEST
@@ -136,6 +136,8 @@ syssvc/tBanner.cdl
 syssvc/tBannerMain.c
 syssvc/tLogTask.cdl
 syssvc/tLogTaskMain.c
+syssvc/tPutLogSIOPort.c
+syssvc/tPutLogSIOPort.cdl
 syssvc/tSerialAdapter.c
 syssvc/tSerialAdapter.cdl
 syssvc/tSerialPort.cdl
@@ -163,6 +165,15 @@ arch/gcc/tool_svc.h
 arch/tracelog/trace_log.h
 arch/tracelog/tTraceLog.c
 arch/tracelog/tTraceLog.cdl
+
+arch/simtimer/sim_timer.c
+arch/simtimer/sim_timer.cfg
+arch/simtimer/sim_timer.h
+arch/simtimer/sim_timer_cntl.h
+arch/simtimer/tSimTimerCntl.c
+arch/simtimer/tSimTimerCntl.cdl
+arch/simtimer/tSimTimerCntlAdapter.c
+arch/simtimer/tSimTimerCntlAdapter.cdl
 
 utils/applyrename.rb
 utils/genrename.rb

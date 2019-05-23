@@ -15,14 +15,12 @@ schedcb_idle
 p_cursom
 p_nxtsom
 scyc_tmevtb
-proc_scycswitch
 pending_scycswitch
 p_runtwd
-newscyc_twdswitch
 pending_twdswitch
 twdtimer_enable
-left_twdtim
 twdtimer_flag
+left_twdtim
 rundom
 p_ctxdom
 initialize_domain
@@ -243,8 +241,10 @@ istkpt
 tmevt_heap_kernel
 tmevt_heap_idle
 initialize_object
-call_inirtn
-call_terrtn
+tnum_inirtn
+inirtnb_table
+tnum_terrtn
+terrtnb_table
 system_cyctim
 tnum_schedcb
 schedcb_table
@@ -268,5 +268,13 @@ tnum_datasec
 datasecinib_table
 tnum_bsssec
 bsssecinib_table
+
+# tTraceLog.c
+log_dsp_enter
+log_dsp_leave
+log_inh_enter
+log_inh_leave
+log_exc_enter
+log_exc_leave
 
 INCLUDE "target"

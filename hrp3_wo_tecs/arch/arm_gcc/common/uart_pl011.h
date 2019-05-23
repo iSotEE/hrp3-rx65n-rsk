@@ -36,7 +36,7 @@
  *  アの利用により直接的または間接的に生じたいかなる損害に関しても，そ
  *  の責任を負わない．
  * 
- *  $Id: uart_pl011.h 415 2018-07-27 09:06:40Z ertl-hiro $
+ *  $Id: uart_pl011.h 576 2018-11-28 00:57:26Z ertl-hiro $
  */
 
 /*
@@ -164,14 +164,19 @@ uart_pl011_putchar(uintptr_t base, char c)
  */
 
 /*
- *  SIOドライバの初期化ルーチン
+ *  SIOドライバの初期化
  */
 extern void		uart_pl011_initialize(void);
 
 /*
+ *  SIOドライバの終了処理
+ */
+extern void		uart_pl011_terminate(void);
+
+/*
  *  SIOの割込みサービスルーチン
  */
-extern void		uart_pl011_isr(void);
+extern void		uart_pl011_isr(ID siopid);
 
 /*
  *  SIOポートのオープン

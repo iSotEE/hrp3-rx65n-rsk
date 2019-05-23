@@ -220,23 +220,23 @@ _kernel_initialize_object(void)
  *  Initialization Routine
  */
 
-void
-_kernel_call_inirtn(void)
-{
-	((INIRTN)(_kernel_target_hrt_initialize))((intptr_t)(0));
-	((INIRTN)(_kernel_target_twdtimer_initialize))((intptr_t)(0));
-}
+const uint_t _kernel_tnum_inirtn = TNUM_INIRTN;
+
+const INIRTNB _kernel_inirtnb_table[TNUM_INIRTN] = {
+	{ (INIRTN)(_kernel_target_hrt_initialize), (intptr_t)(0) },
+	{ (INIRTN)(_kernel_target_twdtimer_initialize), (intptr_t)(0) }
+};
 
 /*
  *  Termination Routine
  */
 
-void
-_kernel_call_terrtn(void)
-{
-	((TERRTN)(_kernel_target_twdtimer_terminate))((intptr_t)(0));
-	((TERRTN)(_kernel_target_hrt_terminate))((intptr_t)(0));
-}
+const uint_t _kernel_tnum_terrtn = TNUM_TERRTN;
+
+const TERRTNB _kernel_terrtnb_table[TNUM_TERRTN] = {
+	{ (TERRTN)(_kernel_target_twdtimer_terminate), (intptr_t)(0) },
+	{ (TERRTN)(_kernel_target_hrt_terminate), (intptr_t)(0) }
+};
 
 /*
  *  Temporal Partitioning Functions

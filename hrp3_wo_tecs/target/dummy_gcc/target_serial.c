@@ -1,7 +1,6 @@
 /*
- *  TOPPERS/HRP Kernel
- *      Toyohashi Open Platform for Embedded Real-Time Systems/
- *      High Reliable system Profile Kernel
+ *  TOPPERS Software
+ *      Toyohashi Open Platform for Embedded Real-Time Systems
  * 
  *  Copyright (C) 2013-2018 by Embedded and Real-Time Systems Laboratory
  *              Graduate School of Information Science, Nagoya Univ., JAPAN
@@ -35,7 +34,7 @@
  *  アの利用により直接的または間接的に生じたいかなる損害に関しても，そ
  *  の責任を負わない．
  * 
- *  $Id: target_serial.c 415 2018-07-27 09:06:40Z ertl-hiro $
+ *  $Id: target_serial.c 576 2018-11-28 00:57:26Z ertl-hiro $
  */
 
 /*
@@ -59,7 +58,7 @@ typedef struct sio_port_initialization_block {
 struct sio_port_control_block {
 	const SIOPINIB *p_siopinib;	/* SIOポート初期化ブロック */
 	intptr_t	exinf;			/* 拡張情報 */
-	bool_t		openflag;		/* オープン済みフラグ */
+	bool_t		opened;			/* オープン済みフラグ */
 	int_t		dummy;			/* ダミーフィールド */
 	/* SIOの状態など */
 };
@@ -97,7 +96,7 @@ sio_initialize(intptr_t exinf)
 	for (i = 0; i < TNUM_SIOP; i++) {
 		p_siopcb = &(siopcb_table[i]);
 		p_siopcb->p_siopinib = &(siopinib_table[i]);
-		p_siopcb->openflag = false;
+		p_siopcb->opened = false;
 		/* その他のフィールドの初期化 */
 	}
 }
@@ -108,17 +107,13 @@ sio_initialize(intptr_t exinf)
 void
 sio_terminate(intptr_t exinf)
 {
-	SIOPCB	*p_siopcb;
 	uint_t	i;
 
 	/*
 	 *  オープンされているSIOポートのクローズ
 	 */
 	for (i = 0; i < TNUM_SIOP; i++) {
-		p_siopcb = &(siopcb_table[i]);
-		if (p_siopcb->openflag) {
-			/* SIOのクローズ処理 */
-		}
+		sio_cls_por(&(siopcb_table[i]));
 	}
 }
 
@@ -134,11 +129,13 @@ sio_opn_por(ID siopid, intptr_t exinf)
 	p_siopcb = get_siopcb(siopid);
 	p_siopinib = p_siopcb->p_siopinib;
 
-	/* SIOのオープン処理 */
+	if (!(p_siopcb->opened)) {
+		/* SIOのオープン処理 */
 
-	p_siopcb->exinf = exinf;
-	p_siopcb->openflag = true;
-	p_siopcb->dummy = p_siopinib->dummy;
+		p_siopcb->exinf = exinf;
+		p_siopcb->opened = true;
+		p_siopcb->dummy = p_siopinib->dummy;
+	}
 	return(p_siopcb);
 }
 
@@ -148,9 +145,11 @@ sio_opn_por(ID siopid, intptr_t exinf)
 void
 sio_cls_por(SIOPCB *p_siopcb)
 {
-	/* SIOのクローズ処理 */
+	if (p_siopcb->opened) {
+		/* SIOのクローズ処理 */
 
-	p_siopcb->openflag = false;
+		p_siopcb->opened = false;
+	}
 }
 
 /*

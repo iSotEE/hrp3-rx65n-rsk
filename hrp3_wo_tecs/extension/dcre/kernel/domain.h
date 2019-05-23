@@ -3,7 +3,7 @@
  *      Toyohashi Open Platform for Embedded Real-Time Systems/
  *      High Reliable system Profile Kernel
  * 
- *  Copyright (C) 2008-2018 by Embedded and Real-Time Systems Laboratory
+ *  Copyright (C) 2008-2019 by Embedded and Real-Time Systems Laboratory
  *              Graduate School of Information Science, Nagoya Univ., JAPAN
  * 
  *  上記著作権者は，以下の(1)〜(4)の条件を満たす場合に限り，本ソフトウェ
@@ -35,7 +35,7 @@
  *  アの利用により直接的または間接的に生じたいかなる損害に関しても，そ
  *  の責任を負わない．
  * 
- *  $Id: domain.h 509 2018-10-27 16:22:39Z ertl-hiro $
+ *  $Id: domain.h 674 2019-03-08 03:46:38Z ertl-hiro $
  */
 
 /*
@@ -344,7 +344,7 @@ extern const DOMINIB	dominib_none;
  */
 #define TA_DOMMASK					(0xffU << 16)
 #define get_atrdomid(atr)			((ID)(int8_t)((atr) >> 16))
-#define set_atrdomid(atr, domid)	(((atr) & ~TA_DOMMASK) | (domid))
+#define set_atrdomid(atr, domid)	(((atr) & ~TA_DOMMASK) | TA_DOM(domid))
 
 /*
  *  オブジェクト属性から保護ドメイン初期化ブロックを取り出す
@@ -408,7 +408,7 @@ extern void		scyc_switch(void);
 extern void		twd_start(void);
 
 /*
- *  タイムウィンドウ周期切換え処理
+ *  タイムウィンドウ切換え処理
  */
 extern void		twd_switch(void);
 

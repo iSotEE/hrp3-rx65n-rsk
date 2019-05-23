@@ -35,7 +35,7 @@
  *  アの利用により直接的または間接的に生じたいかなる損害に関しても，そ
  *  の責任を負わない．
  * 
- *  $Id: target_serial.h 415 2018-07-27 09:06:40Z ertl-hiro $
+ *  $Id: target_serial.h 565 2018-11-26 05:18:31Z ertl-hiro $
  */
 
 /*
@@ -46,16 +46,7 @@
 #ifndef TOPPERS_TARGET_SERIAL_H
 #define TOPPERS_TARGET_SERIAL_H
 
-#include "target_syssvc.h"
 #include "uart_pl011.h"
-
-/*
- *  SIO割込みを登録するための定義
- */
-#define INTNO_SIO		SIO_UART_IRQNO		/* UART割込み番号 */
-#define ISRPRI_SIO		1					/* UART ISR優先度 */
-#define INTPRI_SIO		(-2)				/* UART割込み優先度 */
-#define INTATR_SIO		TA_NULL				/* UART割込み属性 */
 
 #ifndef TOPPERS_MACRO_ONLY
 
@@ -87,22 +78,22 @@ extern void sio_cls_por(SIOPCB *p_siopcb);
 /*
  *  SIOポートへの文字送信
  */
-extern bool_t sio_snd_chr(SIOPCB *siopcb, char c);
+extern bool_t sio_snd_chr(SIOPCB *p_siopcb, char c);
 
 /*
  *  SIOポートからの文字受信
  */
-extern int_t sio_rcv_chr(SIOPCB *siopcb);
+extern int_t sio_rcv_chr(SIOPCB *p_siopcb);
 
 /*
  *  SIOポートからのコールバックの許可
  */
-extern void sio_ena_cbr(SIOPCB *siopcb, uint_t cbrtn);
+extern void sio_ena_cbr(SIOPCB *p_siopcb, uint_t cbrtn);
 
 /*
  *  SIOポートからのコールバックの禁止
  */
-extern void sio_dis_cbr(SIOPCB *siopcb, uint_t cbrtn);
+extern void sio_dis_cbr(SIOPCB *p_siopcb, uint_t cbrtn);
 
 /*
  *  SIOポートからの送信可能コールバック

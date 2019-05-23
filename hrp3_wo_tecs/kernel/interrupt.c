@@ -5,7 +5,7 @@
  * 
  *  Copyright (C) 2000-2003 by Embedded and Real-Time Systems Laboratory
  *                              Toyohashi Univ. of Technology, JAPAN
- *  Copyright (C) 2005-2018 by Embedded and Real-Time Systems Laboratory
+ *  Copyright (C) 2005-2019 by Embedded and Real-Time Systems Laboratory
  *              Graduate School of Information Science, Nagoya Univ., JAPAN
  * 
  *  上記著作権者は，以下の(1)〜(4)の条件を満たす場合に限り，本ソフトウェ
@@ -37,7 +37,7 @@
  *  アの利用により直接的または間接的に生じたいかなる損害に関しても，そ
  *  の責任を負わない．
  * 
- *  $Id: interrupt.c 387 2018-04-20 03:32:14Z ertl-hiro $
+ *  $Id: interrupt.c 670 2019-02-22 07:43:02Z ertl-hiro $
  */
 
 /*
@@ -126,10 +126,6 @@
 #ifndef VALID_INTNO_PRBINT
 #define VALID_INTNO_PRBINT(intno)	VALID_INTNO(intno)
 #endif /* VALID_INTNO_PRBINT */
-
-#ifndef VALID_INTNO_CREISR
-#define VALID_INTNO_CREISR(intno)	VALID_INTNO(intno)
-#endif /* VALID_INTNO_CREISR */
 
 /*
  *  割込み優先度の範囲の判定
@@ -331,7 +327,7 @@ ER_BOOL
 prb_int(INTNO intno)
 {
 	bool_t	locked;
-	ER		ercd;
+	ER_BOOL	ercd;
 
 	LOG_PRB_INT_ENTER(intno);
 	CHECK_PAR(VALID_INTNO_PRBINT(intno));		/*［NGKI3945］［NGKI3952］*/

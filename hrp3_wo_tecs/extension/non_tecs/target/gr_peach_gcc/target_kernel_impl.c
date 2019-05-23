@@ -47,7 +47,6 @@
 #include "arm.h"
 #include "rza1.h"
 #include "scif.h"
-#include "pl310.h"
 
 /*
  *  低消費電力モードの初期化
@@ -173,13 +172,13 @@ port_initialize(void)
 #ifndef TOPPERS_OMIT_TECS
 
 /*
- *  セルタイプtPutLogGRPeach内に実装されている関数を直接呼び出す．
+ *  セルタイプtPutLogSIOPort内に実装されている関数を直接呼び出す．
  */
-extern void	tPutLogGRPeach_initialize(void);
+extern void	tPutLogSIOPort_initialize(void);
 
 #else /* TOPPERS_OMIT_TECS */
 
-extern void	sio_initialize(void);
+extern void	sio_initialize(intptr_t exinf);
 extern void	target_fput_initialize(void);
 
 #endif /* TOPPERS_OMIT_TECS */
@@ -218,11 +217,6 @@ target_initialize(void)
 	CP15_WRITE_VBAR((uint32_t) &vector_table);
 
 	/*
-	 *  L2キャッシュコントローラ（PL310）の初期化
-	 */
-	pl310_initialize(0x0U, ~0x0U);
-
-	/*
 	 *  LEDを青色に点灯させる
 	 */
 	gr_peach_set_led(GR_PEACH_LED_BLUE, 1);
@@ -231,9 +225,9 @@ target_initialize(void)
 	 *  SIOを初期化
 	 */
 #ifndef TOPPERS_OMIT_TECS
-	tPutLogGRPeach_initialize();
+	tPutLogSIOPort_initialize();
 #else /* TOPPERS_OMIT_TECS */
-	sio_initialize();
+	sio_initialize(0);
 	target_fput_initialize();
 #endif /* TOPPERS_OMIT_TECS */
 }
@@ -265,3 +259,51 @@ gr_peach_set_led(uint_t led, uint_t set)
 {
 	rza1_config_port(RZA1_PORT_P(6), led, set);
 }
+
+#ifdef TOPPERS_OMIT_TECS
+/*
+ *		システムログの低レベル出力（本来は別のファイルにすべき）
+ */
+
+#include "target_syssvc.h"
+#include "target_serial.h"
+
+/*
+ *  低レベル出力用のSIOポート管理ブロック
+ */
+static SIOPCB	*p_siopcb_target_fput;
+
+/*
+ *  SIOポートの初期化
+ */
+void
+target_fput_initialize(void)
+{
+	p_siopcb_target_fput = sio_opn_por(SIOPID_FPUT, 0);
+}
+
+/*
+ *  SIOポートへのポーリング出力
+ */
+Inline void
+gr_peach_uart_fput(char c)
+{
+	/*
+	 *  送信できるまでポーリング
+	 */
+	while (!(sio_snd_chr(p_siopcb_target_fput, c))) ;
+}
+
+/*
+ *  SIOポートへの文字出力
+ */
+void
+target_fput_log(char c)
+{
+	if (c == '\n') {
+		gr_peach_uart_fput('\r');
+	}
+	gr_peach_uart_fput(c);
+}
+
+#endif /* TOPPERS_OMIT_TECS */

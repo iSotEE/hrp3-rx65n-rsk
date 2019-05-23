@@ -35,7 +35,7 @@
  *  アの利用により直接的または間接的に生じたいかなる損害に関しても，そ
  *  の責任を負わない．
  * 
- *  $Id: task_refer.c 387 2018-04-20 03:32:14Z ertl-hiro $
+ *  $Id: task_refer.c 621 2018-12-24 09:29:02Z ertl-hiro $
  */
 
 /*
@@ -67,7 +67,7 @@
 #endif /* LOG_REF_TSK_LEAVE */
 
 /*
- *  タスクの状態参照
+ *  タスクの状態参照［NGKI1217］
  */
 #ifdef TOPPERS_ref_tsk
 
@@ -100,19 +100,19 @@ ref_tsk(ID tskid, T_RTSK *pk_rtsk)
 		tstat = p_tcb->tstat;
 		if (TSTAT_DORMANT(tstat)) {
 			/*
-	 		 *  対象タスクが休止状態の場合
+	 		 *  対象タスクが休止状態の場合［NGKI1225］
 			 */
 			pk_rtsk->tskstat = TTS_DMT;
 		}
 		else {
 			/*
-	 		 *  タスク状態の取出し
+	 		 *  タスク状態の取出し［NGKI1225］
 			 */
 			if (TSTAT_SUSPENDED(tstat)) {
 				if (TSTAT_WAITING(tstat)) {
 					pk_rtsk->tskstat = TTS_WAS;
 				}
-					else {
+				else {
 					pk_rtsk->tskstat = TTS_SUS;
 				}
 			}
@@ -127,16 +127,17 @@ ref_tsk(ID tskid, T_RTSK *pk_rtsk)
 			}
 
 			/*
-	 		 *  現在優先度とベース優先度の取出し
+	 		 *  現在優先度とベース優先度の取出し［NGKI1227］
 			 */
 			pk_rtsk->tskpri = EXT_TSKPRI(p_tcb->priority);
 			pk_rtsk->tskbpri = EXT_TSKPRI(p_tcb->bpriority);
 
 			if (TSTAT_WAITING(tstat)) {
 				/*
-		 		 *  待ち要因と待ち対象のオブジェクトのIDの取出し
+		 		 *  待ち要因と待ち対象のオブジェクトのIDの取出し［NGKI1229］
+				 *  ［NGKI1231］
 				 */
-				switch (tstat) {
+				switch (tstat & TS_WAITING_MASK) {
 				case TS_WAITING_SLP:
 					pk_rtsk->tskwait = TTW_SLP;
 					break;
@@ -199,37 +200,37 @@ ref_tsk(ID tskid, T_RTSK *pk_rtsk)
 		 		 *  タイムアウトするまでの時間の取出し
 				 */
 				if (p_tcb->p_winfo->p_tmevtb != NULL) {
-					pk_rtsk->lefttmo
+					pk_rtsk->lefttmo			/*［NGKI1233］［NGKI1235］*/
 							= (TMO) tmevt_lefttim(p_tcb->p_winfo->p_tmevtb);
 				}
 				else {
-					pk_rtsk->lefttmo = TMO_FEVR;
+					pk_rtsk->lefttmo = TMO_FEVR;	/*［NGKI1234］*/
 				}
 			}
 
 			/*
-	 		 *  起床要求キューイング数の取出し
+	 		 *  起床要求キューイング数の取出し［NGKI1239］
 			 */
 			pk_rtsk->wupcnt = p_tcb->wupque ? 1U : 0U;
 
 			/*
-			 *  タスク終了要求状態の取出し
+			 *  タスク終了要求状態の取出し［NGKI3467］
 			 */
 			pk_rtsk->raster = p_tcb->raster;
 
 			/*
-			 *  タスク終了禁止状態の取出し
+			 *  タスク終了禁止状態の取出し［NGKI3468］
 			 */
 			pk_rtsk->dister = !(p_tcb->enater);
 
 			/*
-			 *  拡張サービスコールのネストレベルの取出し
+			 *  拡張サービスコールのネストレベルの取出し［NGKI1243］
 			 */
 			pk_rtsk->svclevel = p_tcb->svclevel;
 		}
 
 		/*
-		 *  起動要求キューイング数の取出し
+		 *  起動要求キューイング数の取出し［NGKI1238］
 		 */
 		pk_rtsk->actcnt = p_tcb->actque ? 1U : 0U;
 		ercd = E_OK;

@@ -2,7 +2,7 @@
  *  TOPPERS/HRP Kernel
  *      Toyohashi Open Platform for Embedded Real-Time Systems/
  *      High Reliable system Profile Kernel
- *
+ * 
  *  Copyright (C) 2006-2018 by Embedded and Real-Time Systems Laboratory
  *              Graduate School of Information Science, Nagoya Univ., JAPAN
  * 
@@ -35,7 +35,7 @@
  *  アの利用により直接的または間接的に生じたいかなる損害に関しても，そ
  *  の責任を負わない．
  * 
- *  $Id: target_kernel.h 533 2018-11-11 05:11:47Z ertl-hiro $
+ *  $Id: target_kernel.h 701 2019-03-25 13:43:08Z ertl-hiro $
  */
 
 /*
@@ -56,9 +56,28 @@
 #define TMAX_INTPRI		(-1)		/* 割込み優先度の最大値（最低値）*/
 
 /*
- *  オーバランハンドラのサポートの可否
+ *  サポートできる機能の定義
+ *
+ *  ena_int／dis_int／clr_int／ras_int／prb_intとオーバランハンドラを
+ *  サポートすることができる．ただし，時間パーティショニングとオーバラ
+ *  ンハンドラを同時に使用することはできない．
  */
+#define TOPPERS_TARGET_SUPPORT_ENA_INT		/* ena_int */
+#define TOPPERS_TARGET_SUPPORT_DIS_INT		/* dis_int */
+#define TOPPERS_TARGET_SUPPORT_CLR_INT		/* clr_int */
+#define TOPPERS_TARGET_SUPPORT_RAS_INT		/* ras_int */
+#define TOPPERS_TARGET_SUPPORT_PRB_INT		/* prb_int */
 #define TOPPERS_TARGET_SUPPORT_OVRHDR
+
+/*
+ *  高分解能タイマのタイマ周期
+ */
+/* TCYC_HRTCNTは定義しない．*/
+
+/*
+ *  高分解能タイマのカウント値の進み幅
+ */
+#define TSTEP_HRTCNT	1U
 
 /*
  *  スプリアス割込みへの対策
@@ -68,8 +87,8 @@
 #endif /* TOPPERS_USE_QEMU */
 
 /*
- *  チップで共通な定義
+ *  コアで共通な定義
  */
-#include "chip_kernel.h"
+#include "core_kernel.h"
 
 #endif /* TOPPERS_TARGET_KERNEL_H */

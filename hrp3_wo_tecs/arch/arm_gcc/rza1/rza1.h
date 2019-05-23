@@ -34,7 +34,7 @@
  *  アの利用により直接的または間接的に生じたいかなる損害に関しても，そ
  *  の責任を負わない．
  * 
- *  $Id: rza1.h 395 2018-04-30 22:52:47Z ertl-hiro $
+ *  $Id: rza1.h 558 2018-11-25 14:02:49Z ertl-hiro $
  */
 
 /*
@@ -98,7 +98,7 @@
 #else /* TOPPERS_RZA1H */
 #define GIC_TNUM_INTNO		UINT_C(538)
 #endif /* TOPPERS_RZA1H */
-#endif /* GIC_TNUM_INT */
+#endif /* GIC_TNUM_INTNO */
 
 /*
  *  割込みコントローラのベースアドレスとレジスタ（RZ/A1固有のもの）
@@ -253,19 +253,6 @@
 #ifndef TOPPERS_MACRO_ONLY
 
 /*
- *  SMPモードに設定
- */
-Inline void
-mpcore_enable_smp(void)
-{
-	uint32_t	reg;
-
-	CP15_READ_ACTLR(reg);
-	reg |= CP15_ACTLR_SMP;
-	CP15_WRITE_ACTLR(reg);
-}
-
-/*
  *  IRQ割込み要求のクリア
  */
 Inline void
@@ -275,7 +262,7 @@ rza1_clear_irq(INTNO intno)
 
 	reg = sil_reh_mem(RZA1_IRQRR);
 	reg &= ~(0x01U << (intno - INTNO_IRQ0));
-	sil_wrh_mem(RZA1_IRQRR, reg);
+	sil_swrh_mem(RZA1_IRQRR, reg);
 }
 
 /*

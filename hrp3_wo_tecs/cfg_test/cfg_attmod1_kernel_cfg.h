@@ -32,6 +32,10 @@
 
 #define TMAX_FNCD	0
 
+#define TNUM_INIRTN	2
+
+#define TNUM_TERRTN	2
+
 #define TNUM_DOMID	2
 #define DOM1	1
 #define DOM2	2

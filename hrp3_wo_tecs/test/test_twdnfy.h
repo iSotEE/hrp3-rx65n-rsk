@@ -2,7 +2,7 @@
  *  TOPPERS Software
  *      Toyohashi Open Platform for Embedded Real-Time Systems
  * 
- *  Copyright (C) 2015-2018 by Embedded and Real-Time Systems Laboratory
+ *  Copyright (C) 2015-2019 by Embedded and Real-Time Systems Laboratory
  *              Graduate School of Information Science, Nagoya Univ., JAPAN
  * 
  *  上記著作権者は，以下の(1)〜(4)の条件を満たす場合に限り，本ソフトウェ
@@ -34,7 +34,7 @@
  *  アの利用により直接的または間接的に生じたいかなる損害に関しても，そ
  *  の責任を負わない．
  * 
- *  $Id: test_twdnfy.h 421 2018-07-29 07:56:03Z ertl-hiro $
+ *  $Id: test_twdnfy.h 637 2019-01-04 16:06:44Z ertl-hiro $
  */
 
 /*
@@ -53,6 +53,11 @@
  */
 #define HIGH_PRIORITY	9
 #define MID_PRIORITY	10
+
+/*
+ *  拡張SVC番号の定義
+ */
+#define TFN_EXTSVC1		51
 
 /*
  *  ターゲットに依存する可能性のある定数の定義
@@ -78,5 +83,7 @@ extern void	task11(intptr_t exinf);
 extern void	task12(intptr_t exinf);
 extern void	task13(intptr_t exinf);
 extern void	task2(intptr_t exinf);
+extern ER_UINT extsvc1_routine(intptr_t par1, intptr_t par2, intptr_t par3,
+									intptr_t par4, intptr_t par5, ID cdmid);
 
 #endif /* TOPPERS_MACRO_ONLY */

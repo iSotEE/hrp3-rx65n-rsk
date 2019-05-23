@@ -36,7 +36,7 @@
 #  アの利用により直接的または間接的に生じたいかなる損害に関しても，そ
 #  の責任を負わない．
 # 
-#  $Id: testexec.rb 507 2018-10-27 15:35:48Z ertl-hiro $
+#  $Id: testexec.rb 608 2018-12-17 00:34:06Z ertl-hiro $
 # 
 
 Encoding.default_external = 'utf-8'
@@ -100,6 +100,10 @@ TEST_SPEC = {
 
   # オーバランハンドラ機能拡張パッケージの機能テストプログラム
   "ovrhdr1"  => { SRC: "test_ovrhdr1" },
+  "ovrhdr2"  => { SRC: "test_ovrhdr2" },
+  "ovrhdr3"  => { TARGET: 1, SRC: "simt_ovrhdr3", DEFS: "-DHRT_CONFIG1" },
+  "ovrhdr4"  => { SRC: "test_ovrhdr4" },
+  "ovrhdr5"  => { SRC: "test_ovrhdr5" },
 
   # 制約タスク拡張パッケージの機能テストプログラム
   "rstr1"    => { SRC: "test_rstr1" },
@@ -110,17 +114,25 @@ TEST_SPEC = {
   "subprio2" => { SRC: "test_subprio2" },
 
   # システム時刻管理機能テストプログラム
-  "systim1" => { TARGET: 1, SRC: "hrt_systim1", DEFS: "-DHRT_CONFIG1" },
-  "systim2" => { TARGET: 1, SRC: "hrt_systim2", DEFS: "-DHRT_CONFIG1" },
-  "systim3" => { TARGET: 1, SRC: "hrt_systim3", DEFS: "-DHRT_CONFIG1" },
-  "systim4" => { TARGET: 1, SRC: "hrt_systim4", DEFS: "-DHRT_CONFIG2" },
+  "systim1" => { TARGET: 1, SRC: "simt_systim1",
+								DEFS: "-DHRT_CONFIG1 -DHOOK_HRT_EVENT" },
+  "systim2" => { TARGET: 1, SRC: "simt_systim2",
+								DEFS: "-DHRT_CONFIG1 -DHOOK_HRT_EVENT" },
+  "systim3" => { TARGET: 1, SRC: "simt_systim3",
+								DEFS: "-DHRT_CONFIG1 -DHOOK_HRT_EVENT" },
+  "systim4" => { TARGET: 1, SRC: "simt_systim4",
+								DEFS: "-DHRT_CONFIG2 -DHOOK_HRT_EVENT" },
+
+  # タイムウィンドウ管理機能のテストプログラム
+  "twd1" => { TARGET: 1, SRC: "simt_twd1", DEFS: "-DHRT_CONFIG1" },
 
   # ドリフト調整機能拡張パッケージのシステム時刻管理機能テストプログラム
-  "drift1"   => { TARGET: 1, SRC: "hrt_drift1", DEFS: "-DHRT_CONFIG1" },
-  "drift1-64ops"  => { TARGET: 1, SRC: "hrt_drift1",
-								DEFS: "-DHRT_CONFIG1 -DUSE_64BIT_OPS" },
-  "systim1-64ops" => { TARGET: 1, SRC: "hrt_systim1",
-								DEFS: "-DHRT_CONFIG1 -DUSE_64BIT_OPS" },
+  "drift1"   => { TARGET: 1, SRC: "simt_drift1",
+								DEFS: "-DHRT_CONFIG1 -DHOOK_HRT_EVENT" },
+  "drift1-64ops"  => { TARGET: 1, SRC: "simt_drift1",
+				DEFS: "-DHRT_CONFIG1 -DHOOK_HRT_EVENT -DUSE_64BIT_OPS" },
+  "systim1-64ops" => { TARGET: 1, SRC: "simt_systim1",
+				DEFS: "-DHRT_CONFIG1 -DHOOK_HRT_EVENT -DUSE_64BIT_OPS" },
 
   # 性能評価プログラム
   "perf0" => { CDL: "perf_pf" },

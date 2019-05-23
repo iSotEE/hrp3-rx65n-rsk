@@ -5,7 +5,7 @@
  * 
  *  Copyright (C) 2000-2003 by Embedded and Real-Time Systems Laboratory
  *                              Toyohashi Univ. of Technology, JAPAN
- *  Copyright (C) 2005-2018 by Embedded and Real-Time Systems Laboratory
+ *  Copyright (C) 2005-2019 by Embedded and Real-Time Systems Laboratory
  *              Graduate School of Information Science, Nagoya Univ., JAPAN
  * 
  *  上記著作権者は，以下の(1)〜(4)の条件を満たす場合に限り，本ソフトウェ
@@ -37,7 +37,7 @@
  *  アの利用により直接的または間接的に生じたいかなる損害に関しても，そ
  *  の責任を負わない．
  * 
- *  $Id: time_manage.c 502 2018-10-27 08:05:10Z ertl-hiro $
+ *  $Id: time_manage.c 674 2019-03-08 03:46:38Z ertl-hiro $
  */
 
 /*
@@ -52,6 +52,7 @@
 #include "dataqueue.h"
 #include "time_event.h"
 #include "target_timer.h"
+#include <sil.h>
 
 /*
  *  トレースログマクロのデフォルト定義
@@ -180,7 +181,9 @@ adj_tim(int32_t adjtim)
 			monotonic_evttim = current_evttim;	/*［ASPD1054］*/
 		}
 
-		set_hrt_event();						/*［ASPD1056］*/
+		if (!in_signal_time) {
+			set_hrt_event();					/*［ASPD1056］*/
+		}
 		ercd = E_OK;
 	}
 	unlock_cpu();

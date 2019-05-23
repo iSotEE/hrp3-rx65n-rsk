@@ -37,7 +37,7 @@
  *  アの利用により直接的または間接的に生じたいかなる損害に関しても，そ
  *  の責任を負わない．
  * 
- *  $Id: tSIOPortCT11MPCore.cdl 285 2018-03-21 02:55:49Z ertl-hiro $
+ *  $Id: tSIOPortCT11MPCore.cdl 576 2018-11-28 00:57:26Z ertl-hiro $
  */
 
 /*
@@ -136,6 +136,13 @@ composite tSIOPortCT11MPCore {
 	cell tInterruptRequest InterruptRequest {
 		interruptNumber   = composite.interruptNumber;
 		interruptPriority = composite.interruptPriority;
+	};
+
+	/*
+	 *  SIOドライバの終了処理ルーチン
+	 */
+	cell tTerminateRoutine TerminateSIO {
+		cTerminateRoutineBody = PL011.eTerminate;
 	};
 };
 

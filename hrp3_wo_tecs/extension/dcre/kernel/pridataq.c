@@ -5,7 +5,7 @@
  * 
  *  Copyright (C) 2000-2003 by Embedded and Real-Time Systems Laboratory
  *                              Toyohashi Univ. of Technology, JAPAN
- *  Copyright (C) 2005-2018 by Embedded and Real-Time Systems Laboratory
+ *  Copyright (C) 2005-2019 by Embedded and Real-Time Systems Laboratory
  *              Graduate School of Information Science, Nagoya Univ., JAPAN
  * 
  *  上記著作権者は，以下の(1)〜(4)の条件を満たす場合に限り，本ソフトウェ
@@ -37,7 +37,7 @@
  *  アの利用により直接的または間接的に生じたいかなる損害に関しても，そ
  *  の責任を負わない．
  * 
- *  $Id: pridataq.c 520 2018-11-01 12:41:13Z ertl-hiro $
+ *  $Id: pridataq.c 674 2019-03-08 03:46:38Z ertl-hiro $
  */
 
 /*
@@ -170,7 +170,7 @@ initialize_pdqcb(PDQCB *p_pdqcb, PDQINIB *p_pdqinib, const DOMINIB *p_dominib)
 }
 
 void
-initialize_pdqaphore(void)
+initialize_pridataq(void)
 {
 	uint_t			i, j, k;
 	ID				domid;
@@ -201,7 +201,7 @@ initialize_pdqaphore(void)
 															p_dominib);
 		}
 	}
-	for (j = 0; j < dominib_none.tnum_apdqid; i++, j++) {
+	for (k = 0; k < dominib_none.tnum_apdqid; i++, j++, k++) {
 		initialize_pdqcb(&(pdqcb_table[i]), &(apdqinib_table[j]),
 													&dominib_none);
 	}

@@ -4,7 +4,7 @@
  * 
  *  Copyright (C) 2000-2003 by Embedded and Real-Time Systems Laboratory
  *                              Toyohashi Univ. of Technology, JAPAN
- *  Copyright (C) 2005-2018 by Embedded and Real-Time Systems Laboratory
+ *  Copyright (C) 2005-2019 by Embedded and Real-Time Systems Laboratory
  *              Graduate School of Information Science, Nagoya Univ., JAPAN
  * 
  *  上記著作権者は，以下の(1)〜(4)の条件を満たす場合に限り，本ソフトウェ
@@ -36,7 +36,7 @@
  *  アの利用により直接的または間接的に生じたいかなる損害に関しても，そ
  *  の責任を負わない．
  * 
- *  $Id: tTraceLog.c 285 2018-03-21 02:55:49Z ertl-hiro $
+ *  $Id: tTraceLog.c 713 2019-03-30 22:34:51Z ertl-hiro $
  */
 
 /*
@@ -47,6 +47,9 @@
 #include "kernel/kernel_impl.h"
 #include "kernel/task.h"
 #include "kernel/time_event.h"
+#ifdef TOPPERS_SUPPORT_PROTECT
+#include "kernel/domain.h"
+#endif /* TOPPERS_SUPPORT_PROTECT */
 #include <sil.h>
 #include <log_output.h>
 #include "target_syssvc.h"
@@ -239,6 +242,37 @@ get_tskstat(intptr_t info)
 	return((intptr_t) tstatstr);
 }
 
+#ifdef TOPPERS_SUPPORT_PROTECT
+
+static intptr_t
+get_somid(intptr_t info)
+{
+	SOMINIB	*p_sominib;
+	ID		somid;
+
+	p_sominib = (SOMINIB *) info;
+	if (p_sominib == NULL) {
+		somid = TSOM_STP;
+	}
+	else {
+		somid = SOMID(p_sominib);
+	}
+	return((intptr_t) somid);
+}
+
+static intptr_t
+get_twd_domid(intptr_t info)
+{
+	TWDINIB	*p_twdinib;
+	ID		domid;
+
+	p_twdinib = (TWDINIB *) info;
+	domid = (ID)(p_twdinib->p_dominib - dominib_table) + TMIN_DOMID;
+	return((intptr_t) domid);
+}
+
+#endif /* TOPPERS_SUPPORT_PROTECT */
+
 /* 
  *  トレースログの表示
  */
@@ -262,6 +296,23 @@ trace_print(TRACE *p_trace, void (*putc)(char))
 		traceinfo[0] = get_tskid(p_trace->logpar[0]);
 		tracemsg = "dispatch to task %d.";
 		break;
+
+#ifdef TOPPERS_SUPPORT_PROTECT
+	case LOG_TYPE_SCYC|LOG_START:
+		traceinfo[0] = get_somid(p_trace->logpar[0]);
+		tracemsg = "system cycle starts with system operating mode %d.";
+		break;
+	case LOG_TYPE_TWD|LOG_START:
+		if (p_trace->logpar[0] == 0) {
+			tracemsg = "idle window starts.";
+		}
+		else {
+			traceinfo[0] = get_twd_domid(p_trace->logpar[0]);
+			tracemsg = "time window for domain %d starts.";
+		}
+		break;
+#endif /* TOPPERS_SUPPORT_PROTECT */
+
 	case LOG_TYPE_COMMENT:
 		for (i = 1; i < TNUM_LOGPAR; i++) {
 			traceinfo[i-1] = p_trace->logpar[i];

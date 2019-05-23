@@ -37,7 +37,7 @@
  *  アの利用により直接的または間接的に生じたいかなる損害に関しても，そ
  *  の責任を負わない．
  * 
- *  $Id: target_svc.h 329 2018-04-07 22:51:47Z ertl-hiro $
+ *  $Id: target_svc.h 536 2018-11-16 07:03:31Z ertl-hiro $
  */
 
 /*
@@ -62,31 +62,34 @@ extern ER	call_svc(FN fncd, intptr_t par1, intptr_t par2,
 } while (false)
 
 #define CAL_SVC_1M(TYPE, FNCD, TYPE1, PAR1) do {						\
-	return((TYPE) call_svc(FNCD, (intptr_t) PAR1, 0, 0, 0, 0));			\
+	return((TYPE) call_svc(FNCD, (intptr_t)(PAR1), 0, 0, 0, 0));		\
 } while (false)
 
-
 #define CAL_SVC_2M(TYPE, FNCD, TYPE1, PAR1, TYPE2, PAR2) do {			\
-	return((TYPE) call_svc(FNCD, (intptr_t) PAR1, (intptr_t) PAR2,		\
+	return((TYPE) call_svc(FNCD, (intptr_t)(PAR1), (intptr_t)(PAR2), 	\
 															0, 0, 0));	\
 } while (false)
 
 #define CAL_SVC_3M(TYPE, FNCD, TYPE1, PAR1,								\
 									TYPE2, PAR2, TYPE3, PAR3) do {		\
-	return((TYPE) call_svc(FNCD, (intptr_t) PAR1, (intptr_t) PAR2,		\
-											(intptr_t) PAR3, 0, 0));	\
+	return((TYPE) call_svc(FNCD, (intptr_t)(PAR1), (intptr_t)(PAR2), 	\
+											(intptr_t)(PAR3), 0, 0));	\
 } while (false)
 
 #define CAL_SVC_4M(TYPE, FNCD, TYPE1, PAR1, TYPE2, PAR2,				\
 									TYPE3, PAR3, TYPE4, PAR4) do {		\
-	return((TYPE) call_svc(FNCD, (intptr_t) PAR1, (intptr_t) PAR2,		\
-								(intptr_t) PAR3, (intptr_t) PAR4, 0));	\
+	return((TYPE) call_svc(FNCD, (intptr_t)(PAR1), (intptr_t)(PAR2), 	\
+								(intptr_t)(PAR3), (intptr_t)(PAR4), 0));\
 } while (false)
 
 #define CAL_SVC_5M(TYPE, FNCD, TYPE1, PAR1, TYPE2, PAR2,				\
 						TYPE3, PAR3, TYPE4, PAR4, TYPE5, PAR5) do {		\
-	return((TYPE) call_svc(FNCD, (intptr_t) PAR1, (intptr_t) PAR2,		\
-				(intptr_t) PAR3, (intptr_t) PAR4, (intptr_t) PAR5));	\
+	return((TYPE) call_svc(FNCD, (intptr_t)(PAR1), (intptr_t)(PAR2), 	\
+				(intptr_t)(PAR3), (intptr_t)(PAR4), (intptr_t)(PAR5)));	\
+} while (false)
+
+#define CAL_SVC_1M_SYSTIM(TYPE, FNCD, TYPE1, PAR1) do {					\
+	return((TYPE) call_svc(FNCD, (SYSTIM)(PAR1), 0, 0, 0, 0));			\
 } while (false)
 
 /*

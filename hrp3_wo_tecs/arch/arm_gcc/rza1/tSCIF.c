@@ -2,7 +2,7 @@
  *  TOPPERS Software
  *      Toyohashi Open Platform for Embedded Real-Time Systems
  * 
- *  Copyright (C) 2006-2018 by Embedded and Real-Time Systems Laboratory
+ *  Copyright (C) 2006-2019 by Embedded and Real-Time Systems Laboratory
  *              Graduate School of Information Science, Nagoya Univ., JAPAN
  * 
  *  上記著作権者は，以下の(1)〜(4)の条件を満たす場合に限り，本ソフトウェ
@@ -34,7 +34,7 @@
  *  アの利用により直接的または間接的に生じたいかなる損害に関しても，そ
  *  の責任を負わない．
  * 
- *  $Id: tSCIF.c 395 2018-04-30 22:52:47Z ertl-hiro $
+ *  $Id: tSCIF.c 640 2019-01-08 06:15:35Z ertl-hiro $
  */
 
 /*
@@ -146,7 +146,8 @@ eSIOPort_open(CELLIDX idx)
 		sil_wrh_mem(SCIF_SCFSR(ATTR_baseAddress), 0U);
 		sil_wrh_mem(SCIF_SCLSR(ATTR_baseAddress), 0U);
 		sil_wrh_mem(SCIF_SCSCR(ATTR_baseAddress), SCIF_SCSCR_INTCLK);
-		sil_wrh_mem(SCIF_SCSMR(ATTR_baseAddress), SCIF_SCSMR_CKS1);
+		sil_wrh_mem(SCIF_SCSMR(ATTR_baseAddress),
+							SCIF_SCSMR_ASYNC|ATTR_mode|SCIF_SCSMR_CKS1);
 		sil_wrh_mem(SCIF_SCEMR(ATTR_baseAddress), 0U);
 		sil_wrb_mem(SCIF_SCBRR(ATTR_baseAddress), (uint8_t) brr);
 		sil_wrh_mem(SCIF_SCFCR(ATTR_baseAddress),
@@ -161,8 +162,9 @@ eSIOPort_open(CELLIDX idx)
 							(uint16_t) ~(SCIF_SCFSR_RDF));
 		}
 		sil_wrh_mem(SCIF_SCFSR(ATTR_baseAddress), 0U);
+
+		VAR_opened = true;
 	}
-	VAR_opened = true;
 }
 
 /*
@@ -173,7 +175,11 @@ eSIOPort_close(CELLIDX idx)
 {
 	CELLCB	*p_cellcb = GET_CELLCB(idx);
 
-	sil_wrh_mem(SCIF_SCSCR(ATTR_baseAddress), 0U);
+	if (VAR_opened) {
+		sil_wrh_mem(SCIF_SCSCR(ATTR_baseAddress), 0U);
+
+		VAR_opened = false;
+	}
 }
 
 /*
@@ -279,5 +285,26 @@ eiTxISR_main(CELLIDX idx)
 		 *  送信可能コールバックルーチンを呼び出す．
 		 */
 		ciSIOCBR_readySend();
+	}
+}
+
+/*
+ *  SIOドライバの終了処理
+ */
+void
+eTerminate_main(CELLIDX idx)
+{
+	CELLCB	*p_cellcb = GET_CELLCB(idx);
+
+	if (VAR_opened) {
+		/*
+		 *  送信FIFOが空になるまで待つ
+		 */
+		while ((sil_reh_mem(SCIF_SCFSR(ATTR_baseAddress))
+											& SCIF_SCFSR_TEND) == 0U) ;
+		/*
+		 *  ポートのクローズ
+		 */
+		eSIOPort_close(idx);
 	}
 }

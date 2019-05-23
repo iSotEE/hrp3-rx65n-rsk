@@ -5,7 +5,7 @@
  * 
  *  Copyright (C) 2000-2003 by Embedded and Real-Time Systems Laboratory
  *                              Toyohashi Univ. of Technology, JAPAN
- *  Copyright (C) 2006-2018 by Embedded and Real-Time Systems Laboratory
+ *  Copyright (C) 2006-2019 by Embedded and Real-Time Systems Laboratory
  *              Graduate School of Information Science, Nagoya Univ., JAPAN
  * 
  *  上記著作権者は，以下の(1)〜(4)の条件を満たす場合に限り，本ソフトウェ
@@ -37,7 +37,7 @@
  *  アの利用により直接的または間接的に生じたいかなる損害に関しても，そ
  *  の責任を負わない．
  * 
- *  $Id: core_kernel_impl.h 520 2018-11-01 12:41:13Z ertl-hiro $
+ *  $Id: core_kernel_impl.h 683 2019-03-16 17:23:13Z ertl-hiro $
  */
 
 /*
@@ -66,15 +66,15 @@
 #define TARGET_MEMATR		(TA_SORDER|TA_WTHROUGH|TA_NONSHARED)
 
 /*
- *  ターゲット依存のメモリオブジェクトアクセス属性
+ *  ターゲット依存のメモリオブジェクトアクセス属性（エラーチェック用）
  */
 #define TARGET_ACCATR		(TA_SORDER|TA_WTHROUGH|TA_NONSHARED)
 
 /*
  *  ターゲット依存のメモリオブジェクト属性
  */
-#define TARGET_MEMATR_SSTACK	(TA_NOINITSEC|TA_NONSHARED)
-#define TARGET_MEMATR_USTACK	(TA_NOINITSEC|TA_NONSHARED)
+#define TARGET_MEMATR_SSTACK	TA_NOINITSEC
+#define TARGET_MEMATR_USTACK	TA_NOINITSEC
 
 /*
  *  エラーチェック方法の指定
@@ -93,6 +93,9 @@
 #define CHECK_USTACK_NONNULL		/* ユーザスタック領域の非NULLチェック */
 #define CHECK_MPF_ALIGN		4		/* 固定長メモリプール領域のアライン単位 */
 #define CHECK_MPF_NONNULL			/* 固定長メモリプール領域の非NULLチェック */
+#define CHECK_MPK_ALIGN		4		/* カーネルメモリプール領域のアライン単位 */
+#define CHECK_MPK_NONNULL			/* カーネルメモリプール領域の非NULL  */
+									/*							チェック */
 #define CHECK_MB_ALIGN		4		/* 管理領域のアライン単位 */
 
 /*
@@ -471,6 +474,17 @@ exc_sense_intmask(void *p_excinf)
 #ifdef USE_ARM_MMU
 
 /*
+ *  ユーザスタック領域をタスク毎に保護しない
+ */
+#define OMIT_USTACK_PROTECT
+
+/*
+ *  レッドゾーン方式を使用する
+ */
+#define USE_REDZONE
+#define TARGET_DUMMY_STKSZ		ARM_PAGE_SIZE
+
+/*
  *  変換テーブルベースレジスタ（TTBR）の設定値
  */
 #if __TARGET_ARCH_ARM < 6
@@ -484,21 +498,21 @@ exc_sense_intmask(void *p_excinf)
 #endif
 
 /*
- *  レッドゾーン方式を使用する
- */
-#define USE_REDZONE
-#define TARGET_DUMMY_STKSZ		ARM_PAGE_SIZE
-
-/*
  *  ターゲット依存のユーザスタックのチェック（動的生成機能拡張パッケー
  *  ジ用）
  */
 #define CHECK_TARGET_USTACK(ustksz, ustk, p_dominib) do {			\
-	CHECK_PAR(USTKSZ_ALIGN(ustksz));			/*［NGKI1056］*/	\
-	CHECK_PAR(USTACK_ALIGN(ustk));				/*［NGKI1056］*/	\
+	CHECK_PAR(SSTKSZ_ALIGN(ustksz));			/*［NGKI1056］*/	\
+	CHECK_PAR(SSTACK_ALIGN(ustk));				/*［NGKI1056］*/	\
 	CHECK_OBJ(valid_memobj_dom(ustk, ustksz, p_dominib->domptn));	\
-												/*［NGKI3990］*/	\
+												/*［HRPS0241］*/	\
 } while (false)
+
+/*
+ *  valid_ustackは使用しない（CHECK_TARGET_USTACKを上書きしたため，動
+ *  的生成機能拡張パッケージ用）
+ */
+#define OMIT_VALID_USTACK
 
 /*
  *  MMUの初期化
@@ -548,7 +562,7 @@ extern void call_ext_tsk(void) NoReturn;
 Inline void
 raise_scycovr_exception(void)
 {
-	Asm("svc %0"::"I"(SVC_SCYCOVR):"lr");
+	Asm("svc %0" : : "I"(SVC_SCYCOVR) : "lr");
 }
 
 /*

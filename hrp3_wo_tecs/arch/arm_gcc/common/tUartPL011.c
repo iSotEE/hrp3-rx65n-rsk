@@ -34,7 +34,7 @@
  *  アの利用により直接的または間接的に生じたいかなる損害に関しても，そ
  *  の責任を負わない．
  * 
- *  $Id: tUartPL011.c 395 2018-04-30 22:52:47Z ertl-hiro $
+ *  $Id: tUartPL011.c 576 2018-11-28 00:57:26Z ertl-hiro $
  */
 
 /*
@@ -127,8 +127,9 @@ eSIOPort_open(CELLIDX idx)
 		 */
 		sil_wrw_mem(UART_CR(ATTR_baseAddress),
 						UART_CR_UARTEN|UART_CR_TXE|UART_CR_RXE);
+
+		VAR_opened = true;
 	}
-	VAR_opened = true;
 }
 
 /*
@@ -139,10 +140,14 @@ eSIOPort_close(CELLIDX idx)
 {
 	CELLCB	*p_cellcb = GET_CELLCB(idx);
 
-	/*
-	 *  UARTをディスエーブル
-	 */
-	sil_wrw_mem(UART_CR(ATTR_baseAddress), 0U);
+	if (VAR_opened) {
+		/*
+		 *  UARTをディスエーブル
+		 */
+		sil_wrw_mem(UART_CR(ATTR_baseAddress), 0U);
+
+		VAR_opened = false;
+	}
 }
 
 /*
@@ -236,4 +241,13 @@ eiISR_main(CELLIDX idx)
 		 */
 		ciSIOCBR_readySend();
 	}
+}
+
+/*
+ *  SIOドライバの終了処理
+ */
+void
+eTerminate_main(CELLIDX idx)
+{
+	eSIOPort_close(idx);
 }

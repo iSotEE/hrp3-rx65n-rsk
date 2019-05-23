@@ -2,7 +2,7 @@
  *  TOPPERS Software
  *      Toyohashi Open Platform for Embedded Real-Time Systems
  * 
- *  Copyright (C) 2015-2018 by Embedded and Real-Time Systems Laboratory
+ *  Copyright (C) 2015-2019 by Embedded and Real-Time Systems Laboratory
  *              Graduate School of Information Science, Nagoya Univ., JAPAN
  * 
  *  上記著作権者は，以下の(1)〜(4)の条件を満たす場合に限り，本ソフトウェ
@@ -34,7 +34,7 @@
  *  アの利用により直接的または間接的に生じたいかなる損害に関しても，そ
  *  の責任を負わない．
  * 
- *  $Id: test_tprot3.c 504 2018-10-27 14:00:56Z ertl-hiro $
+ *  $Id: test_tprot3.c 634 2019-01-04 10:24:40Z ertl-hiro $
  */
 
 /* 
@@ -54,6 +54,9 @@
  *		(B-1) 通常のシステム動作モードへの切換え
  *		(B-2) システム周期停止モードへの切換え
  *	(C) システム周期停止モードからのchg_som
+ *		(C-1) ディスパッチ保留状態でなく，タスク切換えが起こる時
+ *		(C-2) ディスパッチ保留状態でなく，タスク切換えが起こらない時
+ *		(C-3) ディスパッチ保留状態の時
  *
  * 【使用リソース】
  *
@@ -140,14 +143,16 @@
  *	== TASK4 ==
  *	17:	get_som(&somid)
  *		assert(somid == TSOM_STP)
+ *		stp_cyc(CYC1)
  *		dly_tsk(TEST_TIME_PROC) ... TASK4が実行再開するまで
  *	// 実行すべきタスクがない
  *	== TASK4 ==
- *	18:	chg_som(SOM1)												... (C)
+ *	18:	chg_som(SOM1)												... (C-1)
  *	// システム動作モード：SOM1
  *	// タイムウィンドウ for DOM2
  *	== TASK2 ==
- *	19:	get_som(&somid)
+ *	19:	sta_cyc(CYC1)
+ *		get_som(&somid)
  *		assert(somid == SOM1)
  *		DO(WAIT(task2_flag))
  *	// タイムウィンドウ for DOM1
@@ -155,7 +160,51 @@
  *	20:	DO(WAIT(task1_flag))
  *	// アイドルウィンドウ
  *	== TASK3 ==
- *	21:	END
+ *	21:	chg_som(TSOM_STP)
+ *		DO(WAIT(task3_flag))
+ *	// システム動作モード：TSOM_STP
+ *	== TASK4 ==
+ *	22:	get_som(&somid)
+ *		assert(somid == TSOM_STP)
+ *		stp_cyc(CYC1)
+ *		chg_pri(TSK_SELF, HIGH_PRIORITY)
+ *	23:	chg_som(SOM1)												... (C-2)
+ *	// システム動作モード：SOM1
+ *	// タイムウィンドウ for DOM2
+ *	24:	sta_cyc(CYC1)
+ *		get_som(&somid)
+ *		assert(somid == SOM1)
+ *		chg_pri(TSK_SELF, LOW_PRIORITY)
+ *	== TASK2 ==
+ *	25:	DO(WAIT(task2_flag))
+ *	// タイムウィンドウ for DOM1
+ *	== TASK1 ==
+ *	26:	DO(WAIT(task1_flag))
+ *	// アイドルウィンドウ
+ *	== TASK3 ==
+ *	27:	chg_som(TSOM_STP)
+ *		DO(WAIT(task3_flag))
+ *	// システム動作モード：TSOM_STP
+ *	== TASK4 ==
+ *	28:	get_som(&somid)
+ *		assert(somid == TSOM_STP)
+ *		stp_cyc(CYC1)
+ *		dis_dsp()
+ *	29:	chg_som(SOM1)												... (C-3)
+ *		sta_cyc(CYC1)
+ *		get_som(&somid)
+ *		assert(check_somid(somid))
+ *		ena_dsp()
+ *	// システム動作モード：SOM1
+ *	// タイムウィンドウ for DOM2
+ *	== TASK2 ==
+ *	30:	DO(WAIT(task2_flag))
+ *	// タイムウィンドウ for DOM1
+ *	== TASK1 ==
+ *	31:	DO(WAIT(task1_flag))
+ *	// アイドルウィンドウ
+ *	== TASK3 ==
+ *	32:	END
  */
 
 #include <kernel.h>
@@ -177,6 +226,29 @@ cyclic1_handler(intptr_t exinf)
 	SET(task1_flag);
 	SET(task2_flag);
 	SET(task3_flag);
+}
+
+/*
+ *  ディスパッチ保留状態でchg_somを呼び出して，システム周期停止モード
+ *  （TSOM_STP）から他のモード（SOM1）に変更した直後に，get_somでシス
+ *  テム動作モードを参照すると，マルチプロセッサ対応カーネルとそうでな
+ *  いカーネルで，異なる結果になる可能性がある．
+ *
+ *  具体的には，マルチプロセッサ対応でないカーネルでは，システム周期の
+ *  切り換えが保留されるため，TSOM_STPが参照される．それに対してマルチ
+ *  プロセッサ対応カーネルでは，他のプロセッサで先にシステム周期の切り
+ *  換え処理が行われると，一時的に切換え前のシステム動作モードで実行し
+ *  ている状況［NGKI0636］が生じ，切換え後のシステム動作モード（SOM1）
+ *  が参照される可能性がある［NGKI5135］．
+ */
+static bool_t
+check_somid(ID somid)
+{
+#ifndef TOPPERS_SUPPORT_MULTI_PRC
+	return(somid == TSOM_STP);
+#else /* TOPPERS_SUPPORT_MULTI_PRC */
+	return(somid == TSOM_STP || somid == SOM1);
+#endif /* TOPPERS_SUPPORT_MULTI_PRC */
 }
 
 /* DO NOT DELETE THIS LINE -- gentest depends on it. */
@@ -220,6 +292,12 @@ task1(intptr_t exinf)
 	check_point(20);
 	WAIT(task1_flag);
 
+	check_point(26);
+	WAIT(task1_flag);
+
+	check_point(31);
+	WAIT(task1_flag);
+
 	check_point(0);
 }
 
@@ -257,11 +335,20 @@ task2(intptr_t exinf)
 	WAIT(task2_flag);
 
 	check_point(19);
+	ercd = sta_cyc(CYC1);
+	check_ercd(ercd, E_OK);
+
 	ercd = get_som(&somid);
 	check_ercd(ercd, E_OK);
 
 	check_assert(somid == SOM1);
 
+	WAIT(task2_flag);
+
+	check_point(25);
+	WAIT(task2_flag);
+
+	check_point(30);
 	WAIT(task2_flag);
 
 	check_point(0);
@@ -300,7 +387,19 @@ task3(intptr_t exinf)
 	check_point(16);
 	WAIT(task3_flag);
 
-	check_finish(21);
+	check_point(21);
+	ercd = chg_som(TSOM_STP);
+	check_ercd(ercd, E_OK);
+
+	WAIT(task3_flag);
+
+	check_point(27);
+	ercd = chg_som(TSOM_STP);
+	check_ercd(ercd, E_OK);
+
+	WAIT(task3_flag);
+
+	check_finish(32);
 	check_point(0);
 }
 
@@ -316,11 +415,69 @@ task4(intptr_t exinf)
 
 	check_assert(somid == TSOM_STP);
 
+	ercd = stp_cyc(CYC1);
+	check_ercd(ercd, E_OK);
+
 	ercd = dly_tsk(TEST_TIME_PROC);
 	check_ercd(ercd, E_OK);
 
 	check_point(18);
 	ercd = chg_som(SOM1);
+	check_ercd(ercd, E_OK);
+
+	check_point(22);
+	ercd = get_som(&somid);
+	check_ercd(ercd, E_OK);
+
+	check_assert(somid == TSOM_STP);
+
+	ercd = stp_cyc(CYC1);
+	check_ercd(ercd, E_OK);
+
+	ercd = chg_pri(TSK_SELF, HIGH_PRIORITY);
+	check_ercd(ercd, E_OK);
+
+	check_point(23);
+	ercd = chg_som(SOM1);
+	check_ercd(ercd, E_OK);
+
+	check_point(24);
+	ercd = sta_cyc(CYC1);
+	check_ercd(ercd, E_OK);
+
+	ercd = get_som(&somid);
+	check_ercd(ercd, E_OK);
+
+	check_assert(somid == SOM1);
+
+	ercd = chg_pri(TSK_SELF, LOW_PRIORITY);
+	check_ercd(ercd, E_OK);
+
+	check_point(28);
+	ercd = get_som(&somid);
+	check_ercd(ercd, E_OK);
+
+	check_assert(somid == TSOM_STP);
+
+	ercd = stp_cyc(CYC1);
+	check_ercd(ercd, E_OK);
+
+	ercd = dis_dsp();
+	check_ercd(ercd, E_OK);
+
+	check_point(29);
+	ercd = chg_som(SOM1);
+	check_ercd(ercd, E_OK);
+
+	ercd = sta_cyc(CYC1);
+	check_ercd(ercd, E_OK);
+
+	ercd = get_som(&somid);
+	check_ercd(ercd, E_OK);
+
+	check_assert(check_somid(somid));
+
+	ercd = ena_dsp();
 	check_ercd(ercd, E_OK);
 
 	check_point(0);

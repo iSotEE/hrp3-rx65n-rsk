@@ -37,7 +37,7 @@
  *  アの利用により直接的または間接的に生じたいかなる損害に関しても，そ
  *  の責任を負わない．
  * 
- *  $Id: chip_kernel_impl.c 285 2018-03-21 02:55:49Z ertl-hiro $
+ *  $Id: chip_kernel_impl.c 710 2019-03-29 13:58:23Z ertl-hiro $
  */
 
 /*
@@ -45,7 +45,9 @@
  */
 
 #include "kernel_impl.h"
+#include <sil.h>
 #include "interrupt.h"
+#include "pl310.h"
 
 /*
  *  チップ依存の初期化
@@ -54,77 +56,26 @@ void
 chip_initialize(void)
 {
 	/*
-	 *  キャッシュをディスエーブル
+	 *  MPCore依存の初期化
 	 */
-	arm_disable_cache();
+	mpcore_initialize();
 
 	/*
-	 *  コア依存の初期化
+	 *  L2キャッシュコントローラ（PL310）の初期化
 	 */
-	core_initialize();
-
-	/*
-	 *  MPCoreをSMPモードに設定
-	 *
-	 *  Shareable属性のメモリ領域をキャッシュ有効にするには，SMPモード
-	 *  に設定されている必要がある．
-	 */
-	mpcore_enable_smp();
-
-	/*
-	 *  キャッシュをイネーブル
-	 */
-	arm_enable_cache();
-
-	/*
-	 *  GICのディストリビュータの初期化
-	 */
-	gicd_initialize();
-
-	/*
-	 *  GICのCPUインタフェースの初期化
-	 */
-	gicc_initialize();
-
-	/*
-	 *  分岐予測の無効化とイネーブル
-	 */
-	arm_invalidate_bp();
-	arm_enable_bp();
+	pl310_initialize(0x0U, ~0x0U);
 }
 
 /*
- *  チップ依存部の終了処理
+ *  チップ依存の終了処理
  */
 void
 chip_terminate(void)
 {
-	extern void    software_term_hook(void);
-	void (*volatile fp)(void) = software_term_hook;
-
 	/*
-	 *  software_term_hookへのポインタを，一旦volatile指定のあるfpに代
-	 *  入してから使うのは，0との比較が最適化で削除されないようにするた
-	 *  めである．
+	 *  MPCore依存の終了処理
 	 */
-	if (fp != 0) {
-		(*fp)();
-	}
-
-	/*
-	 *  GICのCPUインタフェースの終了処理
-	 */
-	gicc_terminate();
-
-	/*
-	 *  GICのディストリビュータの終了処理
-	 */
-	gicd_terminate();
-
-	/*
-	 *  コア依存の終了処理
-	 */
-	core_terminate();
+	mpcore_terminate();
 }
 
 /*
@@ -184,7 +135,7 @@ config_int(INTNO intno, ATR intatr, PRI intpri)
 	 *  割込み優先度とターゲットプロセッサを設定
 	 */
 	gicd_set_priority(intno, INT_IPM(intpri));
-	gicd_set_target(intno, 1U << arm_prc_index());
+	gicd_set_target(intno, 1U << get_my_prcidx());
 
 	/*
 	 * 割込みを許可

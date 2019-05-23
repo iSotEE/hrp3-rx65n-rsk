@@ -13,12 +13,4 @@ target_ovrtimer_stop
 target_ovrtimer_get_current
 target_totimer_handler
 
-# tTraceLog.c
-log_dsp_enter
-log_dsp_leave
-log_inh_enter
-log_inh_leave
-log_exc_enter
-log_exc_leave
-
-INCLUDE "chip"
+INCLUDE "core"

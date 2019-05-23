@@ -1,8 +1,0 @@
-PACKAGE hrp3_arch_arm_gcc
-
-MANIFEST
-Makefile.target
-chip_kernel.h
-chip_timer.c
-chip_timer.h
-target_syssvc.h

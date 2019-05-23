@@ -2,7 +2,7 @@
  *  TOPPERS Software
  *      Toyohashi Open Platform for Embedded Real-Time Systems
  * 
- *  Copyright (C) 2015-2018 by Embedded and Real-Time Systems Laboratory
+ *  Copyright (C) 2015-2019 by Embedded and Real-Time Systems Laboratory
  *              Graduate School of Information Science, Nagoya Univ., JAPAN
  * 
  *  上記著作権者は，以下の(1)〜(4)の条件を満たす場合に限り，本ソフトウェ
@@ -34,7 +34,7 @@
  *  アの利用により直接的または間接的に生じたいかなる損害に関しても，そ
  *  の責任を負わない．
  * 
- *  $Id: test_twdnfy.c 421 2018-07-29 07:56:03Z ertl-hiro $
+ *  $Id: test_twdnfy.c 694 2019-03-24 14:40:29Z ertl-hiro $
  */
 
 /* 
@@ -81,6 +81,7 @@
  *	== TASK11-1 ==
  *	1:	ext_tsk()
  *	// タイムウィンドウ for DOM2
+ *	// タイムウィンドウ通知が実行される（TASK2を起床）
  *	== TASK2 ==
  *	2:	can_wup(TSK_SELF) -> 1U
  *	3:	slp_tsk()
@@ -94,6 +95,7 @@
  *	== TASK12-1 ==
  *	5:	ext_tsk()
  *	// タイムウィンドウ for DOM2
+ *	// タイムウィンドウ通知が実行される（TASK2を起床）
  *	== TASK2 ==
  *	6:	chg_som(SOM2)
  *		slp_tsk()
@@ -103,12 +105,14 @@
  *	// タイムウィンドウ通知が実行される（TASK13を起動）
  *	// ここでタイムウィンドウを使い切る
  *	// タイムウィンドウ for DOM2
+ *	// タイムウィンドウ通知が実行される（TASK2を起床）
  *	== TASK2 ==
  *	7:	ref_tsk(TASK13, &rtsk)
  *		assert(rtsk.tskstat == TTS_RDY)
  *	8:	slp_tsk()
  *	// タイムウィンドウ for DOM1
  *	== TASK13-1 ==
+ *		DO(delay_nsec(TEST_TIME_TD))		// TASK13が先に実行されることの対策
  *	9:	ext_tsk()
  *	// アイドルウィンドウ
  *	// 4回目のシステム周期（システム動作モード：SOM2）
@@ -116,6 +120,7 @@
  *	// タイムウィンドウ通知が実行される（TASK13を起動）
  *	// ここでタイムウィンドウを使い切る
  *	// タイムウィンドウ for DOM2
+ *	// タイムウィンドウ通知が実行される（TASK2を起床）
  *	== TASK2 ==
  *	10:	ref_tsk(TASK13, &rtsk)
  *		assert(rtsk.tskstat == TTS_RDY)
@@ -125,21 +130,47 @@
  *	// タイムウィンドウ for DOM1
  *	// CYC11が実行される（TASK12を起動）
  *	== TASK13-2 ==
+ *		DO(delay_nsec(TEST_TIME_TD))		// TASK13が先に実行されることの対策
  *	12:	ext_tsk()
  *	== TASK12-2 ==
  *	13:	ext_tsk()
  *	// アイドルウィンドウ
  *	// タイムウィンドウ for DOM1
  *	// タイムウィンドウ通知が実行される（TASK13を起動）
+ *	== TASK13-3 ==
+ *		DO(delay_nsec(TEST_TIME_TD))		// TASK13が先に実行されることの対策
  *	== TASK2 ==
  *	14:	END
  */
 
 #include <kernel.h>
+#include <sil.h>
 #include <t_syslog.h>
 #include "syssvc/test_svc.h"
 #include "kernel_cfg.h"
 #include "test_twdnfy.h"
+
+/*
+ *  タイムウィンドウ切換えの遅延より長い時間（nsec単位）
+ *
+ *  TEST_TIME_CP（μsec単位）の100分の1の時間に設定する．
+ */
+#ifndef TEST_TIME_TD
+#define TEST_TIME_TD		(TEST_TIME_CP * 1000U / 100U)
+#endif /* TEST_TIME_TD */
+
+ER_UINT extsvc1_routine(intptr_t nsec, intptr_t par2, intptr_t par3,
+									intptr_t par4, intptr_t par5, ID cdmid)
+{
+	sil_dly_nse(nsec);
+	return(E_OK);
+}
+
+static void
+delay_nsec(uint_t nsec)
+{
+	(void) cal_svc(TFN_EXTSVC1, nsec, 0, 0, 0, 0);
+}
 
 /* DO NOT DELETE THIS LINE -- gentest depends on it. */
 
@@ -210,6 +241,8 @@ task13(intptr_t exinf)
 
 	switch (++task13_count) {
 	case 1:
+		delay_nsec(TEST_TIME_TD);
+
 		check_point(9);
 		ercd = ext_tsk();
 		check_ercd(ercd, E_OK);
@@ -217,9 +250,16 @@ task13(intptr_t exinf)
 		check_point(0);
 
 	case 2:
+		delay_nsec(TEST_TIME_TD);
+
 		check_point(12);
 		ercd = ext_tsk();
 		check_ercd(ercd, E_OK);
+
+		check_point(0);
+
+	case 3:
+		delay_nsec(TEST_TIME_TD);
 
 		check_point(0);
 

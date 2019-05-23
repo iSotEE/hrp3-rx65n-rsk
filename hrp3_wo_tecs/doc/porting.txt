@@ -3,7 +3,7 @@
 		ターゲット依存部 ポーティングガイド
 
 		対応バージョン: Release 3.1.0
-		最終更新: 2018年11月4日
+		最終更新: 2019年3月29日
 
 このドキュメントは，TOPPERS/HRP3カーネルを，未サポートのターゲットシス
 テムにポーティングするために必要となるターゲット依存部の実装方法を説明
@@ -14,7 +14,7 @@
      Toyohashi Open Platform for Embedded Real-Time Systems/
      High Reliable system Profile Kernel
 
- Copyright (C) 2016-2018 by Embedded and Real-Time Systems Laboratory
+ Copyright (C) 2016-2019 by Embedded and Real-Time Systems Laboratory
              Graduate School of Information Science, Nagoya Univ., JAPAN
  
  上記著作権者は，以下の(1)〜(4)の条件を満たす場合に限り，本ソフトウェ
@@ -46,7 +46,7 @@
  アの利用により直接的または間接的に生じたいかなる損害に関しても，そ
  の責任を負わない．
  
- $Id: porting.txt 524 2018-11-04 13:01:46Z ertl-hiro $
+ $Id: porting.txt 711 2019-03-29 14:06:10Z ertl-hiro $
 ----------------------------------------------------------------------
 
 ○目次
@@ -70,7 +70,6 @@
 	6.1 カーネル実装のターゲット依存部の共通事項
 	6.2 メモリ保護設定と保護ドメインの管理
 	6.3 タスクのスタック領域
-	6.3 タスクディスパッチャ
 		6.3.1 ユーザタスクの用いるスタック領域
 		6.3.2 レッドゾーン保護とダミースタック
 	6.4 タスクディスパッチャ
@@ -91,6 +90,7 @@
 		6.11.1 タイムウィンドウタイマドライバのファイル構成
 		6.11.2 タイムウィンドウタイマの操作と割込み処理
 	6.12 カーネル実装のコンフィギュレーションファイル
+	6.13 トレースログ機能に関する設定
 ７．コンフィギュレータ設定ファイルのターゲット依存部
 	7.1 設定ファイルとターゲット依存部の位置付け
 	7.2 パス2の生成スクリプトのターゲット依存部
@@ -385,18 +385,47 @@ USE_TSKINICTXBをマクロ定義してTSKINICTXBをターゲット依存部で�
 CRE_TSKにより，システムスタック領域を指定せずにユーザタスクを生成した
 場合のデフォルトのシステムスタック領域のサイズ．
 
-6.3.2 レッドゾーン保護とダミースタック
+6.3.2 ユーザスタック領域の扱い
 
 MMUを持つターゲットプロセッサでは，タスク毎にユーザスタック領域のアク
 セス権を切り換えると，効率が極めて低下する場合が多い．その場合には，タ
-スク毎にアクセス権を切り換えるのをやめ，レッドゾーン方式のユーザスタッ
-ク領域保護を採用する．
+スク毎にアクセス権を切り換えるのをやめ，タスクのユーザスタック領域を，
+そのタスクが属する保護ドメイン全体からアクセスできるものとする．
 
-(6-3-2-1) USE_REDZONE（オプション）
+(6-3-2-1) OMIT_USTACK_PROTECT（オプション）
+
+タスクのユーザスタック領域を，そのタスクが属する保護ドメイン全体からア
+クセスできる（言い換えると，ユーザスタック領域をタスク毎に保護しない）
+ものとする場合には，OMIT_USTACK_PROTECTをマクロ定義する．
+
+(6-3-2-2) CHECK_TARGET_USTACK(ustksz, ustk, p_dominib)（オプション）
+
+acre_tskによりユーザドメインに属するタスクを生成する場合に，ustkと
+ustkszで指定されるスタック領域が，p_dominibで指定されるユーザドメイン
+に属するタスクのユーザスタック領域として適切かを判定するためのチェック
+マクロ．動的生成機能拡張パッケージを使用する場合で，以下に示すデフォル
+トの定義を変更したい場合に，定義する必要がある．
+
+----------------------------------------
+#define CHECK_TARGET_USTACK(ustksz, ustk, p_dominib) do {			\
+	CHECK_PAR(USTKSZ_ALIGN(ustksz));			/*［NGKI1056］*/	\
+	CHECK_PAR(USTACK_ALIGN(ustk));				/*［NGKI1056］*/	\
+	CHECK_OBJ(valid_ustack(ustk, ustksz));		/*［NGKI1060］*/	\
+} while (false)
+----------------------------------------
+
+6.3.3 レッドゾーン保護とダミースタック
+
+タスクのユーザスタック領域を，そのタスクが属する保護ドメイン全体からア
+クセスできるものとした場合には，他のタスクからの不正アクセスのリスクを
+下げるために，レッドゾーン方式のユーザスタック領域保護を用いるのが望ま
+しい．
+
+(6-3-3-1) USE_REDZONE（オプション）
 
 レッドゾーン方式を用いる場合には，USE_REDZONEをマクロ定義する．
 
-(6-3-2-2) TARGET_DUMMY_STKSZ（オプション）
+(6-3-3-2) TARGET_DUMMY_STKSZ（オプション）
 
 レッドゾーン方式において用いるダミースタック領域をサイズを，
 TARGET_DUMMY_STKSZに定義する．
@@ -823,7 +852,7 @@ svc_entry(パラメータリスト, FN fncd)
 			goto error_exit;
 		}
 		p_svcinib = &svcinib_table[fncd - 1];
-		if (p_svcinib->svcrtn == NULL) {
+		if (p_svcinib->extsvc == NULL) {
 			ercd = E_RSFN;
 			goto error_exit;
 		}
@@ -832,7 +861,7 @@ svc_entry(パラメータリスト, FN fncd)
 			ソフトウェア割込みによりシステム状態が変化する場合には，
 							ソフトウェア割込み前のシステム状態に戻す
 			LOG_EXTSVC_ENTER(fncd, パラメータリスト, TDOM_KERNEL);
-			ercd = (*(p_svcinib->svcrtn))(パラメータリスト, TDOM_KERNEL);
+			ercd = (*(p_svcinib->extsvc))(パラメータリスト, TDOM_KERNEL);
 			LOG_EXTSVC_LEAVE(fncd, ercd);
 			ソフトウェア割込みからリターン後のシステム状態が，
 							この時点でのシステム状態になるよう準備する
@@ -860,7 +889,7 @@ svc_entry(パラメータリスト, FN fncd)
 				p_runtsk->svclevel++;
 				ソフトウェア割込み前のシステム状態に戻す
 				LOG_EXTSVC_ENTER(fncd, パラメータリスト, cdmid);
-				ercd = (*(p_svcinib->svcrtn))(パラメータリスト, cdmid);
+				ercd = (*(p_svcinib->extsvc))(パラメータリスト, cdmid);
 				LOG_EXTSVC_LEAVE(fncd, ercd);
 				ソフトウェア割込みからリターン後のシステム状態が，
 							この時点でのシステム状態になるよう準備する
@@ -934,7 +963,7 @@ HRP3カーネルでは，bssセクションとdataセクションがメモリ保
 ては，様々な最適化の余地があることから，ターゲット依存に処理を変更でき
 るようにしている．
 
-(6-10-2-1) OMIT_STANDARD_MEMINIB
+(6-10-2-1) OMIT_STANDARD_MEMINIB（オプション）
 
 メモリオブジェクト初期化ブロックをデータ型や生成方法を変更したい場合に，
 このマクロを定義する．このマクロを定義すると，メモリオブジェクト初期化
@@ -944,26 +973,26 @@ HRP3カーネルでは，bssセクションとdataセクションがメモリ保
 えた場合には，probe_mem_write，probe_mem_read，probe_memoryを変更する
 必要がある．
 
-(6-10-2-2) OMIT_PROBE_MEM_WRITE
-(6-10-2-3) OMIT_PROBE_MEM_READ
-(6-10-2-4) OMIT_PROBE_MEMORY
+(6-10-2-2) OMIT_PROBE_MEM_WRITE（オプション）
+(6-10-2-3) OMIT_PROBE_MEM_READ（オプション）
+(6-10-2-4) OMIT_PROBE_MEMORY（オプション）
 
 probe_mem_write，probe_mem_read，probe_mememoryを変更したい場合には，
 それらに対応するマクロを定義し，それらに変わる定義をターゲット依存部で
 用意する．
 
-(6-10-2-5) OMIT_INITIALIZE_MEMORY
+(6-10-2-5) OMIT_INITIALIZE_MEMORY（オプション）
 
 initialize_memory（標準では何もしない）を変更したい場合には，このマク
 ロを定義し，それに変わる定義をターゲット依存部で用意する．
 
-(6-10-2-6) OMIT_INITIALIZE_SECTIONS
+(6-10-2-6) OMIT_INITIALIZE_SECTIONS（オプション）
 
 initialize_sectionsを変更したい場合には，このマクロを定義し，それに変
 わる定義をターゲット依存部で用意する．
 
-(6-10-2-7) OMIT_STANDARD_DATASECINIB
-(6-10-2-8) OMIT_STANDARD_BSSSECINIB
+(6-10-2-7) OMIT_STANDARD_DATASECINIB（オプション）
+(6-10-2-8) OMIT_STANDARD_BSSSECINIB（オプション）
 
 dataセクション初期化ブロック，bssセクション初期化ブロックが不要な場合
 や，それらの生成方法を変更したい場合に，それらに対応するマクロを定義す
@@ -986,6 +1015,22 @@ dataセクション初期化ブロック，bssセクション初期化ブロッ�
 
 コンフィギュレータが割り付ける固定長メモリプール領域のメモリオブジェク
 ト属性．定義しない場合，TA_NOINITSECが使われる．
+
+(6-10-2-12) OMIT_PROBE_MEM_WRITE_DOMPTN（オプション）
+(6-10-2-13) OMIT_PROBE_MEM_RW_DOMPTN（オプション）
+
+動的生成機能拡張パッケージを使用する場合で，probe_mem_write_domptn，
+probe_mem_rw_domptnを変更したい場合には，それらに対応するマクロを定義
+し，それらに変わる定義をターゲット依存部で用意する．
+
+(6-10-2-14) OMIT_VALID_MEMOBJ_DOM（オプション）
+(6-10-2-15) OMIT_VALID_USTACK（オプション）
+
+動的生成機能拡張パッケージを使用する場合で，valid_memobj_dom，
+valid_ustackが必要ない場合には，それらに対応するマクロを定義する．これ
+らのマクロは，CHECK_TARGET_USTACKの定義に使用することを想定している．
+CHECK_TARGET_USTACKのデフォルトの定義を用いる場合には，valid_ustackが
+必要で，valid_memobj_domは必要ない．
 
 6.10.3 エラーチェック方法の指定
 
@@ -1118,6 +1163,14 @@ target_mem.cfgには，次のような静的APIを含める．
 ・周辺デバイス領域の登録
 ・ベクタテーブルなどの配置
 
+6.13 トレースログ機能に関する設定
+
+HRP3カーネルで取得できるトレースログは，ASP3カーネルで取得できるものに
+加えて，以下のものがある．
+
+	LOG_SCYC_START	システム周期の開始
+	LOG_TWD_START	タイムウィンドウの開始
+
 
 ７．コンフィギュレータ設定ファイルのターゲット依存部
 
@@ -1189,13 +1242,7 @@ target_opt.trbは，必要な変数や関数を定義した後，ターゲット
 ゲット非依存部で使用する各種のテーブルのサイズを適正化と，仮のメモリ構
 成・初期化情報の生成を行う．kernel_opt.trbのインクルードの後，
 kernel_mem3.cに，メモリ保護設定のためのターゲット依存の情報（仮の情報）
-を生成する．
-
-また，メモリ保護単位のアラインメント／配置アドレスの決定を行った結果，
-それをリンカスクリプトに反映する必要がある場合には，cfg3_out.ldを生成
-する．リンカスクリプトが，リンクするファイルがkernel_mem2.oから
-kernel_mem3.oに変わるだけであれば，cfg3_out.ldを生成する必要はない
-（Makefile側でcfg3_out.ldを生成する）．
+を生成する．また，cfg3_out.ldを生成する．
 
 target_opt.trbから，開発環境依存部／プロセッサコア依存部／チップ依存部
 を切り分けてもよい．
@@ -1210,13 +1257,8 @@ target_opt.trbから，開発環境依存部／プロセッサコア依存部／
 数を定義した後，ターゲット非依存部（kernel/kernel_mem.trb）をインクルー
 ドする．kernel_mem.trbでは，ターゲット非依存部で使用するメモリ構成・初
 期化情報の生成を行う．kernel_mem.trbのインクルードの後，kernel_mem.cに，
-メモリ保護設定のためのターゲット依存の情報を生成する．
-
-また，リンカスクリプトの内容を変更する必要がある場合には，ldscript.ld
-を生成する．リンカスクリプトが，リンクするファイルがkernel_mem3.o（パ
-ス3を使用しない場合はkernel_mem2.o）からkernel_mem.oに変わるだけであれ
-ば，ldscript.ldを生成する必要はない（Makefile側でldscript.ldを生成す
-る）．
+メモリ保護設定のためのターゲット依存の情報を生成する．また，
+ldscript.ldを生成する．
 
 最後に，チェックパスの生成スクリプト（target_check.trb）をインクルード
 する．

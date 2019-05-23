@@ -5,7 +5,7 @@
  * 
  *  Copyright (C) 2000-2003 by Embedded and Real-Time Systems Laboratory
  *                              Toyohashi Univ. of Technology, JAPAN
- *  Copyright (C) 2004-2018 by Embedded and Real-Time Systems Laboratory
+ *  Copyright (C) 2004-2019 by Embedded and Real-Time Systems Laboratory
  *              Graduate School of Information Science, Nagoya Univ., JAPAN
  * 
  *  上記著作権者は，以下の(1)〜(4)の条件を満たす場合に限り，本ソフトウェ
@@ -37,7 +37,7 @@
  *  アの利用により直接的または間接的に生じたいかなる損害に関しても，そ
  *  の責任を負わない．
  * 
- *  $Id: kernel.h 502 2018-10-27 08:05:10Z ertl-hiro $
+ *  $Id: kernel.h 676 2019-03-11 04:52:04Z ertl-hiro $
  */
 
 /*
@@ -611,7 +611,7 @@ typedef struct t_rmem {
 /*
  *  システム時刻の調整できる範囲（単位：μ秒）
  */
-#define TMIN_ADJTIM		-1000000		/* システム時刻の最小調整時間 */
+#define TMIN_ADJTIM		(-1000000)		/* システム時刻の最小調整時間 */
 #define TMAX_ADJTIM		1000000			/* システム時刻の最大調整時間 */
 
 /*
@@ -650,6 +650,7 @@ typedef struct t_rmem {
 
 #define TSZ_MBFMB(msgcnt, msgsz) \
 	((msgcnt) * (sizeof(uint_t) + TOPPERS_ROUND_SZ(msgsz, sizeof(uint_t))))
+#define TCNT_MBFMB(mbfcnt)	COUNT_MB_T(TSZ_MBFMB(mbfcnt))
 
 #define COUNT_MPF_T(blksz)	TOPPERS_COUNT_SZ(blksz, sizeof(MPF_T))
 #define ROUND_MPF_T(blksz)	TOPPERS_ROUND_SZ(blksz, sizeof(MPF_T))

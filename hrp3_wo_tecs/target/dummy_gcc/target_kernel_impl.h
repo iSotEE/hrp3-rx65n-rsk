@@ -35,7 +35,7 @@
  *  アの利用により直接的または間接的に生じたいかなる損害に関しても，そ
  *  の責任を負わない．
  * 
- *  $Id: target_kernel_impl.h 520 2018-11-01 12:41:13Z ertl-hiro $
+ *  $Id: target_kernel_impl.h 619 2018-12-20 16:48:56Z ertl-hiro $
  */
 
 /*
@@ -67,14 +67,9 @@
 #define CHECK_STACK_NONNULL		/* スタック領域の非NULLチェック */
 #define CHECK_MPF_ALIGN		4	/* 固定長メモリプール領域のアライン単位 */
 #define CHECK_MPF_NONNULL		/* 固定長メモリプール領域の非NULLチェック */
+#define CHECK_MPK_ALIGN		4	/* カーネルメモリプール領域のアライン単位 */
+#define CHECK_MPK_NONNULL		/* カーネルメモリプール領域の非NULLチェック */
 #define CHECK_MB_ALIGN		4	/* 管理領域のアライン単位 */
-
-/*
- *  トレースログに関する設定
- */
-#ifdef TOPPERS_ENABLE_TRACE
-#include "arch/tracelog/trace_log.h"
-#endif /* TOPPERS_ENABLE_TRACE */
 
 /*
  *  トレースログマクロのデフォルト定義

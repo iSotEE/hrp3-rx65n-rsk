@@ -5,7 +5,7 @@
 # 
 #  Copyright (C) 2000-2003 by Embedded and Real-Time Systems Laboratory
 #                              Toyohashi Univ. of Technology, JAPAN
-#  Copyright (C) 2006-2018 by Embedded and Real-Time Systems Laboratory
+#  Copyright (C) 2006-2019 by Embedded and Real-Time Systems Laboratory
 #              Graduate School of Information Science, Nagoya Univ., JAPAN
 # 
 #  上記著作権者は，以下の(1)〜(4)の条件を満たす場合に限り，本ソフトウェ
@@ -37,7 +37,7 @@
 #  アの利用により直接的または間接的に生じたいかなる損害に関しても，そ
 #  の責任を負わない．
 # 
-#  $Id: Makefile 513 2018-10-29 13:54:19Z ertl-hiro $
+#  $Id: Makefile 715 2019-04-03 05:39:42Z ertl-hiro $
 # 
 
 #
@@ -218,6 +218,14 @@ INCLUDES := $(INCLUDES) -I$(TECSGENDIR) -I$(SRCDIR)/tecs_kernel \
 				-I$(TECSDIR)/tecs -I$(TECSDIR)/tecs/rpc
 
 #
+#  トレースログ記録のサンプルコードに関する定義
+#
+ifdef ENABLE_TRACE
+	COPTS := $(COPTS) -DTOPPERS_ENABLE_TRACE
+	SYSSVC_DIRS := $(SYSSVC_DIRS) $(SRCDIR)/arch/tracelog
+endif
+
+#
 #  ターゲットファイル
 #
 .PHONY: all
@@ -373,7 +381,7 @@ CFG3_OUT_LDFLAGS := $(CFG3_OUT_LDFLAGS) -Wl,-T,$(CFG3_OUT_LDSCRIPT)
 #
 #  tecsgenからCプリプロセッサを呼び出す際のオプションの定義
 #
-TECS_CPP = $(CC) $(CDEFS) $(INCLUDES) $(SYSSVC_CFLAGS) -D TECSGEN -E
+TECS_CPP = $(CC) $(CDEFS) $(INCLUDES) -D TECSGEN -E
 
 #
 #  tecsgenの呼出し
@@ -424,10 +432,6 @@ kernel_opt.timestamp: cfg2_out.db $(ALL2_OBJS) $(LIBS_DEP) $(CFG2_OUT_LDSCRIPT)
 	rm -f $(CFG3_OUT_LDSCRIPT)
 	$(CFG) --pass 3 $(CFG_KERNEL) $(INCLUDES) -T $(TARGET_OPT_TRB) \
 				--rom-symbol cfg2_out.syms --rom-image cfg2_out.srec
-	if ! [ -f $(CFG3_OUT_LDSCRIPT) ]; then \
-		sed "s/kernel_mem2\.o/kernel_mem3\.o/g" < $(CFG2_OUT_LDSCRIPT) \
-													> $(CFG3_OUT_LDSCRIPT); \
-	fi
 
 kernel_mem.c $(LDSCRIPT): kernel_mem.timestamp ;
 kernel_mem.timestamp: cfg3_out.db $(ALL3_OBJS) $(LIBS_DEP) $(CFG3_OUT_LDSCRIPT)
@@ -437,10 +441,6 @@ kernel_mem.timestamp: cfg3_out.db $(ALL3_OBJS) $(LIBS_DEP) $(CFG3_OUT_LDSCRIPT)
 	rm -f $(LDSCRIPT)
 	$(CFG) --pass 4 $(CFG_KERNEL) $(INCLUDES) -T $(TARGET_MEM_TRB) \
 				--rom-symbol cfg3_out.syms --rom-image cfg3_out.srec
-	if ! [ -f $(LDSCRIPT) ]; then \
-		sed "s/kernel_mem3\.o/kernel_mem\.o/g" < $(CFG3_OUT_LDSCRIPT) \
-															> $(LDSCRIPT); \
-	fi
 endif
 
 #
@@ -456,10 +456,6 @@ kernel_mem.timestamp: cfg2_out.db $(ALL2_OBJS) $(LIBS_DEP) $(CFG2_OUT_LDSCRIPT)
 	rm -f $(LDSCRIPT)
 	$(CFG) --pass 4 $(CFG_KERNEL) $(INCLUDES) -T $(TARGET_MEM_TRB) \
 				--rom-symbol cfg2_out.syms --rom-image cfg2_out.srec
-	if ! [ -f $(LDSCRIPT) ]; then \
-		sed "s/kernel_mem2\.o/kernel_mem\.o/g" < $(CFG2_OUT_LDSCRIPT) \
-															> $(LDSCRIPT); \
-	fi
 endif
 
 #
@@ -489,7 +485,7 @@ $(APPL_ASMOBJS) $(SYSSVC_ASMOBJS) $(KERNEL_ASMOBJS) $(CFG_ASMOBJS): \
 #  特別な依存関係の定義
 #
 $(OBJDIR)/svc_table.o: omit_svc.h
-$(OBJDIR)/tBannerMain.o: $(filter-out $(OBJDIR)/tBannerMain.o,$(ALL2_OBJS)) \
+$(OBJDIR)/@(BANNEROBJ): $(filter-out $(OBJDIR)/@(BANNEROBJ),$(ALL2_OBJS)) \
 																$(LIBS_DEP)
 
 #

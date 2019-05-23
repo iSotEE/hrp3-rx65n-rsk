@@ -5,7 +5,7 @@
  * 
  *  Copyright (C) 2000-2003 by Embedded and Real-Time Systems Laboratory
  *                              Toyohashi Univ. of Technology, JAPAN
- *  Copyright (C) 2005-2018 by Embedded and Real-Time Systems Laboratory
+ *  Copyright (C) 2005-2019 by Embedded and Real-Time Systems Laboratory
  *              Graduate School of Information Science, Nagoya Univ., JAPAN
  * 
  *  上記著作権者は，以下の(1)〜(4)の条件を満たす場合に限り，本ソフトウェ
@@ -37,7 +37,7 @@
  *  アの利用により直接的または間接的に生じたいかなる損害に関しても，そ
  *  の責任を負わない．
  * 
- *  $Id: sys_manage.c 520 2018-11-01 12:41:13Z ertl-hiro $
+ *  $Id: sys_manage.c 647 2019-01-14 02:55:53Z ertl-hiro $
  */
 
 /*
@@ -233,7 +233,7 @@ rot_rdq(PRI tskpri)
 #endif /* TOPPERS_rot_rdq */
 
 /*
- *  保護ドメイン指定でのタスクの優先順位の回転［NGKI3549］
+ *  対象指定でのタスクの優先順位の回転［NGKI3549］
  */
 #ifdef TOPPERS_mrot_rdq
 
@@ -304,10 +304,8 @@ get_tid(ID *p_tskid)
 	CHECK_UNL();								/*［NGKI2707］*/
 	CHECK_MACV_WRITE(p_tskid, ID);				/*［NGKI2708］*/
 
-	lock_cpu();
 	*p_tskid = (p_runtsk == NULL) ? TSK_NONE : TSKID(p_runtsk);
-	ercd = E_OK;
-	unlock_cpu();
+	ercd = E_OK;								/*［NGKI2710］［NGKI2709］*/
 
   error_exit:
 	LOG_GET_TID_LEAVE(ercd, p_tskid);
@@ -330,10 +328,8 @@ get_did(ID *p_domid)
 	CHECK_UNL();								/*［NGKI2714］*/
 	CHECK_MACV_WRITE(p_domid, ID);				/*［NGKI2715］*/
 
-	lock_cpu();
-	*p_domid = p_runtsk->p_tinib->domid;
-	ercd = E_OK;
-	unlock_cpu();
+	*p_domid = (p_runtsk == NULL) ? TDOM_NONE : p_runtsk->p_tinib->domid;
+	ercd = E_OK;								/*［NGKI3554］［NGKI2716］*/
 
   error_exit:
 	LOG_GET_DID_LEAVE(ercd, p_domid);
@@ -385,7 +381,7 @@ get_lod(PRI tskpri, uint_t *p_load)
 #endif /* TOPPERS_get_lod */
 
 /*
- *  保護ドメイン指定での実行できるタスクの数の参照［NGKI3632］
+ *  対象指定での実行できるタスクの数の参照［NGKI3632］
  */
 #ifdef TOPPERS_mget_lod
 
@@ -485,7 +481,7 @@ get_nth(PRI tskpri, uint_t nth, ID *p_tskid)
 #endif /* TOPPERS_get_nth */
 
 /*
- *  保護ドメイン指定での指定した優先順位のタスクIDの参照［NGKI3651］
+ *  対象指定での指定した優先順位のタスクIDの参照［NGKI3651］
  */
 #ifdef TOPPERS_mget_nth
 

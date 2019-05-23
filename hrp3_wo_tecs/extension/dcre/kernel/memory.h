@@ -37,7 +37,7 @@
  *  アの利用により直接的または間接的に生じたいかなる損害に関しても，そ
  *  の責任を負わない．
  * 
- *  $Id: memory.h 502 2018-10-27 08:05:10Z ertl-hiro $
+ *  $Id: memory.h 682 2019-03-15 23:50:49Z ertl-hiro $
  */
 
 /*
@@ -163,7 +163,8 @@ extern bool_t	probe_mem_read(const void *base, size_t size);
  *  domptnで指定した保護ドメイン（ユーザドメイン）が，指定したメモリ領
  *  域への書込み権を持っているかをチェックし，書込み権を持っている場合
  *  にtrue，そうでない場合にfalseを返す．domptnでカーネルドメインを指
- *  定してはならない．
+ *  定してはならない．あるタスクのみがアクセスできるメモリ領域（ユーザ
+ *  スタック領域のみが該当）を指定した場合には，falseを返す．
  */
 extern bool_t	probe_mem_write_domptn(const void *base, size_t size,
 														ACPTN domptn);
@@ -174,7 +175,8 @@ extern bool_t	probe_mem_write_domptn(const void *base, size_t size,
  *  domptnで指定した保護ドメイン（ユーザドメイン）が，指定したメモリ領
  *  域への書込み権と読出し権を持っているかをチェックし，両方の権限を持っ
  *  ている場合にtrue，そうでない場合にfalseを返す．domptnでカーネルド
- *  メインを指定してはならない．
+ *  メインを指定してはならない．あるタスクのみがアクセスできるメモリ領
+ *  域（ユーザスタック領域のみが該当）を指定した場合には，falseを返す．
  */
 extern bool_t	probe_mem_rw_domptn(const void *base, size_t size,
 														ACPTN domptn);

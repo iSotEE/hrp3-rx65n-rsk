@@ -5,7 +5,7 @@
  * 
  *  Copyright (C) 2000-2003 by Embedded and Real-Time Systems Laboratory
  *                              Toyohashi Univ. of Technology, JAPAN
- *  Copyright (C) 2005-2018 by Embedded and Real-Time Systems Laboratory
+ *  Copyright (C) 2005-2019 by Embedded and Real-Time Systems Laboratory
  *              Graduate School of Information Science, Nagoya Univ., JAPAN
  * 
  *  上記著作権者は，以下の(1)〜(4)の条件を満たす場合に限り，本ソフトウェ
@@ -37,7 +37,7 @@
  *  アの利用により直接的または間接的に生じたいかなる損害に関しても，そ
  *  の責任を負わない．
  * 
- *  $Id: memory.c 352 2018-04-12 15:57:15Z ertl-hiro $
+ *  $Id: memory.c 679 2019-03-12 19:34:49Z ertl-hiro $
  */
 
 /*
@@ -119,15 +119,17 @@ probe_mem_write(const void *base, size_t size)
 		 */
 		return(false);
 	}
-	else if ((accatr & TA_USTACK) == 0U) {
+#ifndef OMIT_USTACK_PROTECT
+	else if ((accatr & TA_USTACK) != 0U) {
+		return(within_ustack(base, size, p_runtsk));
+	}
+#endif /* OMIT_USTACK_PROTECT */
+	else {
 		/*
 		 *  ((accatr & TA_NOWRITE) != 0U)の時は，acptn1を0にしているた
 		 *  め，acptn1のチェックのみを行えばよい．
 		 */
 		return((rundom & meminib_table[meminib].acptn1) != 0U);
-	}
-	else {
-		return(within_ustack(base, size, p_runtsk));
 	}
 }
 
@@ -162,12 +164,14 @@ probe_mem_read(const void *base, size_t size)
 		 */
 		return(false);
 	}
-	else if ((accatr & TA_USTACK) == 0U) {
+#ifndef OMIT_USTACK_PROTECT
+	else if ((accatr & TA_USTACK) != 0U) {
+		return(within_ustack(base, size, p_runtsk));
+	}
+#endif /* OMIT_USTACK_PROTECT */
+	else {
 		return((accatr & TA_NOREAD) == 0U
 					&& (rundom & meminib_table[meminib].acptn2) != 0U);
-	}
-	else {
-		return(within_ustack(base, size, p_runtsk));
 	}
 }
 

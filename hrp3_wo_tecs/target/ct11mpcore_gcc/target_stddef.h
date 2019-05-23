@@ -2,7 +2,7 @@
  *  TOPPERS Software
  *      Toyohashi Open Platform for Embedded Real-Time Systems
  * 
- *  Copyright (C) 2007-2014 by Embedded and Real-Time Systems Laboratory
+ *  Copyright (C) 2007-2019 by Embedded and Real-Time Systems Laboratory
  *              Graduate School of Information Science, Nagoya Univ., JAPAN
  * 
  *  上記著作権者は，以下の(1)〜(4)の条件を満たす場合に限り，本ソフトウェ
@@ -34,7 +34,7 @@
  *  アの利用により直接的または間接的に生じたいかなる損害に関しても，そ
  *  の責任を負わない．
  * 
- *  $Id: target_stddef.h 532 2018-11-11 04:46:48Z ertl-hiro $
+ *  $Id: target_stddef.h 655 2019-01-17 14:31:41Z ertl-hiro $
  */
 
 /*
@@ -64,9 +64,9 @@
 #include "tool_stddef.h"
 
 /*
- *  チッブで共通な定義
+ *  コアで共通な定義
  */
-#include "chip_stddef.h"
+#include "core_stddef.h"
 
 /*
  *  アサーションの失敗時の実行中断処理
@@ -77,6 +77,13 @@ Inline void
 TOPPERS_assert_abort(void)
 {
 #if defined(TOPPERS_USE_QEMU) && !defined(TOPPERS_OMIT_QEMU_SEMIHOSTING)
+	/*
+	 *  デバッグコンソールへ文字列を出力．
+	 */
+	Asm("mov r0, #4\n\t"
+		"mov r1, %0\n\t"
+		"svc 0x00123456" : : "r"("Abort!\n"));
+
 	/*
 	 *  QEMUを終了させる．
 	 */

@@ -36,7 +36,7 @@
  *  アの利用により直接的または間接的に生じたいかなる損害に関しても，そ
  *  の責任を負わない．
  * 
- *  $Id: tUartPL011.cdl 395 2018-04-30 22:52:47Z ertl-hiro $
+ *  $Id: tUartPL011.cdl 576 2018-11-28 00:57:26Z ertl-hiro $
  */
 
 /*
@@ -56,6 +56,7 @@ celltype tUartPL011 {
 	call	siSIOCBR	ciSIOCBR;
 
 	entry	siHandlerBody	eiISR;
+	entry	sRoutineBody	eTerminate;
 
 	attr {
 		uintptr_t	baseAddress;	/* UARTレジスタのベースアドレス */

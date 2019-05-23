@@ -35,7 +35,7 @@
  *  アの利用により直接的または間接的に生じたいかなる損害に関しても，そ
  *  の責任を負わない．
  * 
- *  $Id: target_kernel_impl.c 532 2018-11-11 04:46:48Z ertl-hiro $
+ *  $Id: target_kernel_impl.c 606 2018-12-13 16:13:01Z ertl-hiro $
  */
 
 /*
@@ -82,7 +82,11 @@ dispatcher(void)
 	/* 割込みを許可したらCPUロック解除状態になるよう準備する */
 	/* 割込みをすべて許可する */
 	while (true) {
+#ifdef TOPPERS_CUSTOM_IDLE
+		TOPPERS_CUSTOM_IDLE();
+#else /* TOPPERS_CUSTOM_IDLE */
 		/* 割込み発生を待つ */
+#endif /* TOPPERS_CUSTOM_IDLE */
 	}
 }
 
@@ -180,11 +184,11 @@ svc_entry(intptr_t par1, intptr_t par2, intptr_t par3,
 			goto error_exit;
 		}
 		p_svcinib = &svcinib_table[fncd - 1];
-		if (p_svcinib->svcrtn == NULL) {
+		if (p_svcinib->extsvc == NULL) {
 			ercd = E_RSFN;
 			goto error_exit;
 		}
-		ercd = (*(p_svcinib->svcrtn))(par1, par2, par3, par4, par5, 0);
+		ercd = (*(p_svcinib->extsvc))(par1, par2, par3, par4, par5, 0);
 	}
 
   error_exit:
@@ -217,11 +221,24 @@ start_r(void)
 }
 
 /*
+ *  システムログの低レベル出力のための初期化
+ *
+ *  セルタイプtPutLogSIOPort内に実装されている関数を直接呼び出す．
+ */
+extern void	tPutLogSIOPort_initialize(void);
+
+/*
  *  ターゲット依存の初期化
  */
 void
 target_initialize(void)
 {
+	/*
+	 *  SIOを初期化
+	 */
+#ifndef TOPPERS_OMIT_TECS
+	tPutLogSIOPort_initialize();
+#endif /* TOPPERS_OMIT_TECS */
 }
 
 /*

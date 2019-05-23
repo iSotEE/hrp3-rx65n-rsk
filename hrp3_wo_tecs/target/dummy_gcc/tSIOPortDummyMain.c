@@ -2,7 +2,7 @@
  *  TOPPERS Software
  *      Toyohashi Open Platform for Embedded Real-Time Systems
  * 
- *  Copyright (C) 2013-2016 by Embedded and Real-Time Systems Laboratory
+ *  Copyright (C) 2013-2018 by Embedded and Real-Time Systems Laboratory
  *              Graduate School of Information Science, Nagoya Univ., JAPAN
  * 
  *  上記著作権者は，以下の(1)〜(4)の条件を満たす場合に限り，本ソフトウェ
@@ -34,7 +34,7 @@
  *  アの利用により直接的または間接的に生じたいかなる損害に関しても，そ
  *  の責任を負わない．
  * 
- *  $Id: tSIOPortDummyMain.c 286 2018-03-21 03:08:04Z ertl-hiro $
+ *  $Id: tSIOPortDummyMain.c 576 2018-11-28 00:57:26Z ertl-hiro $
  */
 
 /*
@@ -51,9 +51,15 @@ eSIOPort_open(CELLIDX idx)
 {
 	CELLCB	*p_cellcb = GET_CELLCB(idx);
 
-	/* SIOのオープン処理 */
+	if (!VAR_opened) {
+		/*
+		 *  既にオープンしている場合は、二重にオープンしない．
+		 */
 
-	VAR_openflag = true;
+		/* SIOのオープン処理 */
+
+		VAR_opened = true;
+	}
 }
 
 /*
@@ -64,9 +70,11 @@ eSIOPort_close(CELLIDX idx)
 {
 	CELLCB	*p_cellcb = GET_CELLCB(idx);
 
-	/* SIOのクローズ処理 */
+	if (VAR_opened) {
+		/* SIOのクローズ処理 */
 
-	VAR_openflag = false;
+		VAR_opened = false;
+	}
 }
 
 /*
@@ -167,9 +175,5 @@ eiISR_main(CELLIDX idx)
 void
 eTerminate_main(CELLIDX idx)
 {
-	CELLCB	*p_cellcb = GET_CELLCB(idx);
-
-	if (VAR_openflag) {
-		/* SIOのクローズ処理 */
-	}
+	eSIOPort_close(idx);
 }

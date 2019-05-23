@@ -37,7 +37,7 @@
  *  アの利用により直接的または間接的に生じたいかなる損害に関しても，そ
  *  の責任を負わない．
  * 
- *  $Id: startup.c 509 2018-10-27 16:22:39Z ertl-hiro $
+ *  $Id: startup.c 627 2018-12-31 16:52:32Z ertl-hiro $
  */
 
 /*
@@ -87,6 +87,7 @@ void
 sta_ker(void)
 {
 	ID		domid;
+	uint_t	i;
 
 	/*
 	 *  TECSの初期化
@@ -119,7 +120,9 @@ sta_ker(void)
 	/*
 	 *  初期化ルーチンの実行
 	 */ 
-	call_inirtn();
+	for (i = 0; i < tnum_inirtn; i++) {
+		(*(inirtnb_table[i].inirtn))(inirtnb_table[i].exinf);
+	}
 
 	/*
 	 *  高分解能タイマの設定
@@ -187,10 +190,14 @@ ext_ker(void)
 void
 exit_kernel(void)
 {
+	uint_t	i;
+
 	/*
 	 *  終了処理ルーチンの実行
 	 */
-	call_terrtn();
+	for (i = 0; i < tnum_terrtn; i++) {
+		(*(terrtnb_table[i].terrtn))(terrtnb_table[i].exinf);
+	}
 
 	/*
 	 *  ターゲット依存の終了処理

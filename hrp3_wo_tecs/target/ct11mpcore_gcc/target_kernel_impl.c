@@ -35,7 +35,7 @@
  *  アの利用により直接的または間接的に生じたいかなる損害に関しても，そ
  *  の責任を負わない．
  * 
- *  $Id: target_kernel_impl.c 415 2018-07-27 09:06:40Z ertl-hiro $
+ *  $Id: target_kernel_impl.c 565 2018-11-26 05:18:31Z ertl-hiro $
  */
 
 /*
@@ -52,13 +52,13 @@
 #ifndef TOPPERS_OMIT_TECS
 
 /*
- *  セルタイプtPutLogCT11MPCore内に実装されている関数を直接呼び出す．
+ *  セルタイプtPutLogSIOPort内に実装されている関数を直接呼び出す．
  */
-extern void	tPutLogCT11MPCore_initialize(void);
+extern void	tPutLogSIOPort_initialize(void);
 
 #else /* TOPPERS_OMIT_TECS */
 
-extern void	sio_initialize(void);
+extern void	sio_initialize(intptr_t exinf);
 extern void	target_fput_initialize(void);
 
 #endif /* TOPPERS_OMIT_TECS */
@@ -72,9 +72,9 @@ target_initialize(void)
 	uint32_t	reg;
 
 	/*
-	 *  チップ依存の初期化
+	 *  MPCore依存の初期化
 	 */
-	chip_initialize();
+	mpcore_initialize();
 	
 	/*
 	 *  Emulation Baseboardの割込みモードの設定
@@ -92,9 +92,9 @@ target_initialize(void)
 	 *  UARTを初期化
 	 */
 #ifndef TOPPERS_OMIT_TECS
-	tPutLogCT11MPCore_initialize();
+	tPutLogSIOPort_initialize();
 #else /* TOPPERS_OMIT_TECS */
-	sio_initialize();
+	sio_initialize(0);
 	target_fput_initialize();
 #endif /* TOPPERS_OMIT_TECS */
 }
@@ -106,9 +106,9 @@ void
 target_exit(void)
 {
 	/*
-	 *  チップ依存の終了処理
+	 *  MPCore依存の終了処理
 	 */
-	chip_terminate();
+	mpcore_terminate();
 
 	/*
 	 *  ターゲット依存の終了処理
@@ -122,3 +122,51 @@ target_exit(void)
 #endif
 	while (true) ;
 }
+
+#ifdef TOPPERS_OMIT_TECS
+/*
+ *		システムログの低レベル出力（本来は別のファイルにすべき）
+ */
+
+#include "target_syssvc.h"
+#include "target_serial.h"
+
+/*
+ *  低レベル出力用のSIOポート管理ブロック
+ */
+static SIOPCB	*p_siopcb_target_fput;
+
+/*
+ *  SIOポートの初期化
+ */
+void
+target_fput_initialize(void)
+{
+	p_siopcb_target_fput = uart_pl011_opn_por(SIOPID_FPUT, 0);
+}
+
+/*
+ *  SIOポートへのポーリング出力
+ */
+static void
+ct11mpcore_uart_fput(char c)
+{
+	/*
+	 *  送信できるまでポーリング
+	 */
+	while (!(uart_pl011_snd_chr(p_siopcb_target_fput, c))) ;
+}
+
+/*
+ *  SIOポートへの文字出力
+ */
+void
+target_fput_log(char c)
+{
+	if (c == '\n') {
+		ct11mpcore_uart_fput('\r');
+	}
+	ct11mpcore_uart_fput(c);
+}
+
+#endif /* TOPPERS_OMIT_TECS */

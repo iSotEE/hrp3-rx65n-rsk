@@ -36,7 +36,7 @@
  *  アの利用により直接的または間接的に生じたいかなる損害に関しても，そ
  *  の責任を負わない．
  * 
- *  $Id: arm.h 412 2018-07-25 09:38:09Z ertl-hiro $
+ *  $Id: arm.h 704 2019-03-27 05:50:02Z ertl-hiro $
  */
 
 /*
@@ -333,20 +333,21 @@ arm_disable_bp(void)
 }
 
 /*
- *  プロセッサ番号の取得
+ *  自プロセッサのインデックス（0オリジン）の取得
  *
- *  マルチプロセッサアフィニティレジスタを読んで，その下位8ビットを返す．
- *  ARMv6では，マルチプロセッサをサポートしている場合にのみ使用できる．
+ *  マルチプロセッサアフィニティレジスタを読んで，その下位8ビットを返
+ *  す．ARMv6では，マルチプロセッサをサポートしている場合にのみ使用で
+ *  きる．
  */
 #if __TARGET_ARCH_ARM >= 6
 
 Inline uint32_t
-arm_prc_index(void)
+get_my_prcidx(void)
 {
 	uint32_t	reg;
 
 	CP15_READ_MPIDR(reg);
-	return(reg & 0xffU);
+	return((uint_t)(reg & 0xffU));
 }
 
 #endif /* __TARGET_ARCH_ARM >= 6 */

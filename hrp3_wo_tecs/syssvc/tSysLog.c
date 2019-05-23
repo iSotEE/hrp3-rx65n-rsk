@@ -36,7 +36,7 @@
  *  アの利用により直接的または間接的に生じたいかなる損害に関しても，そ
  *  の責任を負わない．
  * 
- *  $Id: tSysLog.c 399 2018-05-02 12:38:36Z ertl-hiro $
+ *  $Id: tSysLog.c 538 2018-11-19 13:46:23Z ertl-hiro $
  */
 
 /*
@@ -48,6 +48,17 @@
 #undef TOPPERS_OMIT_SYSLOG
 #include <t_syslog.h>
 #include <log_output.h>
+
+/*
+ *  トレースログに関する設定
+ */
+#ifdef TOPPERS_ENABLE_TRACE
+#include "arch/tracelog/trace_log.h"
+#endif /* TOPPERS_ENABLE_TRACE */
+
+/*
+ *  ターゲット依存情報の定義
+ */
 #include "target_syssvc.h"
 
 /*

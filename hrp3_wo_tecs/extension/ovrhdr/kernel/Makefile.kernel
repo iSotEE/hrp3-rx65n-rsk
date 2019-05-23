@@ -37,7 +37,7 @@
 #  アの利用により直接的または間接的に生じたいかなる損害に関しても，そ
 #  の責任を負わない．
 # 
-#  $Id: Makefile.kernel 509 2018-10-27 16:22:39Z ertl-hiro $
+#  $Id: Makefile.kernel 595 2018-12-10 05:05:03Z ertl-hiro $
 # 
 
 #
@@ -116,7 +116,7 @@ cyclic = cycini.o sta_cyc.o stp_cyc.o ref_cyc.o cyccal.o
 
 alarm = almini.o sta_alm.o stp_alm.o ref_alm.o almcal.o
 
-overrun = ovrini.o ovrsta.o ovrstp.o sta_ovr.o stp_ovr.o ref_ovr.o ovrcal.o
+overrun = ovrsta.o ovrstp.o sta_ovr.o stp_ovr.o ref_ovr.o ovrcal.o
 
 sys_manage = rot_rdq.o mrot_rdq.o get_did.o get_tid.o \
 		get_lod.o mget_lod.o get_nth.o mget_nth.o \

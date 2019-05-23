@@ -1,7 +1,7 @@
 #
 #		Makefile のターゲット依存部（ダミーターゲット用）
 #
-#  $Id: Makefile.target 496 2018-10-24 18:05:56Z ertl-hiro $
+#  $Id: Makefile.target 541 2018-11-19 14:15:36Z ertl-hiro $
 # 
 
 #
@@ -65,11 +65,3 @@ $(START_OBJS): $(OBJDIR)/%.o: %.c
 	$(CC) -c -o $@ -MD -MP -MF $(DEPDIR)/$*.d $(CFLAGS) $(KERNEL_CFLAGS) $<
 
 LDFLAGS := -nostdlib $(LDFLAGS)
-
-#
-#  トレースログ記録のサンプルコードに関する定義
-#
-ifdef ENABLE_TRACE
-	COPTS := $(COPTS) -DTOPPERS_ENABLE_TRACE
-	SYSSVC_DIRS := $(SYSSVC_DIRS) $(SRCDIR)/arch/tracelog
-endif

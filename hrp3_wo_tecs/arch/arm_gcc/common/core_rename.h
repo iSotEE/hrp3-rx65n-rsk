@@ -48,6 +48,25 @@
 #define default_exc_handler			_kernel_default_exc_handler
 
 /*
+ *  mpcore_kernel_impl.c
+ */
+#define mpcore_initialize			_kernel_mpcore_initialize
+#define mpcore_terminate			_kernel_mpcore_terminate
+
+/*
+ *  mpcore_timer.c
+ */
+#define target_hrt_initialize		_kernel_target_hrt_initialize
+#define target_hrt_terminate		_kernel_target_hrt_terminate
+#define target_hrt_handler			_kernel_target_hrt_handler
+#define target_twdtimer_initialize	_kernel_target_twdtimer_initialize
+#define target_twdtimer_terminate	_kernel_target_twdtimer_terminate
+#define target_twdtimer_handler		_kernel_target_twdtimer_handler
+#define target_ovrtimer_initialize	_kernel_target_ovrtimer_initialize
+#define target_ovrtimer_terminate	_kernel_target_ovrtimer_terminate
+#define target_ovrtimer_handler		_kernel_target_ovrtimer_handler
+
+/*
  *  gic_kernel_impl.c
  */
 #define gicc_initialize				_kernel_gicc_initialize

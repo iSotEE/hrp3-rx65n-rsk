@@ -3,7 +3,7 @@
  *      Toyohashi Open Platform for Embedded Real-Time Systems/
  *      High Reliable system Profile Kernel
  * 
- *  Copyright (C) 2006-2018 by Embedded and Real-Time Systems Laboratory
+ *  Copyright (C) 2006-2019 by Embedded and Real-Time Systems Laboratory
  *              Graduate School of Information Science, Nagoya Univ., JAPAN
  * 
  *  上記著作権者は，以下の(1)〜(4)の条件を満たす場合に限り，本ソフトウェ
@@ -35,7 +35,7 @@
  *  アの利用により直接的または間接的に生じたいかなる損害に関しても，そ
  *  の責任を負わない．
  * 
- *  $Id: chip_timer.c 448 2018-08-25 14:38:00Z ertl-hiro $
+ *  $Id: chip_timer.c 652 2019-01-14 12:57:17Z ertl-hiro $
  */
 
 /*
@@ -165,7 +165,7 @@ target_totimer_handler(void)
 		twd_switch();				/* タイムウィンドウ切換え処理 */
 	}
 #ifdef TOPPERS_SUPPORT_OVRHDR
-	if (ovrinib[0].ovrhdr != NULL) {
+	if (ovrinib.ovrhdr != NULL) {
 		call_ovrhdr();				/* オーバランハンドラの起動処理 */
 	}
 #endif /* TOPPERS_SUPPORT_OVRHDR */

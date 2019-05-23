@@ -34,7 +34,7 @@
  *  アの利用により直接的または間接的に生じたいかなる損害に関しても，そ
  *  の責任を負わない．
  * 
- *  $Id: gic_kernel_impl.c 170 2016-03-31 06:04:11Z ertl-hiro $
+ *  $Id: gic_kernel_impl.c 710 2019-03-29 13:58:23Z ertl-hiro $
  */
 
 /*
@@ -226,7 +226,7 @@ config_int(INTNO intno, ATR intatr, PRI intpri)
 	 *  割込み優先度とターゲットプロセッサを設定
 	 */
 	gicd_set_priority(intno, INT_IPM(intpri));
-	gicd_set_target(intno, 1U << arm_prc_index());
+	gicd_set_target(intno, 1U << get_my_prcidx());
 
 	/*
 	 * 割込みを許可

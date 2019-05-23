@@ -1,7 +1,7 @@
 #
 #		Makefile のチップ依存部（RZ/A1用）
 #
-#  $Id: Makefile.chip 285 2018-03-21 02:55:49Z ertl-hiro $
+#  $Id: Makefile.chip 548 2018-11-19 17:52:07Z ertl-hiro $
 # 
 
 #
@@ -21,9 +21,9 @@ CDEFS := $(CDEFS) -D__TARGET_ARCH_ARM=7
 #  カーネルに関する定義
 #
 KERNEL_DIRS := $(KERNEL_DIRS) $(CHIPDIR)
+KERNEL_COBJS := $(KERNEL_COBJS) chip_kernel_impl.o mpcore_kernel_impl.o \
+									gic_kernel_impl.o pl310.o chip_timer.o
 KERNEL_ASMOBJS := $(KERNEL_ASMOBJS) gic_support.o
-KERNEL_COBJS := $(KERNEL_COBJS) chip_kernel_impl.o gic_kernel_impl.o \
-															chip_timer.o
 
 #
 #  システムサービスに関する定義

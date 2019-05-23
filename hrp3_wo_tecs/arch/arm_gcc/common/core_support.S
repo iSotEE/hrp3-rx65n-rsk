@@ -37,7 +37,7 @@
  *  アの利用により直接的または間接的に生じたいかなる損害に関しても，そ
  *  の責任を負わない．
  * 
- *  $Id: core_support.S 530 2018-11-08 07:15:30Z ertl-hiro $
+ *  $Id: core_support.S 657 2019-01-18 04:26:06Z ertl-hiro $
  */
 
 /*
@@ -186,6 +186,11 @@ ALABEL(start_dispatch)
 	 */
 
 	/*
+	 *  各種のデバイス（特に割込みコントローラ）の設定が完了するのを待つ．
+	 */
+	asm_data_sync_barrier r0
+	
+	/*
 	 *	タスクコンテキストに切り換える．
 	 */
 	ldr		r2, =excpt_nest_count	/* 例外ネストカウントを0に */
@@ -332,6 +337,9 @@ ALABEL(call_exit_kernel)
 	msr		cpsr_c, #(CPSR_SVC_MODE AOR CPSR_INTLOCK)
 	ldr		r0, =istkpt				/* 非タスクコンテキスト用のスタックに */
 	ldr		sp, [r0]
+	ldr		r0, =excpt_nest_count	/* 例外ネストカウントを1に */
+	mov		r1, #1
+	str		r1, [r0]
 	b		exit_kernel
 
 /*
@@ -1572,8 +1580,12 @@ ALABEL(svc_entry)
 									/* lrはアラインメントのため */
 	ldr		r12, =svc_table
 	ldr		r12, [r12,-r5,lsl #2]	/* サービスコールの番地を取り出す */
+#if __TARGET_ARCH_ARM < 5
 	adr		lr, ret_svc				/* サービスコールからの戻り先番地 */
 	bx		r12						/* サービスコールへ分岐 */
+#else /* __TARGET_ARCH_ARM < 5 */
+	blx		r12						/* サービスコールルーチンへ分岐 */
+#endif /* __TARGET_ARCH_ARM < 5 */
 
 	/*
 	 *  サービスコールからのリターン処理
@@ -1662,8 +1674,8 @@ ALABEL(extsvc_entry)
 	 */
 	ldr		lr, =svcinib_table-8
 	add		lr, lr, r5, lsl #3			/* p_svcinibを取得 */
-	ldr		r4, [lr, #SVCINIB_svcrtn]	/* p_svcinib->svcrtnを取得 */
-	tst		r4, r4						/* p_svcinib->svcrtnがNULLか？ */
+	ldr		r4, [lr, #SVCINIB_extsvc]	/* p_svcinib->extsvcを取得 */
+	tst		r4, r4						/* p_svcinib->extsvcがNULLか？ */
 	beq		ret_extsvc_rsfn
 
 	/* 
@@ -1685,7 +1697,7 @@ ALABEL(extsvc_entry)
 	subs	r12, sp, r12				/* スタック残量 → r12 */
 	blo		ret_extsvc_nomem			/* スタック残量 < 0 ならエラー */
 	ldr		lr, [lr, #SVCINIB_stksz]	/* p_svcinib->stksz → lr */
-	cmp		r12, lr						/* スタックの残量 < lr ならエラー */
+	cmp		r12, lr						/* スタック残量 < lr ならエラー */
 	blo		ret_extsvc_nomem
 
     /*
@@ -1746,9 +1758,14 @@ ALABEL(extsvc_entry_1)
 	/*
 	 *  拡張サービスコールを呼び出す
 	 */
+#if __TARGET_ARCH_ARM < 5
 	adr		lr, ret_extsvc			/* サービスコールからの戻り先番地 */
 	bx		r4						/* 拡張サービスコールルーチンへ分岐 */
+#else /* __TARGET_ARCH_ARM < 5 */
+	blx		r4						/* 拡張サービスコールルーチンへ分岐 */
+#endif /* __TARGET_ARCH_ARM < 5 */
 
+ALABEL(ret_extsvc)
 #ifdef LOG_EXTSVC_LEAVE
 	push	{r0,r1}					/* r1はアラインメントのため */
 	mov		r1, r0					/* 拡張サービスコールの返り値 → r1 */
@@ -1756,8 +1773,6 @@ ALABEL(extsvc_entry_1)
 	bl		log_extsvc_leave
 	pop		{r0,r1}
 #endif /* LOG_EXTSVC_LEAVE */
-
-ALABEL(ret_extsvc)
 	add		sp, sp, #8				/* 第5〜6パラメータを捨てる */
 
 	/*

@@ -35,7 +35,7 @@
  *  アの利用により直接的または間接的に生じたいかなる損害に関しても，そ
  *  の責任を負わない．
  * 
- *  $Id: test_svc.c 415 2018-07-27 09:06:40Z ertl-hiro $
+ *  $Id: test_svc.c 613 2018-12-19 23:38:01Z ertl-hiro $
  */
 
 /* 
@@ -142,7 +142,7 @@ void
 _check_finish(uint_t count)
 {
 	if (count > 0U) {
-		check_point(count);
+		_check_point(count);
 		syslog_0(LOG_NOTICE, "All check points passed.");
 	}
 	test_finish();

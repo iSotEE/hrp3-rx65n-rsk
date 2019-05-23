@@ -37,7 +37,7 @@
  *  アの利用により直接的または間接的に生じたいかなる損害に関しても，そ
  *  の責任を負わない．
  * 
- *  $Id: svc_manage.h 3 2015-08-08 15:11:16Z ertl-hiro $
+ *  $Id: svc_manage.h 606 2018-12-13 16:13:01Z ertl-hiro $
  */
 
 /*
@@ -51,7 +51,7 @@
  *  拡張サービスコール初期化ブロック
  */
 typedef struct extended_service_call_initialization_block {
-	EXTSVC		svcrtn;		/* 拡張サービスコールの先頭番地 */
+	EXTSVC		extsvc;		/* 拡張サービスコールの先頭番地 */
 	size_t		stksz;		/* 拡張サービスコールで使用するスタックサイズ */
 } SVCINIB;
 

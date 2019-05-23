@@ -34,7 +34,7 @@
  *  アの利用により直接的または間接的に生じたいかなる損害に関しても，そ
  *  の責任を負わない．
  * 
- *  $Id: extsvc_fncode.h 415 2018-07-27 09:06:40Z ertl-hiro $
+ *  $Id: extsvc_fncode.h 588 2018-12-02 10:00:33Z ertl-hiro $
  */
 
 /*
@@ -96,6 +96,12 @@
 #define TFN_CHECK_ASSERT_ERROR			(24)
 #define TFN_CHECK_ERCD_ERROR			(25)
 #define TFN_GET_INTERRUPT_PRIORITY_MASK	(26)
+
+/*
+ *  タイマドライバシミュレータ
+ */
+#define TFN_SIMTIM_ADVANCE				(28)
+#define TFN_SIMTIM_ADD					(29)
 
 #endif /* TOPPERS_OMIT_TECS */
 #endif /* TOPPERS_EXTSVC_FNCODE_H */

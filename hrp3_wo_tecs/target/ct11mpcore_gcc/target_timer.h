@@ -35,7 +35,7 @@
  *  アの利用により直接的または間接的に生じたいかなる損害に関しても，そ
  *  の責任を負わない．
  * 
- *  $Id: target_timer.h 510 2018-10-27 16:30:45Z ertl-hiro $
+ *  $Id: target_timer.h 545 2018-11-19 16:19:47Z ertl-hiro $
  */
 
 /*
@@ -57,7 +57,7 @@
  *  実現する．
  */
 #define USE_MPCORE_TMRWDG_HRT
-#include "chip_timer.h"
+#include "mpcore_timer.h"
 
 /*
  *  タイムウィンドウ／オーバランタイマドライバ

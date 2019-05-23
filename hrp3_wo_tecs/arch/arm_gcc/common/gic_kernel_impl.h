@@ -2,7 +2,7 @@
  *  TOPPERS Software
  *      Toyohashi Open Platform for Embedded Real-Time Systems
  * 
- *  Copyright (C) 2006-2017 by Embedded and Real-Time Systems Laboratory
+ *  Copyright (C) 2006-2019 by Embedded and Real-Time Systems Laboratory
  *              Graduate School of Information Science, Nagoya Univ., JAPAN
  * 
  *  上記著作権者は，以下の(1)〜(4)の条件を満たす場合に限り，本ソフトウェ
@@ -34,7 +34,7 @@
  *  アの利用により直接的または間接的に生じたいかなる損害に関しても，そ
  *  の責任を負わない．
  * 
- *  $Id: gic_kernel_impl.h 244 2018-01-17 23:37:20Z ertl-hiro $
+ *  $Id: gic_kernel_impl.h 708 2019-03-27 21:48:02Z ertl-hiro $
  */
 
 /*
@@ -197,7 +197,7 @@
 Inline void
 gicc_set_priority(uint_t pri)
 {
-	sil_wrw_mem(GICC_PMR, pri);
+	sil_swrw_mem(GICC_PMR, pri);
 }
 
 /*
@@ -229,7 +229,7 @@ extern void gicc_terminate(void);
 Inline void
 gicd_disable_int(INTNO intno)
 {
-	sil_wrw_mem(GICD_ICENABLER(intno / 32), (1U << (intno % 32)));
+	sil_swrw_mem(GICD_ICENABLER(intno / 32), (1U << (intno % 32)));
 }
 
 /*
@@ -238,7 +238,7 @@ gicd_disable_int(INTNO intno)
 Inline void
 gicd_enable_int(INTNO intno)
 {
-	sil_wrw_mem(GICD_ISENABLER(intno / 32), (1U << (intno % 32)));
+	sil_swrw_mem(GICD_ISENABLER(intno / 32), (1U << (intno % 32)));
 }
 
 /*
@@ -247,7 +247,7 @@ gicd_enable_int(INTNO intno)
 Inline void
 gicd_clear_pending(INTNO intno)
 {
-	sil_wrw_mem(GICD_ICPENDR(intno / 32), (1U << (intno % 32)));
+	sil_swrw_mem(GICD_ICPENDR(intno / 32), (1U << (intno % 32)));
 }
 
 /*
@@ -256,7 +256,7 @@ gicd_clear_pending(INTNO intno)
 Inline void
 gicd_set_pending(INTNO intno)
 {
-	sil_wrw_mem(GICD_ISPENDR(intno / 32), (1U << (intno % 32)));
+	sil_swrw_mem(GICD_ISPENDR(intno / 32), (1U << (intno % 32)));
 }
 
 /*
@@ -275,7 +275,7 @@ gicd_probe_pending(INTNO intno)
 Inline void
 gicd_raise_sgi(INTNO intno)
 {
-	sil_wrw_mem(GICD_SGIR, (0x02000000 | intno));
+	sil_swrw_mem(GICD_SGIR, (0x02000000 | intno));
 }
 
 /*
@@ -328,22 +328,22 @@ gicd_set_priority(INTNO intno, uint_t pri)
 /*
  *  割込みターゲットプロセッサの設定
  *
- *  prcsは，ターゲットとするプロセッサを表すビットのビット毎論理和で指
- *  定する．
+ *  affinityは，ターゲットとするプロセッサを表すビットのビット毎論理和
+ *  で指定する．
  *		プロセッサ0 : 0x01
  *		プロセッサ1 : 0x02
  *		プロセッサ2 : 0x04
  *		プロセッサ3 : 0x08
  */
 Inline void
-gicd_set_target(INTNO intno, uint_t prcs)
+gicd_set_target(INTNO intno, uint_t affinity)
 {
 	uint_t		shift = (intno % 4) * 8;
 	uint32_t	reg;
 
 	reg = sil_rew_mem(GICD_ITARGETSR(intno / 4));
 	reg &= ~(0xffU << shift);
-	reg |= (prcs << shift);
+	reg |= (affinity << shift);
 	sil_wrw_mem(GICD_ITARGETSR(intno / 4), reg);
 }
 
@@ -410,6 +410,16 @@ t_get_ipm(void)
 {
 	return(EXT_IPM(gicc_get_priority()));
 }
+
+/*
+ *  割込み要求禁止フラグが操作できる割込み番号の範囲の判定
+ */
+#ifdef GIC_SUPPORT_DISABLE_SGI
+#define VALID_INTNO_DISINT(intno)	VALID_INTNO(intno)
+#else /* GIC_SUPPORT_DISABLE_SGI */
+#define VALID_INTNO_DISINT(intno) \
+				(GIC_INTNO_PPI0 <= (intno) && (intno) <= TMAX_INTNO)
+#endif /* GIC_SUPPORT_DISABLE_SGI */
 
 /*
  *  割込み要求禁止フラグのセット

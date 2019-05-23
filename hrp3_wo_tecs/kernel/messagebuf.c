@@ -5,7 +5,7 @@
  * 
  *  Copyright (C) 2000-2003 by Embedded and Real-Time Systems Laboratory
  *                              Toyohashi Univ. of Technology, JAPAN
- *  Copyright (C) 2005-2018 by Embedded and Real-Time Systems Laboratory
+ *  Copyright (C) 2005-2019 by Embedded and Real-Time Systems Laboratory
  *              Graduate School of Information Science, Nagoya Univ., JAPAN
  * 
  *  上記著作権者は，以下の(1)〜(4)の条件を満たす場合に限り，本ソフトウェ
@@ -37,7 +37,7 @@
  *  アの利用により直接的または間接的に生じたいかなる損害に関しても，そ
  *  の責任を負わない．
  * 
- *  $Id: messagebuf.c 477 2018-10-18 13:32:54Z ertl-hiro $
+ *  $Id: messagebuf.c 673 2019-03-05 06:50:40Z ertl-hiro $
  */
 
 /*
@@ -217,11 +217,11 @@ dequeue_message(MBFCB *p_mbfcb, void *msg)
 	assert(p_mbfcb->smbfcnt > 0);
 	msgsz = *((uint_t *) &(mbuffer[p_mbfcb->head]));
 	p_mbfcb->head += sizeof(uint_t);
-	if (p_mbfcb->head >= p_mbfcb->p_mbfinib->mbfsz) {
+	if (p_mbfcb->head >= p_mbfinib->mbfsz) {
 		p_mbfcb->head = 0U;
 	}
 
-	remsz = p_mbfcb->p_mbfinib->mbfsz - p_mbfcb->head;
+	remsz = p_mbfinib->mbfsz - p_mbfcb->head;
 	copysz = msgsz;
 	if (remsz < copysz) {
 		memcpy(msg, &(mbuffer[p_mbfcb->head]), remsz);
@@ -231,7 +231,7 @@ dequeue_message(MBFCB *p_mbfcb, void *msg)
 	}
 	memcpy(msg, &(mbuffer[p_mbfcb->head]), copysz);
 	p_mbfcb->head += TOPPERS_ROUND_SZ(copysz, sizeof(uint_t));
-	if (p_mbfcb->head >= p_mbfcb->p_mbfinib->mbfsz) {
+	if (p_mbfcb->head >= p_mbfinib->mbfsz) {
 		p_mbfcb->head = 0U;
 	}
 

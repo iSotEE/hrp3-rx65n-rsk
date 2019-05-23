@@ -36,7 +36,7 @@
  *  アの利用により直接的または間接的に生じたいかなる損害に関しても，そ
  *  の責任を負わない．
  * 
- *  $Id: tSCIF.cdl 395 2018-04-30 22:52:47Z ertl-hiro $
+ *  $Id: tSCIF.cdl 576 2018-11-28 00:57:26Z ertl-hiro $
  */
 
 /*
@@ -60,10 +60,12 @@ celltype tSCIF {
 
 	entry	siHandlerBody	eiRxISR;
 	entry	siHandlerBody	eiTxISR;
+	entry	sRoutineBody	eTerminate;
 
 	attr {
 		uintptr_t	baseAddress;	/* SCIFレジスタのベースアドレス */
-		uint32_t	baudRate;		/* ボーレートの設定値 */
+		uint16_t	mode;			/* モードレジスタの設定値 */
+		uint32_t	baudRate;		/* ボーレート */
 	};
 	var {
 		bool_t		opened = false;	/* オープン済み */

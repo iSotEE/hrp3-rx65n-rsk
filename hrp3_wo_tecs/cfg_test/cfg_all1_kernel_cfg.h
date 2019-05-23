@@ -65,6 +65,10 @@
 
 #define TMAX_FNCD	3
 
+#define TNUM_INIRTN	4
+
+#define TNUM_TERRTN	4
+
 #define TNUM_DOMID	0
 
 #define TNUM_SOMID	0

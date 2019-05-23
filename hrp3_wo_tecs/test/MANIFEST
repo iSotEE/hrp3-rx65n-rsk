@@ -1,18 +1,6 @@
 PACKAGE hrp3
 
 MANIFEST
-hrt_systim1.c
-hrt_systim1.cfg
-hrt_systim1.h
-hrt_systim2.c
-hrt_systim2.cfg
-hrt_systim2.h
-hrt_systim3.c
-hrt_systim3.cfg
-hrt_systim3.h
-hrt_systim4.c
-hrt_systim4.cfg
-hrt_systim4.h
 perf0.c
 perf0.cfg
 perf0.h
@@ -34,11 +22,28 @@ perf5.c
 perf5.cfg
 perf5.h
 perf_pf.cdl
+simt_systim1.c
+simt_systim1.cfg
+simt_systim1.h
+simt_systim2.c
+simt_systim2.cfg
+simt_systim2.h
+simt_systim3.c
+simt_systim3.cfg
+simt_systim3.h
+simt_systim4.c
+simt_systim4.cfg
+simt_systim4.h
+simt_twd1.c
+simt_twd1.cfg
+simt_twd1.h
 tBitKernel.c
 tBitMutex.c
 test_calsvc.c
 test_calsvc.cfg
 test_calsvc.h
+test_common.h
+test_common2.cfg
 test_cpuexc.h
 test_cpuexc.txt
 test_cpuexc1.c
@@ -178,7 +183,6 @@ test_tprot4.cfg
 test_tprot4.h
 test_tprot5.c
 test_tprot5.cfg
-test_tprot5.h
 test_twdnfy.c
 test_twdnfy.cfg
 test_twdnfy.h
