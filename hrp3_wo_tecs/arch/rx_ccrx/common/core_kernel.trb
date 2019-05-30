@@ -42,6 +42,25 @@
 #
 
 #
+#  空のセクションに関する処理
+#
+sectionMapFileName = SearchFilePath('section.map')
+$bOmitEmptySection = !sectionMapFileName.nil?
+if $bOmitEmptySection
+  # パス2一回目のmapファイルから空のセクションを取得
+  aEmptySections = []
+  File.readlines(sectionMapFileName).each{|line|
+    if line.start_with?('W0561100:Cannot find ')
+      section = line.gsub(/W0561100:Cannot find "(.+?)" specified in option.*/, '\1').strip
+      aEmptySections.push(section) if !section.start_with?('R_')
+    end
+  }
+  # ATT_SECから空のセクションを削除
+  $cfgData[:ATT_SEC].delete_if{|_, params| aEmptySections.delete(params[:secname])}
+  raise unless aEmptySections.length == 0
+end
+
+#
 #  有効なCPU例外ハンドラ番号
 #
 $EXCNO_VALID = [ 20, 21, 23, 25, 30, 31 ]

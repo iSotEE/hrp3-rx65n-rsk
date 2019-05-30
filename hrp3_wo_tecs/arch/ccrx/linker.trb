@@ -132,7 +132,7 @@ aRegionKeys.each{|memreg|
     # 標準ROMの場合、領域の最後に初期化データ用セクションを追加
     sections = sections + sStdRomSections
     # 必要に応じて、-romオプションを出力
-    if sStdRomOption != ''
+    if $bOmitEmptySection && sStdRomOption != ''
       $sectionClnk.add("-rom=#{sStdRomOption.chop}")
     end
   end

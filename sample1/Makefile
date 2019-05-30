@@ -465,6 +465,11 @@ endif
 ifndef USE_CFG_PASS3
 kernel_mem.c $(LDSCRIPT): kernel_mem.timestamp ;
 kernel_mem.timestamp: cfg2_out.db $(ALL2_OBJS) $(LIBS_DEP) $(CFG2_OUT_LDSCRIPT)
+	rm -f cfg2_out.abs.map section.map
+	$(call linker,$(CFG2_OUT),$(ALL2_OBJS) $(ALL_LIBS),$(CFLAGS),$(LDFLAGS) $(CFG2_OUT_LDFLAGS))
+	mv cfg2_out.abs.map section.map
+	$(CFG) --pass 2 $(CFG_KERNEL) $(patsubst -include=%,-I%,$(INCLUDES)) -T $(TARGET_KERNEL_TRB)
+	$(call compiler_cc,kernel_mem2.c,$(CFLAGS) $(CFG_CFLAGS))
 	$(call linker,$(CFG2_OUT),$(ALL2_OBJS) $(ALL_LIBS),$(CFLAGS),$(LDFLAGS) $(CFG2_OUT_LDFLAGS))
 	$(call obj2syms,$(CFG2_OUT),cfg2_out.syms,section.csv)
 	$(call obj2srec,$(CFG2_OUT),cfg2_out.srec)
