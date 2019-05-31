@@ -11,8 +11,8 @@ PRCDIR = $(SRCDIR)/arch/$(CORE)_$(TOOL)/$(PRC)
 #  コンパイルオプション
 #
 INCLUDES += -include=$(PRCDIR)
-COPTS += -cpu=rx600
-ASFLAGS += -cpu=rx600
+COPTS += -isa=rxv2
+ASFLAGS += -isa=rxv2
 
 #
 #  カーネルに関する定義

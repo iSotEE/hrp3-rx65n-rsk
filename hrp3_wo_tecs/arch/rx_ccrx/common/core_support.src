@@ -497,34 +497,32 @@ start_utask_r_after_twd:
 ;  上方向に向かって積み上げられるものとする.
 ;
 ;	-------------------------
-;	|       ACC-HI(4byte)   |
+;	|       ACC-REGS        |
 ;	-------------------------(SP + 0)
-;	|       ACC-LO(4byte)   |
-;	-------------------------(SP + 4)
 ;	|       FPSW(4byte)     |
-;	-------------------------(SP + 8)
+;	-------------------------(SP + ACC-SIZE)
 ;	|       R14(4byte)      |
-;	-------------------------(SP + 12)
+;	-------------------------(SP + ACC-SIZE + 4)
 ;	|       R15(4byte)      |
-;	-------------------------(SP + 16)
+;	-------------------------(SP + ACC-SIZE + 8)
 ;	|       R1(4byte)       |
-;	-------------------------(SP + 20)
+;	-------------------------(SP + ACC-SIZE + 12)
 ;	|       R2(4byte)       |
-;	-------------------------(SP + 24)
+;	-------------------------(SP + ACC-SIZE + 16)
 ;	|       R3(4byte)       |
-;	-------------------------(SP + 28)
+;	-------------------------(SP + ACC-SIZE + 20)
 ;	|       R4(4byte)       |
-;	-------------------------(SP + 32)
+;	-------------------------(SP + ACC-SIZE + 24)
 ;	|       R5(4byte)       |
-;	-------------------------(SP + 36)
+;	-------------------------(SP + ACC-SIZE + 28)
 ;	|       R6(4byte)       |
-;	-------------------------(SP + 40)
+;	-------------------------(SP + ACC-SIZE + 32)
 ;	|       R7(4byte)       |
-;	-------------------------(SP + 44)
+;	-------------------------(SP + ACC-SIZE + 36)
 ;	|       PC(4byte)       |
-;	-------------------------(SP + 48)
+;	-------------------------(SP + ACC-SIZE + 40)
 ;	|       PSW(4byte)      |
-;	-------------------------(SP + 52)
+;	-------------------------(SP + ACC-SIZE + 44)
 ;
 ;  ここでは, 割込み処理モードに変更してハンドラを実行する.
 ;
@@ -535,17 +533,31 @@ start_utask_r_after_twd:
 
 ;
 ;  ret_int先頭でスタックに積まれているPSWレジスタへのオフセット
-;  ACC + FPSW + R14--R15 + R1--R7 + PC
+;  ACC-REGS + FPSW + R14--R15 + R1--R7 + PC
 ;
-	RET_INT_GET_PSW_OFFSET	.equ	(8+4+36+4)
+
+	RET_INT_GET_PSW_OFFSET	.equ	(RX_ACC_REGS_SIZE+4+36+4)
 
 _kernel_interrupt:
 	pushm	r14-r15						; スクラッチレジスタを退避
 	pushc	fpsw						; FPUステータスレジスタ退避
+.if __RXV1 == 1
 	mvfacmi	r5
 	shll	#16, r5						; ACC最下位16bitは0とする
 	mvfachi	r4
 	pushm	r4-r5						; アキュムレータ退避
+.elif __RXV2 == 1
+	mvfaclo	#0, A1, r5
+	mvfachi	#0, A1, r4
+	mvfacgu	#0, A1, r3
+	pushm	r3-r5						; ACC1退避
+	mvfaclo	#0, A0, r5
+	mvfachi	#0, A0, r4
+	mvfacgu	#0, A0, r3
+	pushm	r3-r5						; ACC0退避
+.else
+	#error "Unsupported ISA"
+.endif
 
 	;
 	;  例外ネストカウントをインクリメントする．割込みが非タスクコンテキ
@@ -633,7 +645,7 @@ _kernel_interrupt_1:
 	;
 	;  タスクのスタックに保存したスクラッチレジスタ等を捨てる．
 	;
-	add		#(8+52), sp					; rundomの番地と値、スクラッチレジスタ（PSWを除いて、13*4=52Bytes）等を捨てる
+	add		#(8+RET_INT_GET_PSW_OFFSET), sp	; rundomの番地と値、スクラッチレジスタ（PSWを除いて）等を捨てる
 
 .if	TIPM_LOCK == TIPM_LOCK_ALL
 	pop		r5							; 割込み/CPU例外発生前のIPL値取得
@@ -716,9 +728,22 @@ _kernel_interrupt_4:
 	;  割込み処理からのリターン
 	;
 _kernel_interrupt_5:
+.if __RXV1 == 1
 	popm	r4-r5						; アキュムレータ復帰
 	mvtaclo	r5							; ACC最下位16bitは0で復帰
 	mvtachi	r4
+.elif __RXV2 == 1
+	popm	r3-r5						; ACC0復帰
+	mvtaclo	r5, A0
+	mvtachi	r4, A0
+	mvtacgu	r3, A0
+	popm	r3-r5						; ACC1復帰
+	mvtaclo	r5, A1
+	mvtachi	r4, A1
+	mvtacgu	r3, A1
+.else
+	#error "Unsupported ISA"
+.endif
 	popc	fpsw						; FPUステータスレジスタ復帰
 	popm	r14-r15						; レジスタ復帰
 	popm	r1-r7
@@ -763,34 +788,32 @@ _kernel_interrupt_5:
 ;	------------------------- (intptr_t)(p_excinf + 24)
 ;	|       R13(4byte)      |
 ;	------------------------- (intptr_t)(p_excinf + 28)
-;	|       ACC-HI(4byte)   |
+;	|       ACC-REGS        |
 ;	------------------------- (intptr_t)(p_excinf + 32)
-;	|       ACC-LO(4byte)   |
-;	------------------------- (intptr_t)(p_excinf + 36)
 ;	|       FPSW(4byte)     |
-;	------------------------- (intptr_t)(p_excinf + 40)
+;	------------------------- (intptr_t)(p_excinf + ACC-SIZE + 32)
 ;	|       R14(4byte)      |
-;	------------------------- (intptr_t)(p_excinf + 44)
+;	------------------------- (intptr_t)(p_excinf + ACC-SIZE + 36)
 ;	|       R15(4byte)      |
-;	------------------------- (intptr_t)(p_excinf + 48)
+;	------------------------- (intptr_t)(p_excinf + ACC-SIZE + 40)
 ;	|       R1(4byte)       |
-;	------------------------- (intptr_t)(p_excinf + 52)
+;	------------------------- (intptr_t)(p_excinf + ACC-SIZE + 44)
 ;	|       R2(4byte)       |
-;	------------------------- (intptr_t)(p_excinf + 56)
+;	------------------------- (intptr_t)(p_excinf + ACC-SIZE + 48)
 ;	|       R3(4byte)       |
-;	------------------------- (intptr_t)(p_excinf + 60)
+;	------------------------- (intptr_t)(p_excinf + ACC-SIZE + 52)
 ;	|       R4(4byte)       |
-;	------------------------- (intptr_t)(p_excinf + 64)
+;	------------------------- (intptr_t)(p_excinf + ACC-SIZE + 56)
 ;	|       R5(4byte)       |
-;	------------------------- (intptr_t)(p_excinf + 68)
+;	------------------------- (intptr_t)(p_excinf + ACC-SIZE + 60)
 ;	|       R6(4byte)       |
-;	------------------------- (intptr_t)(p_excinf + 72)
+;	------------------------- (intptr_t)(p_excinf + ACC-SIZE + 64)
 ;	|       R7(4byte)       |
-;	------------------------- (intptr_t)(p_excinf + 76)
+;	------------------------- (intptr_t)(p_excinf + ACC-SIZE + 68)
 ;	|       PC(4byte)       |
-;	------------------------- (intptr_t)(p_excinf + 80)
+;	------------------------- (intptr_t)(p_excinf + ACC-SIZE + 72)
 ;	|       PSW(4byte)      |
-;	------------------------- (intptr_t)(p_excinf + 84)
+;	------------------------- (intptr_t)(p_excinf + ACC-SIZE + 76)
 ;
 ;  ここでは, 割込み処理モードに変更してハンドラを実行する.
 ;  CPU例外ハンドラに渡すVP型の変数 p_excinf としてISPの値渡す．
@@ -815,10 +838,23 @@ _kernel_exception:
 	;
 	pushm	r14-r15						; スクラッチレジスタを退避
 	pushc	fpsw
+.if __RXV1 == 1
 	mvfacmi	r5
 	shll	#16, r5						; ACC最下位16bitは0とする
 	mvfachi	r4
 	pushm	r4-r5						; アキュムレータ退避
+.elif __RXV2 == 1
+	mvfaclo	#0, A1, r5
+	mvfachi	#0, A1, r4
+	mvfacgu	#0, A1, r3
+	pushm	r3-r5						; ACC1退避
+	mvfaclo	#0, A0, r5
+	mvfachi	#0, A0, r4
+	mvfacgu	#0, A0, r3
+	pushm	r3-r5						; ACC0退避
+.else
+	#error "Unsupported ISA"
+.endif
 
 	;
 	;  CPU例外が発生した状況を判断するための追加情報をスタックに保存する

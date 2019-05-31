@@ -507,10 +507,23 @@ exc_sense_context( void *p_excinf )
 }
 
 /*
+ *	アキュムレータ用レジスタのサイズ
+ *	RXv1: ACC-HI, ACC-LO. 4 * 2 = 8 Bytes.
+ *	RXv2: ACC0-GU, ACC0-HI, ACC0-LO, ACC1-GU, ACC1-HI, ACC1-LO. 4 * 6 = 24 Bytes.
+ */
+#if defined(__RXV1)
+#define RX_ACC_REGS_SIZE (8U)
+#elif defined(__RXV2)
+#define RX_ACC_REGS_SIZE (24U)
+#else
+#error "Unsupported ISA"
+#endif
+
+/*
  *  CPU例外情報 p_excinf から PSW の値を取得するためのオフセット値
  *  EXCNO + RUNDOM + ACC + FPSW + R1～R15 + PC
  */
-#define EXC_GET_PSW_OFFSET	(4+4+8+4+60+4)
+#define EXC_GET_PSW_OFFSET	(4+4+RX_ACC_REGS_SIZE+4+60+4)
 
 /*
  *  CPU例外の発生した時のIPLの参照
