@@ -1122,9 +1122,9 @@ service_call_return:
 	;  システム状態になるように準備する
 	;
 	mvfc	psw, r14				; psw → r14
-	and		#PSW_I_MASK, r14
+	and		#(PSW_I_MASK | PSW_IPL_MASK), r14
 	mov.l	4[sp], r15
-	and		#~PSW_I_MASK, r15
+	and		#~(PSW_I_MASK | PSW_IPL_MASK), r15
 	or		r14, r15
 	mov.l	r15, 4[sp]
 
@@ -1304,9 +1304,9 @@ ret_extsvc:
 	;  システム状態になるように準備する
 	;
 	mvfc	psw, r14				; psw → r14
-	and		#PSW_I_MASK, r14
+	and		#(PSW_I_MASK | PSW_IPL_MASK), r14
 	mov.l	4[sp], r15
-	and		#~PSW_I_MASK, r15
+	and		#~(PSW_I_MASK | PSW_IPL_MASK), r15
 	or		r14, r15
 	mov.l	r15, 4[sp]
 
