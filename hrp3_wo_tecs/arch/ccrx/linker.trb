@@ -94,10 +94,12 @@ aRegionKeys.each{|memreg|
       if params[:SEC_LAST] && params.has_key?(:ILABEL)
         $sectionCsv.add("#{$PREFIX_START}#{params[:ILABEL]},#{sRomSecName},0")
       end
+    elsif params[:MP_TOP]
+      # dataセクション以外のMP_TOPの場合
+      sAlignedSection += "#{sSecName},"
     end
 
     sections += "#{sSecName},"
-    sAlignedSection += "#{sSecName}," if params[:MP_TOP]
 
     # 先頭ラベルの生成
     aStartLabels = []    
