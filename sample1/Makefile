@@ -70,7 +70,8 @@ MKDIR = busybox mkdir
 OBJ_LDFLAGS += -subcommand=section.clnk
 CFG2_OUT_LDFLAGS += -subcommand=section.clnk
 CFG2_OUT_LDSCRIPT = section.clnk section.csv
-KERNEL_SECTION_CFLGAS = -section=P=P_KERNEL,C=C_KERNEL,D=D_KERNEL,B=B_KERNEL
+KERNEL_SECTION_CFLGAS = -section=P=P_OBJ_libkernel,C=C_OBJ_libkernel,D=D_OBJ_libkernel,B=B_OBJ_libkernel,L=L_OBJ_libkernel,W=W_OBJ_libkernel
+OBJECT_SECTION_CFLAGS = -section=P=P_OBJ_$(notdir $(basename $(<))),C=C_OBJ_$(notdir $(basename $(<))),D=D_OBJ_$(notdir $(basename $(<))),B=B_OBJ_$(notdir $(basename $(<))),L=L_OBJ_$(notdir $(basename $(<))),W=W_OBJ_$(notdir $(basename $(<)))
 
 #
 #  ターゲットの指定（Makefile.targetで上書きされるのを防ぐため）
@@ -228,13 +229,13 @@ APPL_CDL = sample1.cdl
 APPL_DIRS := $(APPLDIRS) $(SRCDIR)/library
 APPL_ASMOBJS :=
 ifdef USE_CXX
-	APPL_CXXOBJS := ccrx_sample1.obj
+	APPL_CXXOBJS := sample1.obj
 	APPL_COBJS :=
 else
-	APPL_COBJS := ccrx_sample1.obj
+	APPL_COBJS := sample1.obj
 endif
 APPL_COBJS := $(APPL_COBJS) $(TECS_USER_COBJS) $(TECS_OUTOFDOMAIN_COBJS) \
-				ccrx_log_output.obj ccrx_vasyslog.obj ccrx_t_perror.obj ccrx_strerror.obj
+				log_output.obj vasyslog.obj t_perror.obj strerror.obj
 APPL_CFLAGS := $(APPL_CFLAGS)
 ifdef APPLDIRS
 	INCLUDES := $(INCLUDES) $(foreach dir,$(APPLDIRS),-I$(dir))
@@ -654,7 +655,7 @@ $(SYSSVC_ASMOBJS): %.obj: %.src
 	$(call compiler_as,$<,$(ASFLAGS) $(SYSSVC_ASFLAGS))
 
 $(APPL_COBJS): %.obj: %.c
-	$(call compiler_cc,$<,$(CFLAGS) $(APPL_CFLAGS))
+	$(call compiler_cc,$<,$(CFLAGS) $(APPL_CFLAGS) $(OBJECT_SECTION_CFLAGS))
 
 $(APPL_ASMOBJS): %.obj: %.src
 	$(call compiler_as,$<,$(ASFLAGS) $(APPL_ASFLAGS))

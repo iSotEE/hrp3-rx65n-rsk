@@ -44,20 +44,40 @@
 #
 #  空のセクションに関する処理
 #
-sectionMapFileName = SearchFilePath('section.map')
-$bOmitEmptySection = !sectionMapFileName.nil?
-if $bOmitEmptySection
+$sectionMapFileName = SearchFilePath('section.map')
+$bOmitEmptySection = !$sectionMapFileName.nil?
+
+def TargetMemoryObject()
+  # ATT_MODにより生成されたメモリオブジェクトを修正
+  $memObj.each{|_, params|
+    if params[:type] == :ATTMOD
+      # モジュール名をセクション名の末尾に追加
+      params[:secname] = params[:secname] + '_' + params[:modname].strip.split('.')[0]
+    end
+  }
+
+  # パス2一回目の場合、これ以降の処理をskip
+  return if !$bOmitEmptySection
+
   # パス2一回目のmapファイルから空のセクションを取得
   aEmptySections = []
-  File.readlines(sectionMapFileName).each{|line|
+  File.readlines($sectionMapFileName).each{|line|
     if line.start_with?('W0561100:Cannot find ')
       section = line.gsub(/W0561100:Cannot find "(.+?)" specified in option.*/, '\1').strip
       aEmptySections.push(section) if !section.start_with?('R_')
     end
   }
-  # ATT_SECから空のセクションを削除
-  $cfgData[:ATT_SEC].delete_if{|_, params| aEmptySections.delete(params[:secname])}
+
+  # ATT_SECとATT_MODにより生成された空のセクションを削除
+  $memObj.delete_if{|_, params|
+    aEmptySections.delete(params[:secname])
+  }
+
+  # 全ての空のセクションは削除されたはず、念のためチェックする
   raise unless aEmptySections.length == 0
+
+  # 最後に登録したメモリオブジェクトのキーを更新
+  $lastMOKey = $memObj.keys.last
 end
 
 #
@@ -66,6 +86,18 @@ end
 $EXCNO_VALID = [ 20, 21, 23, 25, 30, 31 ]
 
 IncludeTrb("rx_mpu_lib.trb")
+
+#
+#  標準のセクションの定義
+#
+$defaultSections = [
+  { SECNAME: "P_OBJ", MEMREG: :stdrom, MEMATR: $mematrTextSec },
+  { SECNAME: "C_OBJ", MEMREG: :stdrom, MEMATR: $mematrRodataSec },
+  { SECNAME: "D_OBJ", MEMREG: :stdram, MEMATR: $mematrDataSec },
+  { SECNAME: "B_OBJ", MEMREG: :stdram, MEMATR: $mematrBssSec },
+  { SECNAME: "L_OBJ", MEMREG: :stdrom, MEMATR: $mematrRodataSec },
+  { SECNAME: "W_OBJ", MEMREG: :stdrom, MEMATR: $mematrRodataSec }
+]
 
 #
 #  ユーザスタック領域のセクション名と確保方法
@@ -157,7 +189,7 @@ EOS
 # 
 
 kernelCfgAsm.add(<<EOS)
-	.section P_KERNEL, CODE
+	.section P_OBJ_libkernel, CODE
 	.glb	_start
 	.glb	_kernel_interrupt
 	.glb	_kernel_exception

@@ -91,7 +91,7 @@ def PrepareDominictxb(genFile)
         # ユーザスタック、またはカーネルドメイン専用の場合はskip
         next
       end
-      if ![:ATTMEM, :ATTSEC, :MPFAREA].include?(moParams[:type])
+      if ![:ATTMEM, :ATTMOD, :ATTSEC, :MPFAREA].include?(moParams[:type])
         error_exit("not supported")
       end
       if (moParams[:acptn1] == $TACP_KERNEL || moParams[:acptn1] == $TACP_SHARED) && \

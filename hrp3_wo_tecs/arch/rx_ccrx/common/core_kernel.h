@@ -71,6 +71,7 @@
 #define TOPPERS_TARGET_SUPPORT_PRB_INT		/* prb_int */
 #define TOPPERS_TARGET_SUPPORT_ML_AUTO		/* 自動メモリ配置 */
 #define TOPPERS_TARGET_SUPPORT_ML_MANUAL	/* 手動メモリ配置 */
+#define TOPPERS_TARGET_SUPPORT_ATT_MOD		/* ATT_MOD */
 
 /*
  *  カーネル管理の割込み優先度の範囲

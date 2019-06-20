@@ -42,7 +42,7 @@
 ;
 ;  RXコア共通の初期化ルーチン
 ;
-	.section	P_KERNEL, CODE
+	.section	P_OBJ_libkernel, CODE
 
 	.glb	_sta_ker
 	.glb	_software_init_hook

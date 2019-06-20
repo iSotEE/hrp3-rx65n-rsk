@@ -40,7 +40,7 @@
 ;
 ;  初期化ルーチン
 ;
-	.section	P_KERNEL, CODE
+	.section	P_OBJ_libkernel, CODE
 
 	.glb	_core_start
 	.glb	_start

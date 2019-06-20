@@ -172,7 +172,7 @@ ld_TINIB_task	.macro	dst, tinib, tmp
 .endif
 .endm
 
-	.section	P_KERNEL, CODE
+	.section	P_OBJ_libkernel, CODE
 
 ;
 ;  APIからのタスクディスパッチャ入口
