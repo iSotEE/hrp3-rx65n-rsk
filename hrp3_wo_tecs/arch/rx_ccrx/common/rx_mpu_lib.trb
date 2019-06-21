@@ -61,7 +61,11 @@ $hDomainMemobj = {}
 $hDominictxb = {}
 $nMaxDomainMpuNum = 0
 $nTotalMpuInfoNum = 0
+$nMaxMpuInfoTableSize = nil
 def PrepareDominictxb(genFile)
+  # MPU情報数の最大可能値 = MPU領域数 * (ユーザ+共有)ドメイン数
+  $nMaxMpuInfoTableSize = $TARGET_MPU_NUM * ($udomainList.size + 1)
+
   # タイムイベントヒープ領域用extern宣言の生成
   aTmevtHeapList = ["kernel", "idle"]
   $udomainList.each{|key|
@@ -122,8 +126,9 @@ def PrepareDominictxb(genFile)
     error_exit("MPU region number exceeds the limit")
   end
   if $TOPPERS_ML_AUTO
+    $MPU_INFO_TABLE_SIZE = $nMaxMpuInfoTableSize if $MPU_INFO_TABLE_SIZE.nil?
     if $nTotalMpuInfoNum > $MPU_INFO_TABLE_SIZE
-      error_exit("increase MPU_INFO_TABLE_SIZE and build again")
+      error_exit("increase MPU_INFO_TABLE_SIZE (must >= #{$nTotalMpuInfoNum}) and build again")
     else
       # MPU情報テーブルの使用状況の表示
       STDERR.puts("== #{$nTotalMpuInfoNum}/#{$MPU_INFO_TABLE_SIZE} of the allocated MPU info table is used ==")
@@ -172,8 +177,16 @@ def GenerateMpuAreaInfo(aMemObj, acptn)
   }
 end
 def GenerateMpuInfoTable
-  tableSize = $TOPPERS_ML_AUTO ? "MPU_INFO_TABLE_SIZE" : $nTotalMpuInfoNum 
-  $kernelMemC.add("const MPU_INFO _kernel_mpu_info_table[#{tableSize}] = {")
+  if $TOPPERS_ML_AUTO
+    $kernelMemC.add(<<EOS)
+#ifndef MPU_INFO_TABLE_SIZE
+#define MPU_INFO_TABLE_SIZE	(#{$nMaxMpuInfoTableSize}U)
+#endif /* MPU_INFO_TABLE_SIZE */
+const MPU_INFO _kernel_mpu_info_table[MPU_INFO_TABLE_SIZE] = {
+EOS
+  else
+    $kernelMemC.add("const MPU_INFO _kernel_mpu_info_table[#{$nTotalMpuInfoNum}] = {")
+  end
   if $aSharedMemObj.size > 0
     $kernelMemC.add("\t/* Shared: */")
     GenerateMpuAreaInfo($aSharedMemObj, $acptnShared)

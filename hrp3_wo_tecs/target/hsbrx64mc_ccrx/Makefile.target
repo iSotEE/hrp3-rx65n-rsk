@@ -11,6 +11,14 @@ CORE  = rx
 TOOL  = ccrx
 
 #
+#  確保するMPU情報テーブルのサイズに関する定義
+#
+#  デフォルトでは、最大可能サイズでビルドする
+#  以下の定義で確保するサイズを精確に設定すると、ROM消費を減らせる
+#
+#CDEFS := $(CDEFS) -DMPU_INFO_TABLE_SIZE=3
+
+#
 #  コンパイルオプション
 #
 INCLUDES := $(INCLUDES) -include=$(TARGETDIR)

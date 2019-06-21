@@ -272,9 +272,6 @@ extern const MPU_INFO mpu_info_table[];
 
 #if defined(TOPPERS_ML_AUTO)
 #define USE_LATERPASS_DOMINIB
-#if !defined(MPU_INFO_TABLE_SIZE)
-#define MPU_INFO_TABLE_SIZE (8)
-#endif
 #endif
 
 /*

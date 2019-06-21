@@ -157,6 +157,10 @@ if $TOPPERS_ML_AUTO
   #  仮MPU情報の生成
   #
   $kernelMemC.add(<<EOS)
+#ifndef MPU_INFO_TABLE_SIZE
+#define MPU_INFO_TABLE_SIZE	(#{$nMaxMpuInfoTableSize}U)
+#endif /* MPU_INFO_TABLE_SIZE */
+
 const MPU_INFO _kernel_mpu_info_table[MPU_INFO_TABLE_SIZE] = {{0, 0}};
 const uint8_t _kernel_shared_mpu_num = 1U;
 const uint8_t _kernel_max_domain_mpu_num = 1U;
