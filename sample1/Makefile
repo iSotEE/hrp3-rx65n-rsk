@@ -427,6 +427,7 @@ cfg1_out.srec: $(CFG1_OUT)
 
 $(CFG2_OUT_SRCS) $(CFG2_OUT_LDSCRIPT) cfg2_out.db: kernel_cfg.timestamp ;
 kernel_cfg.timestamp: cfg1_out.db cfg1_out.syms cfg1_out.srec
+	rm -f section.map
 	$(CFG) --pass 2 $(CFG_KERNEL) $(patsubst -include=%,-I%,$(INCLUDES)) -T $(TARGET_KERNEL_TRB)
 
 #
