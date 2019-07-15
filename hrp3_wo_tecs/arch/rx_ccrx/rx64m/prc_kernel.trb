@@ -28,7 +28,7 @@ $cfgData[:CFG_INT].each do |key, params|
   if $INT_IRQ_MIN <= key && key <= $INT_IRQ_MAX
     # IRQ割込みの場合
     #（TA_NEGEDGE等が同時に設定されている場合）
-    if target_intatr.to_s(2).count("1") > 0
+    if target_intatr.to_s(2).count("1") > 1
       error_illegal_sym("E_RSATR", params, :intatr, :intno)
     end
   else
