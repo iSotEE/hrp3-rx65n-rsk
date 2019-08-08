@@ -60,6 +60,9 @@ endef
 define obj2syms # 1: obj file name, 2: syms file name, 3: section.csv (optional)
 $(PYTHON) map2syms.py $(1).map $(2) $(3)
 endef
+define section_cflags #1: file name
+-section=P=P_OBJ_$(notdir $(basename $(1))),C=C_OBJ_$(notdir $(basename $(1))),D=D_OBJ_$(notdir $(basename $(1))),B=B_OBJ_$(notdir $(basename $(1))),L=L_OBJ_$(notdir $(basename $(1))),W=W_OBJ_$(notdir $(basename $(1)))
+endef
 PYTHON = $(E2STUDIODIR)\eclipse\features\com.renesas.python.win32.x86_2.7.12.002\python\python.exe
 SED = $(E2STUDIODIR)\Utilities\sed.exe
 CC_CONVERTER = $(E2STUDIODIR)\Utilities\ccrx\renesas_cc_converter.exe
@@ -70,8 +73,6 @@ MKDIR = busybox mkdir
 OBJ_LDFLAGS += -subcommand=section.clnk
 CFG2_OUT_LDFLAGS += -subcommand=section.clnk
 CFG2_OUT_LDSCRIPT = section.clnk section.csv
-KERNEL_SECTION_CFLGAS = -section=P=P_OBJ_libkernel,C=C_OBJ_libkernel,D=D_OBJ_libkernel,B=B_OBJ_libkernel,L=L_OBJ_libkernel,W=W_OBJ_libkernel
-OBJECT_SECTION_CFLAGS = -section=P=P_OBJ_$(notdir $(basename $(<))),C=C_OBJ_$(notdir $(basename $(<))),D=D_OBJ_$(notdir $(basename $(<))),B=B_OBJ_$(notdir $(basename $(<))),L=L_OBJ_$(notdir $(basename $(<))),W=W_OBJ_$(notdir $(basename $(<)))
 
 #
 #  ターゲットの指定（Makefile.targetで上書きされるのを防ぐため）
@@ -250,7 +251,7 @@ SYSSVC_DIRS := $(TECSGENDIR) $(SRCDIR)/tecs_kernel \
 SYSSVC_ASMOBJS := $(SYSSVC_ASMOBJS)
 SYSSVC_COBJS := $(SYSSVC_COBJS) syslog.obj banner.obj serial.obj logtask.obj $(TECS_KERNEL_COBJS) \
 				$(INIT_TECS_COBJ) $(CXXRTS)
-SYSSVC_CFLAGS := $(SYSSVC_CFLAGS) -DTOPPERS_SVC_CALL $(KERNEL_SECTION_CFLGAS)
+SYSSVC_CFLAGS := $(SYSSVC_CFLAGS) -DTOPPERS_SVC_CALL
 INCLUDES := $(INCLUDES) -I$(TECSGENDIR) -I$(SRCDIR)/tecs_kernel \
 				-I$(TECSDIR)/tecs -I$(TECSDIR)/tecs/rpc
 
@@ -280,7 +281,6 @@ CFG_TABS := --api-table $(SRCDIR)/kernel/kernel_api.def \
 CFG_ASMOBJS := $(CFG_ASMOBJS)
 CFG_COBJS := kernel_cfg.obj kernel_mem.obj $(CFG_COBJS)
 CFG_OBJS := $(CFG_ASMOBJS) $(CFG_COBJS)
-CFG_CFLAGS := $(CFG_CFLAGS) $(KERNEL_SECTION_CFLGAS)
 
 CFG2_OUT_SRCS := kernel_cfg.h kernel_cfg.c kernel_mem2.c $(CFG2_OUT_SRCS)
 CFG2_COBJS := kernel_cfg.obj kernel_mem2.obj $(CFG2_COBJS)
@@ -305,7 +305,7 @@ CFG3_ASMOBJS := $(CFG3_ASMOBJS)
 KERNEL_DIRS := $(KERNEL_DIRS) $(SRCDIR)/kernel
 KERNEL_ASMOBJS := $(KERNEL_ASMOBJS)
 KERNEL_COBJS := $(KERNEL_COBJS) svc_table.obj
-KERNEL_CFLAGS := $(KERNEL_CFLAGS) -I$(SRCDIR)/kernel $(KERNEL_SECTION_CFLGAS)
+KERNEL_CFLAGS := $(KERNEL_CFLAGS) -I$(SRCDIR)/kernel
 
 #
 #  カーネルのファイル構成の定義
@@ -471,7 +471,7 @@ kernel_mem.timestamp: cfg2_out.db $(ALL2_OBJS) $(LIBS_DEP) $(CFG2_OUT_LDSCRIPT)
 	$(call linker,$(CFG2_OUT),$(ALL2_OBJS) $(ALL_LIBS),$(CFLAGS),$(LDFLAGS) $(CFG2_OUT_LDFLAGS))
 	mv cfg2_out.abs.map section.map
 	$(CFG) --pass 2 $(CFG_KERNEL) $(patsubst -include=%,-I%,$(INCLUDES)) -T $(TARGET_KERNEL_TRB)
-	$(call compiler_cc,kernel_mem2.c,$(CFLAGS) $(CFG_CFLAGS))
+	$(call compiler_cc,kernel_mem2.c,$(CFLAGS) $(CFG_CFLAGS) $(call section_cflags, kernel_mem))
 	$(call linker,$(CFG2_OUT),$(ALL2_OBJS) $(ALL_LIBS),$(CFLAGS),$(LDFLAGS) $(CFG2_OUT_LDFLAGS))
 	$(call obj2syms,$(CFG2_OUT),cfg2_out.syms,section.csv)
 	$(call obj2srec,$(CFG2_OUT),cfg2_out.srec)
@@ -584,7 +584,7 @@ ALL_CFG_COBJS = $(sort $(CFG_COBJS) $(CFG2_COBJS) $(CFG3_COBJS) cfg1_out.obj)
 ALL_CFG_ASMOBJS = $(sort $(CFG_ASMOBJS) $(CFG2_ASMOBJS) $(CFG3_ASMOBJS))
 
 $(ALL_CFG_COBJS): %.obj: %.c
-	$(call compiler_cc,$<,$(CFLAGS) $(CFG_CFLAGS))
+	$(call compiler_cc,$<,$(CFLAGS) $(CFG_CFLAGS) $(call section_cflags,$(patsubst kernel_mem%.c,kernel_mem,$<)))
 
 $(ALL_CFG_COBJS:.obj=.s): %.s: %.c
 	$(CC) -S $(CFLAGS) $(CFG_CFLAGS) $<
@@ -644,19 +644,19 @@ endif
 #  コンパイルルールの定義
 #
 $(KERNEL_COBJS): %.obj: %.c
-	$(call compiler_cc,$<,$(CFLAGS) $(KERNEL_CFLAGS))
+	$(call compiler_cc,$<,$(CFLAGS) $(KERNEL_CFLAGS) $(call section_cflags,libkernel))
 
 $(KERNEL_ASMOBJS): %.obj: %.src
 	$(call compiler_as,$<,$(ASFLAGS) $(KERNEL_ASFLAGS))
 
 $(SYSSVC_COBJS): %.obj: %.c
-	$(call compiler_cc,$<,$(CFLAGS) $(SYSSVC_CFLAGS))
+	$(call compiler_cc,$<,$(CFLAGS) $(SYSSVC_CFLAGS) $(call section_cflags,$<))
 
 $(SYSSVC_ASMOBJS): %.obj: %.src
 	$(call compiler_as,$<,$(ASFLAGS) $(SYSSVC_ASFLAGS))
 
 $(APPL_COBJS): %.obj: %.c
-	$(call compiler_cc,$<,$(CFLAGS) $(APPL_CFLAGS) $(OBJECT_SECTION_CFLAGS))
+	$(call compiler_cc,$<,$(CFLAGS) $(APPL_CFLAGS) $(call section_cflags,$<))
 
 $(APPL_ASMOBJS): %.obj: %.src
 	$(call compiler_as,$<,$(ASFLAGS) $(APPL_ASFLAGS))
