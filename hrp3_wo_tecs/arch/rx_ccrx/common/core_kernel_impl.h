@@ -323,14 +323,12 @@ t_get_ipm( void )
 }
 
 /*
- *  割込み要因毎のレベル & 属性定義テーブル
- *  (テンプレートファイルによる出力)
+ *  割込み要求ライン設定テーブル（kernel_cfg.c）
+ *
+ *  割込み要求ラインに対して割込み属性が設定されていれば1，設定されてい
+ *  なければ0を保持するテーブル．
  */
-typedef struct cfg_int_info {
-	PRI		intpri;
-} CFG_INT_INFO;
-
-extern const CFG_INT_INFO cfg_int_table[];
+extern const uint8_t cfg_int_table[];
 
 /*
  *  割込み属性の設定のチェック
@@ -338,7 +336,7 @@ extern const CFG_INT_INFO cfg_int_table[];
 Inline bool_t
 check_intno_cfg(INTNO intno)
 {
-	return(cfg_int_table[( intno )].intpri > 0);
+	return(cfg_int_table[intno] != 0U);
 }
 
 /*

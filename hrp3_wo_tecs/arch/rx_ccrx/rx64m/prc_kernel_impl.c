@@ -149,7 +149,7 @@ config_int( INTNO intno, ATR intatr, PRI intpri )
 	} else {
 		iprno = intno;
 	}
-	*ICU_IPRr_ADDR(iprno) = cfg_int_table[intno].intpri;
+	*ICU_IPRr_ADDR(iprno) = (uint8_t)(-intpri);
 
 	/*
 	 *  割込みのマスク解除

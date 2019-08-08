@@ -136,11 +136,11 @@ IncludeTrb("kernel/kernel.trb")
 # 割込み番号から割込み優先度及び属性を取り出すテーブル
 # 
 INTNO_RANGE = (0..$TMAX_INTNO)
-$kernelCfgC.comment_header("Interrupt Level and Attribute Table")
-$kernelCfgC.add("const CFG_INT_INFO _kernel_cfg_int_table[#{INTNO_RANGE.size}] = {")
+$kernelCfgC.comment_header("Interrupt Configuration Table")
+$kernelCfgC.add("const uint8_t _kernel_cfg_int_table[#{INTNO_RANGE.size}] = {")
 INTNO_RANGE.each do |intno|
   if $cfgData[:CFG_INT].has_key?(intno)
-    intpri = -$cfgData[:CFG_INT][intno][:intpri]
+    intpri = "1"
   else
     intpri = "0"
   end
