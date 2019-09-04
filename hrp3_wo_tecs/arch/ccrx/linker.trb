@@ -91,7 +91,7 @@ aRegionKeys.each{|memreg|
       end
       sStdRomSections += "#{sRomSecName},"
       sStdRomOption += "#{sRomSecName}=#{sSecName},"
-      if params[:SEC_LAST] && params.has_key?(:ILABEL)
+      if params[:SEC_TOP] && params.has_key?(:ILABEL)
         $sectionCsv.add("#{$PREFIX_START}#{params[:ILABEL]},#{sRomSecName},0")
       end
     elsif params[:MP_TOP]
