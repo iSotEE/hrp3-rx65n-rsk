@@ -82,7 +82,7 @@ all: clean
 #
 #  ターゲット略称の定義
 #
-TARGET = hsbrx64mc_ccrx
+TARGET = rx65n_rsk_ccrx
 
 #
 #  プログラミング言語の定義
