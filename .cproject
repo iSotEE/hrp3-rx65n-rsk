@@ -17,7 +17,7 @@
 					<folderInfo id="com.renesas.cdt.managedbuild.renesas.ccrx.base.toolchain.1633216451.1580648755" name="/" resourcePath="">
 						<toolChain id="com.renesas.cdt.managedbuild.renesas.ccrx.base.toolchain.150466334" name="Renesas CCRX Toolchain" superClass="com.renesas.cdt.managedbuild.renesas.ccrx.base.toolchain">
 							<targetPlatform archList="all" binaryParser="org.eclipse.cdt.core.ELF;org.eclipse.cdt.core.PE" id="com.renesas.cdt.managedbuild.renesas.ccrx.base.targetPlatform.1180228530" osList="win32" superClass="com.renesas.cdt.managedbuild.renesas.ccrx.base.targetPlatform"/>
-							<builder autoBuildTarget="all" buildPath="${workspace_loc:/hrp3-rx64m}/sample1" cleanBuildTarget="clean" enableAutoBuild="false" enableCleanBuild="true" enabledIncrementalBuild="true" id="com.renesas.cdt.managedbuild.renesas.ccrx.base.builder.1747571567" incrementalBuildTarget="all" keepEnvironmentInBuildfile="false" managedBuildOn="false" name="CCRX Builder" parallelBuildOn="false" superClass="com.renesas.cdt.managedbuild.renesas.ccrx.base.builder"/>
+							<builder autoBuildTarget="all" buildPath="${workspace_loc:hrp3-rx65n-rsk}/sample1" cleanBuildTarget="clean" enableAutoBuild="false" enableCleanBuild="true" enabledIncrementalBuild="true" id="com.renesas.cdt.managedbuild.renesas.ccrx.base.builder.1747571567" incrementalBuildTarget="all" keepEnvironmentInBuildfile="false" managedBuildOn="false" name="CCRX Builder" parallelBuildOn="false" superClass="com.renesas.cdt.managedbuild.renesas.ccrx.base.builder"/>
 							<tool id="com.renesas.cdt.managedbuild.renesas.ccrx.base.dsp.412641965" name="DSP Assembler" superClass="com.renesas.cdt.managedbuild.renesas.ccrx.base.dsp"/>
 							<tool id="com.renesas.cdt.managedbuild.renesas.ccrx.base.common.857373689" name="Common" superClass="com.renesas.cdt.managedbuild.renesas.ccrx.base.common"/>
 							<tool id="com.renesas.cdt.managedbuild.renesas.ccrx.base.compiler.2126896123" name="Compiler" superClass="com.renesas.cdt.managedbuild.renesas.ccrx.base.compiler">
@@ -37,7 +37,7 @@
 			</storageModule>
 			<storageModule moduleId="com.renesas.cdt.managedbuild.core.toolchainInfo">
 				<option id="toolchain.id" value="Renesas_RXC"/>
-				<option id="toolchain.version" value="v2.08.00"/>
+				<option id="toolchain.version" value="v3.01.00"/>
 			</storageModule>
 			<storageModule moduleId="org.eclipse.cdt.core.externalSettings"/>
 		</cconfiguration>
@@ -51,7 +51,7 @@
 	<storageModule moduleId="org.eclipse.cdt.core.LanguageSettingsProviders"/>
 	<storageModule moduleId="refreshScope" versionNumber="2">
 		<configuration configurationName="Default">
-			<resource resourceType="PROJECT" workspacePath="/hrp3-rx64m"/>
+			<resource resourceType="PROJECT" workspacePath="/hrp3-rx65n-rsk"/>
 		</configuration>
 	</storageModule>
 	<storageModule moduleId="org.eclipse.cdt.make.core.buildtargets"/>

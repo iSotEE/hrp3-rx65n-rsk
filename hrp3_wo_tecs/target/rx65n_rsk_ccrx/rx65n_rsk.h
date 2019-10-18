@@ -36,10 +36,10 @@
  *
  */
 
-#ifndef TOPPERS_HSBRX64MC_H
-#define TOPPERS_HSBRX64MC_H
+#ifndef TOPPERS_RX65N_RSK_H
+#define TOPPERS_RX65N_RSK_H
 
-#include "rx64m.h"
+#include "rx65n.h"
 
 /*
  *  各クロック周波数の定義
@@ -56,4 +56,4 @@
 #define UART_DEFAULT_CKS  (0) /* PCLK / 1 */
 #define UART_DEFAULT_BAUD (115200UL)
 
-#endif /* TOPPERS_HSBRX64MC_H */
+#endif /* TOPPERS_RX65N_RSK_H */

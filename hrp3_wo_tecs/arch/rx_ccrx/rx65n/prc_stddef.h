@@ -36,7 +36,7 @@
  */
 
 /*
- *		t_stddef.hのプロセッサ依存部（RX64M用）
+ *		t_stddef.hのプロセッサ依存部（RX65N用）
  *
  *  このインクルードファイルは，target_stddef.h（または，そこからインク
  *  ルードされるファイル）のみからインクルードされる．他のファイルから
@@ -49,7 +49,7 @@
 /*
  *  ターゲットを識別するためのマクロの定義
  */
-#define TOPPERS_RX64M				/* プロセッサ略称 */
+#define TOPPERS_RX65N				/* プロセッサ略称 */
 
 #include "core_stddef.h"
 

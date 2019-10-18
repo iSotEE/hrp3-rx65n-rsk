@@ -57,7 +57,7 @@
 /*
  *  ターゲットを識別するためのマクロの定義
  */
-#define TOPPERS_HSBRX64MC			/* システム略称 */
+#define TOPPERS_RX65N_RSK			/* システム略称 */
 
 /*
  *  プロセッサで共通な定義

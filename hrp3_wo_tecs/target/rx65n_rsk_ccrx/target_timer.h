@@ -38,13 +38,13 @@
  */
 
 /*
- *		タイマドライバ（HSBRX64MC用）
+ *		タイマドライバ（Renesas Starter Kit+ for RX65N-2MB用）
  */
 
 #ifndef TOPPERS_TARGET_TIMER_H
 #define TOPPERS_TARGET_TIMER_H
 
-#include "hsbrx64mc.h"
+#include "rx65n_rsk.h"
 
 /*
  *  高分解能タイマのマクロ
@@ -70,7 +70,7 @@
 #endif
 
 /*
- *  プロセッサで共通な定義（RX64M用）
+ *  プロセッサで共通な定義（RX65N用）
  */
 #include "prc_timer.h"
 

@@ -38,7 +38,7 @@
  */
 
 /*
- *		kernel.hのターゲット依存部（HSBRX64MC用）
+ *		kernel.hのターゲット依存部（Renesas Starter Kit+ for RX65N-2MB用）
  *
  *  このヘッダファイルは，kernel.hからインクルードされる．他のファイル
  *  から直接インクルードすることはない．このファイルをインクルードする

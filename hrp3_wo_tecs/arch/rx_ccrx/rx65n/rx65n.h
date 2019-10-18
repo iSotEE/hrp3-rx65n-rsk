@@ -37,8 +37,8 @@
  *
  */
 
-#ifndef TOPPERS_RX64M_H
-#define TOPPERS_RX64M_H
+#ifndef TOPPERS_RX65N_H
+#define TOPPERS_RX65N_H
 
 /*
  *  割込み番号の定義(可変ベクタテーブル)
@@ -51,6 +51,8 @@
 #define INT_TXI1	61
 #define INT_IRQ_MIN	64
 #define INT_IRQ_MAX	79
+#define INT_RXI8	100
+#define INT_TXI8	101
 #define TMAX_INTNO	255
 
 /*
@@ -95,6 +97,15 @@
 #define SYSTEM_MSTPCRA_MSTPA1_BIT	( 1UL << 1U )
 #define SYSTEM_MSTPCRB_ADDR			( ( volatile uint32_t __evenaccess * )0x00080014 )
 #define SYSTEM_MSTPCRB_MSTPB30_BIT	( 1UL << 30U )
+#define SYSTEM_MSTPCRC_ADDR			( ( volatile uint32_t __evenaccess * )0x00080018 )
+#define SYSTEM_MSTPCRC_MSTPC27_BIT	( 1UL << 27U )
+#define SYSTEM_ROMWT_ADDR			( ( volatile uint8_t __evenaccess * )0x0008101C )
+
+/*
+ *  FLASHモジュール
+ */
+#define FLASH_ROMCE_ADDR			( ( volatile uint16_t __evenaccess * )0x00081000 )
+#define FLASH_ROMCIV_ADDR			( ( volatile uint16_t __evenaccess * )0x00081004 )
 
 /*
  *  CMTWモジュール
@@ -134,18 +145,26 @@
 #define SCI1_TDR_ADDR			( ( volatile uint8_t __evenaccess * )0x0008A023 )
 #define SCI1_SMR_ADDR			( ( volatile uint8_t __evenaccess * )0x0008A020 )
 #define SCI1_SCR_ADDR			( ( volatile uint8_t __evenaccess * )0x0008A022 )
+#define SCI8_RDR_ADDR			( ( volatile uint8_t __evenaccess * )0x0008A105 )
+#define SCI8_TDR_ADDR			( ( volatile uint8_t __evenaccess * )0x0008A103 )
+#define SCI8_SMR_ADDR			( ( volatile uint8_t __evenaccess * )0x0008A100 )
+#define SCI8_SCR_ADDR			( ( volatile uint8_t __evenaccess * )0x0008A102 )
 #define SCIn_SCR_TEIE_BIT		( 1UL << 2U )
 #define SCIn_SCR_RE_BIT			( 1UL << 4U )
 #define SCIn_SCR_TE_BIT			( 1UL << 5U )
 #define SCIn_SCR_RIE_BIT		( 1UL << 6U )
 #define SCIn_SCR_TIE_BIT		( 1UL << 7U )
 #define SCI1_SSR_ADDR			( ( volatile uint8_t __evenaccess * )0x0008A024 )
+#define SCI8_SSR_ADDR			( ( volatile uint8_t __evenaccess * )0x0008A104 )
 #define SCIn_SSR_TEND_BIT		( 1UL << 2U )
 #define SCIn_SSR_RDRF_BIT		( 1UL << 6U )
 #define SCIn_SSR_TDRE_BIT		( 1UL << 7U )
 #define SCI1_SCMR_ADDR			( ( volatile uint8_t __evenaccess * )0x0008A026 )
 #define SCI1_BRR_ADDR			( ( volatile uint8_t __evenaccess * )0x0008A021 )
 #define SCI1_SEMR_ADDR			( ( volatile uint8_t __evenaccess * )0x0008A027 )
+#define SCI8_SCMR_ADDR			( ( volatile uint8_t __evenaccess * )0x0008A106 )
+#define SCI8_BRR_ADDR			( ( volatile uint8_t __evenaccess * )0x0008A101 )
+#define SCI8_SEMR_ADDR			( ( volatile uint8_t __evenaccess * )0x0008A107 )
 
 /*
  *  MPCモジュール
@@ -156,14 +175,19 @@
 #define MPC_PF0PFS_ADDR			( ( volatile uint8_t __evenaccess * )0x0008C1B8 )
 #define MPC_PF1PFS_ADDR			( ( volatile uint8_t __evenaccess * )0x0008C1B9 )
 #define MPC_PF2PFS_ADDR			( ( volatile uint8_t __evenaccess * )0x0008C1BA )
+#define MPC_PJ1PFS_ADDR			( ( volatile uint8_t __evenaccess * )0x0008C1D1 )
+#define MPC_PJ2PFS_ADDR			( ( volatile uint8_t __evenaccess * )0x0008C1D2 )
 
 /*
  *  PORTモジュール
  */
 #define PORTF_PDR_ADDR			( ( volatile uint8_t __evenaccess * )0x0008C00F )
+#define PORTJ_PDR_ADDR			( ( volatile uint8_t __evenaccess * )0x0008C012 )
 #define PORTn_PDR_B0_BIT		( 1UL << 0U )
+#define PORTn_PDR_B1_BIT		( 1UL << 1U )
 #define PORTn_PDR_B2_BIT		( 1UL << 2U )
 #define PORTF_PMR_ADDR			( ( volatile uint8_t __evenaccess * )0x0008C06F )
+#define PORTJ_PMR_ADDR			( ( volatile uint8_t __evenaccess * )0x0008C072 )
 
 /*
  *  MPUモジュール
@@ -174,4 +198,4 @@
 #define MPU_MPESTS_ADDR			( ( volatile uint32_t __evenaccess * )0x0008650C )
 #define MPU_MPDEA_ADDR			( ( volatile uint32_t __evenaccess * )0x00086514 )
 
-#endif	/* TOPPERS_RX64M_H */
+#endif	/* TOPPERS_RX65N_H */

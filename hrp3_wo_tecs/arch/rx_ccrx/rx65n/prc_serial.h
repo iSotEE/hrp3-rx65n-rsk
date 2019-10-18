@@ -38,7 +38,7 @@
  */
 
 /*
- *  シリアルI/Oデバイス（SIO）ドライバ（RX64M用）
+ *  シリアルI/Oデバイス（SIO）ドライバ（RX65N用）
  */
 
 #ifndef TOPPERS_PRC_SERIAL_H

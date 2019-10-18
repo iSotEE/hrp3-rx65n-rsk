@@ -40,7 +40,7 @@
  */
 
 /*
- *		カーネルのターゲット依存部に関する定義（HSBRX64MC用）
+ *		カーネルのターゲット依存部に関する定義（Renesas Starter Kit+ for RX65N-2MB用）
  *
  *  カーネルのターゲット依存部のヘッダファイル．kernel_impl.hのターゲッ
  *  ト依存部の位置付けとなる．
@@ -72,7 +72,7 @@
 #define LOG_EXC_LEAVE	( 0 )
 
 /*
- *  プロセッサ依存部（RX64M用）
+ *  プロセッサ依存部（RX65N用）
  */
 #include "prc_kernel_impl.h"
 

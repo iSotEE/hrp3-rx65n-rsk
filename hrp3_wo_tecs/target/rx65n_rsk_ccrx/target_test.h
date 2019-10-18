@@ -38,13 +38,13 @@
  */
 
 /*
- *		テストプログラムのターゲット依存部（HSBRX64MC用）
+ *		テストプログラムのターゲット依存部（Renesas Starter Kit+ for RX65N-2MB用）
  */
 
 #ifndef TOPPERS_TARGET_TEST_H
 #define TOPPERS_TARGET_TEST_H
 
-#include "rx64m.h"
+#include "rx65n.h"
 
 /*
  *  サンプルプログラム／テストプログラムで使用する割込みに関する定義

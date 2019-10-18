@@ -38,13 +38,13 @@
  */
 
 /*
- *		ターゲット依存モジュール（HSBRX64MC用）
+ *		ターゲット依存モジュール（Renesas Starter Kit+ for RX65N-2MB用）
  */
 
 #include "kernel_impl.h"
 #include "kernel/memory.h"
 #include "task.h"
-#include "hsbrx64mc.h"
+#include "rx65n_rsk.h"
 
 /*
  *  ハードウェア固有の初期化ルーチン
@@ -54,6 +54,13 @@ void
 hardware_init_hook(void)
 {
 #if FREQ_MAIN_CLOCK == 24000000 && FREQ_PCLK_BCD == 60000000 && FREQ_CMTW0 == 7500000 && FREQ_CMTW1 == 7500000
+	/* Set ROM to two wait cycles before changing to high speed mode */
+	sil_wrb_mem((void *)SYSTEM_ROMWT_ADDR, 0x2);
+	while(sil_reb_mem((void *)SYSTEM_ROMWT_ADDR) == 0);
+
+	/* Enable ROM cache for no-wait access */
+	sil_wrh_mem((void *)FLASH_ROMCE_ADDR, 0x1);
+
 	/*
 	 *  クロック設定.
 	 *  メインクロック: 24MHz,
@@ -101,9 +108,11 @@ hardware_init_hook(void)
 			(0x1 << SYSTEM_SCKCR_PCLKA_SHIFT) | (0x1 << SYSTEM_SCKCR_BCK_SHIFT) |
 			(0x1 << SYSTEM_SCKCR_ICK_SHIFT) |(0x2 << SYSTEM_SCKCR_FCK_SHIFT));
 	sil_wrh_mem((void *)SYSTEM_SCKCR2_ADDR, (0x4 << SYSTEM_SCKCR2_UCK_SHIFT) | 0x1);
+	while(sil_reh_mem((void *)SYSTEM_SCKCR2_ADDR) == 0);
 
 	/* 8. SCKCR3 レジスタの CKSEL[2:0] ビットで LOCO クロックから PLL クロックに変更 */
 	sil_wrh_mem((void *)SYSTEM_SCKCR3_ADDR, (0x4 << SYSTEM_SCKCR3_CKSEL_SHIFT));
+	while(sil_reh_mem((void *)SYSTEM_SCKCR3_ADDR) == 0);
 
 	/* PRCRで書込み禁止 */
 	sil_wrh_mem((void *)SYSTEM_PRCR_ADDR, SYSTEM_PRCR_PRKEY_BITS);
@@ -138,29 +147,29 @@ target_initialize(void)
 	prc_initialize();
 
 	/*
-	 * SCI1用ポート設定
+	 * SCI8用ポート設定
 	 */
 
-	/* ポートPF0をTxD1, ポートPF2をRxD1に */
-	sil_wrb_mem((void *)PORTF_PMR_ADDR , 0x05);
+	/* ポートPJ1をRXD8に, ポートPJ2をTXD8 */
+	sil_wrb_mem((void *)PORTJ_PMR_ADDR , 0x06);
 
-	/* データディレクションレジスタ(PDR)の設定 PF2(RxD1)を入力ポートにする */
-	sil_wrb_mem((void *)(PORTF_PDR_ADDR) ,
-					sil_reb_mem((void *)(PORTF_PDR_ADDR)) & ~PORTn_PDR_B2_BIT);
+	/* データディレクションレジスタ(PDR)の設定 PJ1(RXD8)を入力ポートにする */
+	sil_wrb_mem((void *)(PORTJ_PDR_ADDR) ,
+					sil_reb_mem((void *)(PORTJ_PDR_ADDR)) & ~PORTn_PDR_B1_BIT);
 
-	/* データディレクションレジスタ(PDR)の設定 PF0(TxD1)を出力ポートにする */
-	sil_wrb_mem((void *)(PORTF_PDR_ADDR) ,
-					sil_reb_mem((void *)(PORTF_PDR_ADDR)) & ~PORTn_PDR_B0_BIT);
+	/* データディレクションレジスタ(PDR)の設定 PJ2(TXD8)を出力ポートにする */
+	sil_wrb_mem((void *)(PORTJ_PDR_ADDR) ,
+					sil_reb_mem((void *)(PORTJ_PDR_ADDR)) & ~PORTn_PDR_B2_BIT);
 
 	/* 書き込みプロテクトレジスタの設定 PFSWEビットへの書き込みを許可 */
 	sil_wrb_mem((void *)(MPC_PWPR_ADDR) , 0x00);
 	/* 書き込みプロテクトレジスタの設定 PxxFSレジスタへの書き込みを許可 */
 	sil_wrb_mem((void *)(MPC_PWPR_ADDR) , MPC_PWPR_PFSWE_BIT);
 
-	/* P21端子機能制御レジスタ PF2をRXD1とする */
-	sil_wrb_mem((void *)(MPC_PF2PFS_ADDR) , 0x0a);
-	/* P20端子機能制御レジスタ PF0をTXD1とする */
-	sil_wrb_mem((void *)(MPC_PF0PFS_ADDR) , 0x0a);
+	/* 端子機能制御レジスタ PJ1をRXD8とする */
+	sil_wrb_mem((void *)(MPC_PJ1PFS_ADDR) , 0x0a);
+	/* 端子機能制御レジスタ PJ2をTXD8とする */
+	sil_wrb_mem((void *)(MPC_PJ2PFS_ADDR) , 0x0a);
 
 	/* 書き込みプロテクトレジスタの設定 書き込みを禁止 */
 	sil_wrb_mem((void *)(MPC_PWPR_ADDR) , MPC_PWPR_B0WI_BIT);

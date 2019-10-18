@@ -40,7 +40,7 @@
  */
 
 /*
- *		タイマドライバ（RX64M CMTW0用）
+ *		タイマドライバ（RX65N CMTW0用）
  */
 
 #ifndef TOPPERS_PRC_TIMER_H

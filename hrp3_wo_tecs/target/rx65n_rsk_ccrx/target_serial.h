@@ -39,13 +39,13 @@
  */
 
 /*
- *		シリアルインタフェースドライバのターゲット依存部（HSBRX64MC用）
+ *		シリアルインタフェースドライバのターゲット依存部（Renesas Starter Kit+ for RX65N-2MB用）
  */
 
 #ifndef TOPPERS_TARGET_SERIAL_H
 #define TOPPERS_TARGET_SERIAL_H
 
-#include "hsbrx64mc.h"
+#include "rx65n_rsk.h"
 
 /*
  *  SIOポート数の定義
@@ -55,8 +55,8 @@
 /*
  *  各SIOポートの関連情報
  */
-#define SCI1_SIO_ID (1)
-#define SCI1_INTPRI (-4)
+#define SCI8_SIO_ID (1)
+#define SCI8_INTPRI (-4)
 
 #include "prc_serial.h"
 

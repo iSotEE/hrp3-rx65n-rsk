@@ -40,7 +40,7 @@
  */
 
 /*
- *		kernel_impl.hのプロセッサ依存部（RX64M用）
+ *		kernel_impl.hのプロセッサ依存部（RX65N用）
  *
  *  このヘッダファイルは，target_kernel_impl.h（または，そこからインク
  *  ルードされるファイル）のみからインクルードされる．他のファイルから
@@ -51,7 +51,7 @@
 #ifndef TOPPERS_PRC_KERNEL_IMPL_H
 #define TOPPERS_PRC_KERNEL_IMPL_H
 
-#include "rx64m.h"
+#include "rx65n.h"
 #include "core_kernel_impl.h"
 
 /*

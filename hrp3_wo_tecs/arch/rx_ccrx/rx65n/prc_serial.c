@@ -67,7 +67,7 @@ typedef struct sio_port_initialization_block {
 } SIOPINIB;
 
 #if defined(SCI1_SIO_ID)
-static SIOPINIB siopinib_sci1 = {
+static const SIOPINIB siopinib_sci1 = {
 	(volatile uint8_t *)SCI1_SCR_ADDR,
 	(volatile uint8_t *)SCI1_SMR_ADDR,
 	(volatile uint8_t *)SCI1_SCMR_ADDR,
@@ -80,6 +80,23 @@ static SIOPINIB siopinib_sci1 = {
 	INT_TXI1,
 	INT_RXI1,
 	SYSTEM_MSTPCRB_MSTPB30_BIT
+};
+#endif
+
+#if defined(SCI8_SIO_ID)
+static const SIOPINIB siopinib_sci8 = {
+	(volatile uint8_t *)SCI8_SCR_ADDR,
+	(volatile uint8_t *)SCI8_SMR_ADDR,
+	(volatile uint8_t *)SCI8_SCMR_ADDR,
+	(volatile uint8_t *)SCI8_SEMR_ADDR,
+	(volatile uint8_t *)SCI8_TDR_ADDR,
+	(volatile uint8_t *)SCI8_RDR_ADDR,
+	(volatile uint8_t *)SCI8_BRR_ADDR,
+	(volatile uint32_t *)SYSTEM_MSTPCRC_ADDR,
+	(volatile uint8_t *)SCI8_SSR_ADDR,
+	INT_TXI8,
+	INT_RXI8,
+	SYSTEM_MSTPCRC_MSTPC27_BIT
 };
 #endif
 
@@ -175,6 +192,10 @@ sio_initialize(intptr_t exinf)
 
 #if defined(SCI1_SIO_ID)
 	get_siopcb(SCI1_SIO_ID)->p_siopinib = &siopinib_sci1;
+#endif
+
+#if defined(SCI8_SIO_ID)
+	get_siopcb(SCI8_SIO_ID)->p_siopinib = &siopinib_sci8;
 #endif
 
 	/*

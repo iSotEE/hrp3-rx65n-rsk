@@ -6,10 +6,10 @@
 <stringAttribute key="com.renesas.cdt.core.imageFileName" value="${workspace_loc:\asp3-rx64m\sample1/asp.x}"/>
 <stringAttribute key="com.renesas.cdt.core.initCommands" value=""/>
 <stringAttribute key="com.renesas.cdt.core.ipAddress" value="localhost"/>
-<stringAttribute key="com.renesas.cdt.core.jtagDevice" value="E1 (RX)"/>
-<stringAttribute key="com.renesas.cdt.core.jtagDeviceId" value="com.renesas.hardwaredebug.rx.e1"/>
+<stringAttribute key="com.renesas.cdt.core.jtagDevice" value="E2 Lite (RX)"/>
+<stringAttribute key="com.renesas.cdt.core.jtagDeviceId" value="com.renesas.hardwaredebug.rx.e2"/>
 <listAttribute key="com.renesas.cdt.core.listGDBExe">
-<listEntry value="rx-elf-gdb  -rx-force-v2"/>
+<listEntry value="rx-elf-gdb -rx-force-v2"/>
 </listAttribute>
 <listAttribute key="com.renesas.cdt.core.listGDBLaunchName">
 <listEntry value="main"/>
@@ -18,21 +18,22 @@
 <listEntry value="61234"/>
 </listAttribute>
 <booleanAttribute key="com.renesas.cdt.core.loadImage" value="true"/>
-<stringAttribute key="com.renesas.cdt.core.optionInitCommands" value=""/>
+<stringAttribute key="com.renesas.cdt.core.optionInitCommands" value="monitor set_internal_mem_overwrite 0-581&#10;"/>
 <intAttribute key="com.renesas.cdt.core.portNumber" value="61234"/>
 <stringAttribute key="com.renesas.cdt.core.runCommands" value=""/>
 <stringAttribute key="com.renesas.cdt.core.secondGDBExe" value="green_dsp-elf-gdb"/>
 <booleanAttribute key="com.renesas.cdt.core.secondGDBSupport" value="false"/>
 <intAttribute key="com.renesas.cdt.core.secondGdbPortNumber" value="61237"/>
-<stringAttribute key="com.renesas.cdt.core.serverParam" value="-g E1  -t R5F564ML  -p 61234 -d 61236 -uClockSrcHoco= 0 -uInputClock= 24.0000 -uAllowClockSourceInternal= 1 -uUseFine= 1 -uFineBaudRate= 2.00 -w 1 -z 0 -uRegisterSetting= 0 -uModePin= 0 -uChangeStartupBank= 0 -uStartupBank= 0 -uDebugMode= 0 -uExecuteProgram= 0 -uIdCode= FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF -uresetOnReload= 1 -n 0 -uWorkRamAddress= 1000 -uProgReWriteIRom= 0 -uProgReWriteDFlash= 0 -uhookWorkRamAddr= 0x1000 -uhookWorkRamSize= 0x230"/>
+<stringAttribute key="com.renesas.cdt.core.serverParam" value="-g E2LITE  -t R5F565NE  -uClockSrcHoco= 0 -uInputClock= 27.0 -uAllowClockSourceInternal= 1 -uUseFine= 0 -uJTagClockFreq= 6.00 -w 0 -z 0 -uRegisterSetting= 0 -uModePin= 0 -uChangeStartupBank= 0 -uStartupBank= 0 -uDebugMode= 0 -uExecuteProgram= 0 -uIdCode= FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF -uresetOnReload= 1 -n 0 -uWorkRamAddress= 1000 -uProgReWriteIRom= 0 -uProgReWriteDFlash= 0 -uhookWorkRamAddr= 0x3fdd0 -uhookWorkRamSize= 0x230"/>
 <booleanAttribute key="com.renesas.cdt.core.setResume" value="true"/>
 <booleanAttribute key="com.renesas.cdt.core.setStopAt" value="true"/>
 <booleanAttribute key="com.renesas.cdt.core.startServer" value="true"/>
 <stringAttribute key="com.renesas.cdt.core.stopAt" value="main"/>
-<stringAttribute key="com.renesas.cdt.core.targetDevice" value="R5F564ML"/>
+<stringAttribute key="com.renesas.cdt.core.targetDevice" value="R5F565NE"/>
 <booleanAttribute key="com.renesas.cdt.core.useRemoteTarget" value="true"/>
 <stringAttribute key="com.renesas.cdt.debug.ioview.dsf.registerSelection" value="&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot; standalone=&quot;no&quot;?&gt;&#13;&#10;&lt;selectedRegisterList ioFilePath=&quot;C:\Renesas\e2_studio\DebugComp\RX\Iofiles\RX64M.sfrx&quot;&gt;&#13;&#10;&lt;selectedRegister path=&quot;SCI1&quot;/&gt;&#13;&#10;&lt;selectedRegister path=&quot;SYSTEM/PLLCR&quot;/&gt;&#13;&#10;&lt;selectedRegister path=&quot;SYSTEM/PLLCR2&quot;/&gt;&#13;&#10;&lt;selectedRegister path=&quot;SYSTEM/MOSCCR&quot;/&gt;&#13;&#10;&lt;selectedRegister path=&quot;SYSTEM/MOFCR&quot;/&gt;&#13;&#10;&lt;/selectedRegisterList&gt;&#13;&#10;"/>
-<stringAttribute key="com.renesas.cdt.launch.dsf.IO_MAP" value="${eclipse_home}"/>
+<stringAttribute key="com.renesas.cdt.debug.ioview.dsf.registerSelection0" value="&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot; standalone=&quot;no&quot;?&gt;&#13;&#10;&lt;selectedRegisterList ioFilePath=&quot;C:\Renesas\e2_studio\DebugComp\RX\Iofiles\RX65N.sfrx&quot;/&gt;&#13;&#10;"/>
+<stringAttribute key="com.renesas.cdt.launch.dsf.IO_MAP" value="${support_area_loc}"/>
 <booleanAttribute key="com.renesas.cdt.launch.dsf.USE_DEFAULT_IO_MAP" value="true"/>
 <listAttribute key="com.renesas.cdt.launch.dsf.downloadImages">
 <listEntry value="|true|true|true||true|No core"/>
@@ -42,6 +43,12 @@
 <stringAttribute key="com.renesas.cdt.launch.dsf.serverPath" value="${renesas.support.targetLoc:rx-debug}\e2-server-gdb"/>
 <listAttribute key="com.renesas.cdt.launch.ui.address.mruList.eventpointDataAccessAddress">
 <listEntry value="0x4a5c"/>
+</listAttribute>
+<listAttribute key="com.renesas.cdt.launch.ui.address.mruList.eventpointExecutionAddress">
+<listEntry value="0xffc024d5"/>
+<listEntry value="0xffc026c2"/>
+<listEntry value="0xffc02270"/>
+<listEntry value="0xffc020e5"/>
 </listAttribute>
 <listAttribute key="com.renesas.cdt.launch.ui.address.mruList.memoryMonitorExpression">
 <listEntry value="0x505c"/>
@@ -83,10 +90,42 @@
 <intAttribute key="com.renesas.hardwaredebug.e1.timer_clock" value="0"/>
 <intAttribute key="com.renesas.hardwaredebug.e1.work_ram_start" value="4096"/>
 <booleanAttribute key="com.renesas.hardwaredebug.rx.e1.E1DebugToolSettingsTree.resetAfterReload" value="true"/>
+<booleanAttribute key="com.renesas.hardwaredebug.rx.e2.E2LiteDebugToolSettingsTree.resetAfterReload" value="true"/>
+<booleanAttribute key="com.renesas.hardwaredebug.rx.e2lite.allow.change.startup_bank" value="false"/>
+<booleanAttribute key="com.renesas.hardwaredebug.rx.e2lite.allow.clock.source.internal" value="true"/>
+<intAttribute key="com.renesas.hardwaredebug.rx.e2lite.clock_source" value="0"/>
+<stringAttribute key="com.renesas.hardwaredebug.rx.e2lite.connection.mode" value="0"/>
+<booleanAttribute key="com.renesas.hardwaredebug.rx.e2lite.e2lite_pwr" value="false"/>
+<booleanAttribute key="com.renesas.hardwaredebug.rx.e2lite.enable.hot.plug" value="false"/>
+<booleanAttribute key="com.renesas.hardwaredebug.rx.e2lite.execute.program" value="false"/>
+<stringAttribute key="com.renesas.hardwaredebug.rx.e2lite.external_memory" value=""/>
+<stringAttribute key="com.renesas.hardwaredebug.rx.e2lite.fine.baud.rate" value="1.50"/>
+<stringAttribute key="com.renesas.hardwaredebug.rx.e2lite.flash_overwrite_blocks" value="0-581"/>
+<stringAttribute key="com.renesas.hardwaredebug.rx.e2lite.hook_Stop_func" value="0x0"/>
+<booleanAttribute key="com.renesas.hardwaredebug.rx.e2lite.hook_enable_Stop" value="false"/>
+<booleanAttribute key="com.renesas.hardwaredebug.rx.e2lite.hook_enable_start" value="false"/>
+<stringAttribute key="com.renesas.hardwaredebug.rx.e2lite.hook_start_func" value="0x0"/>
+<intAttribute key="com.renesas.hardwaredebug.rx.e2lite.hook_work_ram_Addr" value="261584"/>
+<intAttribute key="com.renesas.hardwaredebug.rx.e2lite.hook_work_ram_Size" value="560"/>
+<stringAttribute key="com.renesas.hardwaredebug.rx.e2lite.id_code" value="FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF"/>
+<stringAttribute key="com.renesas.hardwaredebug.rx.e2lite.inputclock" value="27.0"/>
+<stringAttribute key="com.renesas.hardwaredebug.rx.e2lite.jtag.clock.freq" value="6.00"/>
+<stringAttribute key="com.renesas.hardwaredebug.rx.e2lite.jtag.or.fine" value="0"/>
+<booleanAttribute key="com.renesas.hardwaredebug.rx.e2lite.le" value="true"/>
+<stringAttribute key="com.renesas.hardwaredebug.rx.e2lite.mode" value="0"/>
+<stringAttribute key="com.renesas.hardwaredebug.rx.e2lite.mode_pin" value="0"/>
+<booleanAttribute key="com.renesas.hardwaredebug.rx.e2lite.prog_rewrite_dflash" value="false"/>
+<booleanAttribute key="com.renesas.hardwaredebug.rx.e2lite.prog_rewrite_irom" value="false"/>
+<stringAttribute key="com.renesas.hardwaredebug.rx.e2lite.serial_number" value=""/>
+<stringAttribute key="com.renesas.hardwaredebug.rx.e2lite.startup_bank" value="0"/>
+<stringAttribute key="com.renesas.hardwaredebug.rx.e2lite.supply.voltage" value="3.3"/>
+<intAttribute key="com.renesas.hardwaredebug.rx.e2lite.timer_clock" value="0"/>
+<intAttribute key="com.renesas.hardwaredebug.rx.e2lite.work_ram_start" value="4096"/>
+<booleanAttribute key="com.renesas.hardwaredebug.timemeasurement" value="true"/>
 <intAttribute key="org.eclipse.cdt.debug.gdbjtag.core.delay" value="3"/>
 <booleanAttribute key="org.eclipse.cdt.debug.gdbjtag.core.doHalt" value="false"/>
 <booleanAttribute key="org.eclipse.cdt.debug.gdbjtag.core.doReset" value="false"/>
-<stringAttribute key="org.eclipse.cdt.debug.gdbjtag.core.imageFileName" value="C:\Users\liyixiao\Desktop\SOISOCX-RX64M\e2studio_workspace\hrp3-rx64m\sample1\hrp.x"/>
+<stringAttribute key="org.eclipse.cdt.debug.gdbjtag.core.imageFileName" value="C:\Users\liyixiao\Desktop\ISoT\workspace-skeleton-no-isr\hrp3-rx65n-rsk\sample1\hrp.x"/>
 <stringAttribute key="org.eclipse.cdt.debug.gdbjtag.core.imageOffset" value=""/>
 <stringAttribute key="org.eclipse.cdt.debug.gdbjtag.core.initCommands" value=""/>
 <booleanAttribute key="org.eclipse.cdt.debug.gdbjtag.core.loadImage" value="true"/>
@@ -97,23 +136,23 @@
 <booleanAttribute key="org.eclipse.cdt.debug.gdbjtag.core.setResume" value="false"/>
 <booleanAttribute key="org.eclipse.cdt.debug.gdbjtag.core.setStopAt" value="true"/>
 <stringAttribute key="org.eclipse.cdt.debug.gdbjtag.core.stopAt" value="main"/>
-<stringAttribute key="org.eclipse.cdt.debug.gdbjtag.core.symbolsFileName" value="C:\Users\liyixiao\Desktop\SOISOCX-RX64M\e2studio_workspace\hrp3-rx64m\sample1\hrp.x"/>
+<stringAttribute key="org.eclipse.cdt.debug.gdbjtag.core.symbolsFileName" value="C:\Users\liyixiao\Desktop\ISoT\workspace-skeleton-no-isr\hrp3-rx65n-rsk\sample1\hrp.x"/>
 <stringAttribute key="org.eclipse.cdt.debug.gdbjtag.core.symbolsOffset" value=""/>
 <booleanAttribute key="org.eclipse.cdt.debug.gdbjtag.core.useFileForImage" value="false"/>
 <booleanAttribute key="org.eclipse.cdt.debug.gdbjtag.core.useFileForSymbols" value="false"/>
 <booleanAttribute key="org.eclipse.cdt.debug.gdbjtag.core.useProjBinaryForImage" value="true"/>
 <booleanAttribute key="org.eclipse.cdt.debug.gdbjtag.core.useProjBinaryForSymbols" value="true"/>
-<stringAttribute key="org.eclipse.cdt.dsf.gdb.DEBUG_NAME" value="rx-elf-gdb  -rx-force-v2"/>
+<stringAttribute key="org.eclipse.cdt.dsf.gdb.DEBUG_NAME" value="rx-elf-gdb -rx-force-v2"/>
 <booleanAttribute key="org.eclipse.cdt.dsf.gdb.NON_STOP" value="true"/>
 <intAttribute key="org.eclipse.cdt.launch.ATTR_BUILD_BEFORE_LAUNCH_ATTR" value="2"/>
 <booleanAttribute key="org.eclipse.cdt.launch.DEBUGGER_STOP_AT_MAIN" value="true"/>
 <stringAttribute key="org.eclipse.cdt.launch.DEBUGGER_STOP_AT_MAIN_SYMBOL" value="main"/>
 <stringAttribute key="org.eclipse.cdt.launch.PROGRAM_NAME" value="sample1/hrp.x"/>
-<stringAttribute key="org.eclipse.cdt.launch.PROJECT_ATTR" value="hrp3-rx64m"/>
+<stringAttribute key="org.eclipse.cdt.launch.PROJECT_ATTR" value="hrp3-rx65n-rsk"/>
 <booleanAttribute key="org.eclipse.cdt.launch.PROJECT_BUILD_CONFIG_AUTO_ATTR" value="false"/>
 <stringAttribute key="org.eclipse.cdt.launch.PROJECT_BUILD_CONFIG_ID_ATTR" value=""/>
 <listAttribute key="org.eclipse.debug.core.MAPPED_RESOURCE_PATHS">
-<listEntry value="/hrp3-rx64m"/>
+<listEntry value="/hrp3-rx65n-rsk"/>
 </listAttribute>
 <listAttribute key="org.eclipse.debug.core.MAPPED_RESOURCE_TYPES">
 <listEntry value="4"/>

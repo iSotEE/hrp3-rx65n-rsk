@@ -1,5 +1,5 @@
 #
-#		Makefile のプロセッサ依存部（RX64M用）
+#		Makefile のプロセッサ依存部（RX65N用）
 #
 
 #
