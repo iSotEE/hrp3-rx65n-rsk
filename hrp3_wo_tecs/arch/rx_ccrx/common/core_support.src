@@ -312,15 +312,15 @@ dispatcher_0:
 	; ドメイン用MPUの切換え処理
 	;
 	mov.l	#0, r3
-	mov.l	DOMINIB_use_mpu_num[r1], r4		; use_mpu_num → r4
+	mov.b	DOMINIB_use_mpu_num[r1], r4		; use_mpu_num → r4
 	mov.l	DOMINIB_mpu_area_info[r1], r5	; mpu_area_info → r5
 	mov.l	#MPU_RSPAGE1_ADDR, r1
 	mov.l	#MPU_REPAGE1_ADDR, r2
 dispatcher_set_domain_mpu_loop:
 	cmp		r3, r4
 	beq		dispatcher_disable_unused_mpu
-	mov.l	[r5], r1
-	mov.l	4[r5], r2
+	mov.l	[r5], [r1]
+	mov.l	4[r5], [r2]
 	add		#8, r1
 	add		#8, r2
 	add		#1, r3
