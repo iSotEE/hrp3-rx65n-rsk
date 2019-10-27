@@ -37,7 +37,7 @@
  *  アの利用により直接的または間接的に生じたいかなる損害に関しても，そ
  *  の責任を負わない．
  * 
- *  $Id: sys_manage.c 647 2019-01-14 02:55:53Z ertl-hiro $
+ *  $Id: sys_manage.c 763 2019-10-01 12:49:46Z ertl-hiro $
  */
 
 /*
@@ -209,9 +209,7 @@ rot_rdq(PRI tskpri)
 		CHECK_PAR(VALID_TPRI(tskpri));			/*［NGKI2685］*/
 		pri = INT_PRIORITY(tskpri);
 	}
-	if (!sense_context()) {
-		CHECK_ACPTN(p_runtsk->p_dominib->acvct.acptn1);		/*［NGKI3766］*/
-	}
+	CHECK_ACPTN(p_runtsk->p_dominib->acvct.acptn1);		/*［NGKI3766］*/
 
 	lock_cpu();
 	rotate_ready_queue(pri, p_runtsk->p_schedcb);
@@ -251,7 +249,7 @@ mrot_rdq(ID schedno, PRI tskpri)
 		p_dominib = &dominib_kernel;
 	}
 	else if (schedno == TDOM_SELF) {
-		if (sense_context()) {
+		if (rundom == TACP_KERNEL) {
 			p_dominib = &dominib_kernel;
 		}
 		else {
@@ -262,8 +260,8 @@ mrot_rdq(ID schedno, PRI tskpri)
 		CHECK_ID(VALID_DOMID(schedno));			/*［NGKI2696］*/
 		p_dominib = get_dominib(schedno);
 	}
-	if (tskpri == TPRI_SELF) {
-		pri = p_runtsk->bpriority;
+	if (tskpri == TPRI_SELF && !sense_context()) {
+		pri = p_runtsk->bpriority;				/*［NGKI2701］*/
 	}
 	else {
 		CHECK_PAR(VALID_TPRI(tskpri));			/*［NGKI2697］*/

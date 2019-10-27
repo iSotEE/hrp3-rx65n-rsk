@@ -1,8 +1,11 @@
 /*
- *  TOPPERS Software
- *      Toyohashi Open Platform for Embedded Real-Time Systems
+ *  TOPPERS/HRP Kernel
+ *      Toyohashi Open Platform for Embedded Real-Time Systems/
+ *      High Reliable system Profile Kernel
  * 
- *  Copyright (C) 2015-2016 by Embedded and Real-Time Systems Laboratory
+ *  Copyright (C) 2000-2003 by Embedded and Real-Time Systems Laboratory
+ *                              Toyohashi Univ. of Technology, JAPAN
+
  *              Graduate School of Information Science, Nagoya Univ., JAPAN
  * 
  *  上記著作権者は，以下の(1)〜(4)の条件を満たす場合に限り，本ソフトウェ
@@ -34,64 +37,48 @@
  *  アの利用により直接的または間接的に生じたいかなる損害に関しても，そ
  *  の責任を負わない．
  * 
- *  $Id: test_tprot2.h 508 2018-10-27 15:57:48Z ertl-hiro $
+ *  $Id: target_kernel_impl.h 761 2019-09-30 03:18:30Z ertl-honda $
  */
 
 /*
- *		時間パーティショニングに関するテスト(2)
+ *		カーネルのターゲット依存部に関する定義（ZYBO_Z7用）
+ *
+ *  カーネルのターゲット依存部のヘッダファイル．kernel_impl.hのターゲッ
+ *  ト依存部の位置付けとなる．
  */
 
-#include <kernel.h>
+#ifndef TOPPERS_TARGET_KERNEL_IMPL_H
+#define TOPPERS_TARGET_KERNEL_IMPL_H
 
 /*
- *  ターゲット依存の定義
+ *  ターゲットのハードウェア資源の定義
  */
-#include "target_test.h"
+#include "zybo_z7.h"
 
 /*
- *  システム周期
+ *  微少時間待ちのための定義（本来はSILのターゲット依存部）
  */
-#define SYSTEM_CYCLE	(40 * TEST_TIME_CP)
+#define SIL_DLY_TIM1	70
+#define SIL_DLY_TIM2	44
 
 /*
- *  タイムウィンドウの長さ
+ *  チップ依存部（Zynq7000用）
  */
-#define TWD_DOM1_TIME	(15 * TEST_TIME_CP)
-#define TWD_DOM2_TIME	(5 * TEST_TIME_CP)
+#include "chip_kernel_impl.h"
 
-/*
- *  各タスクの優先度の定義
- */
-#define HIGH_PRIORITY	9
-#define MID_PRIORITY	10
-
-/*
- *  ターゲットに依存する可能性のある定数の定義
- */
-#ifndef STACK_SIZE
-#define	STACK_SIZE		4096		/* タスクのスタックサイズ */
-#endif /* STACK_SIZE */
-
-#ifndef TEST_TIME_CP
-#define TEST_TIME_CP	50000U		/* チェックポイント到達情報の出力時間 */
-#endif /* TEST_TIME_CP */
-
-#ifndef TEST_TIME_PROC
-#define TEST_TIME_PROC	1000U		/* チェックポイントを通らない場合の時間 */
-#endif /* TEST_TIME_PROC */
-
-/*
- *  関数のプロトタイプ宣言
- */
 #ifndef TOPPERS_MACRO_ONLY
 
-extern void	task11(intptr_t exinf);
-extern void	task12(intptr_t exinf);
-extern void	task2(intptr_t exinf);
-extern void	task3(intptr_t exinf);
-extern void	task4(intptr_t exinf);
-extern void	task51(intptr_t exinf);
-extern void	task52(intptr_t exinf);
-extern void	alarm1_handler(intptr_t exinf);
+/*
+ *  ターゲットシステム依存の初期化
+ */
+extern void	target_initialize(void);
+
+/*
+ *  ターゲットシステムの終了
+ *
+ *  システムを終了する時に使う．
+ */
+extern void	target_exit(void) NoReturn;
 
 #endif /* TOPPERS_MACRO_ONLY */
+#endif /* TOPPERS_TARGET_KERNEL_IMPL_H */

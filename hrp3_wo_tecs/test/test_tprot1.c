@@ -2,7 +2,7 @@
  *  TOPPERS Software
  *      Toyohashi Open Platform for Embedded Real-Time Systems
  * 
- *  Copyright (C) 2015-2016 by Embedded and Real-Time Systems Laboratory
+ *  Copyright (C) 2015-2019 by Embedded and Real-Time Systems Laboratory
  *              Graduate School of Information Science, Nagoya Univ., JAPAN
  * 
  *  上記著作権者は，以下の(1)〜(4)の条件を満たす場合に限り，本ソフトウェ
@@ -34,7 +34,7 @@
  *  アの利用により直接的または間接的に生じたいかなる損害に関しても，そ
  *  の責任を負わない．
  * 
- *  $Id: test_tprot1.c 614 2018-12-20 12:30:12Z ertl-hiro $
+ *  $Id: test_tprot1.c 787 2019-10-04 06:41:43Z ertl-hiro $
  */
 
 /* 
@@ -89,7 +89,7 @@
  *		assert(tskid == TASK1)
  *		get_did(&domid)
  *		assert(domid == DOM1)
- *		DO(WAIT(task1_flag))
+ *		WAIT(task1_flag)
  *	== CYC1-1 ==
  *	2:	get_tid(&tskid)
  *		assert(tskid == TASK1)
@@ -98,7 +98,7 @@
  *		RETURN
  *	// タイムウィンドウ for DOM2									... (A-1)
  *	== TASK2 ==
- *	3:	DO(WAIT(task2_flag))
+ *	3:	WAIT(task2_flag)
  *	== CYC1-2 ==
  *	4:	get_tid(&tskid)
  *		assert(tskid == TASK2)
@@ -107,9 +107,9 @@
  *		RETURN
  *	// アイドルウィンドウ											... (B-1)
  *	== TASK3 ==
- *	5:	DO(SET(task1_flag))
- *		DO(SET(task2_flag))
- *		DO(WAIT(task3_flag))
+ *	5:	SET(task1_flag)
+ *		SET(task2_flag)
+ *		WAIT(task3_flag)
  *	== CYC1-3 ==
  *		RETURN
  *	== CYC1-4 ==
@@ -120,9 +120,9 @@
  *		RETURN
  *	// タイムウィンドウ for DOM1									... (C-1)
  *	== TASK1 ==
- *	7:	DO(SET(task3_flag))
+ *	7:	SET(task3_flag)
  *		sus_tsk(TASK2)
- *		DO(WAIT(task1_flag))
+ *		WAIT(task1_flag)
  *	== CYC1-5 ==
  *	8:	get_tid(&tskid)
  *		assert(tskid == TASK1)
@@ -131,8 +131,8 @@
  *		RETURN
  *	// タイムウィンドウ for DOM2									... (A-2)
  *	== TASK3 ==
- *	9:	DO(SET(task1_flag))
- *		DO(WAIT(task3_flag))
+ *	9:	SET(task1_flag)
+ *		WAIT(task3_flag)
  *	== CYC1-6 ==
  *	10:	get_tid(&tskid)
  *		assert(tskid == TASK3)
@@ -150,9 +150,9 @@
  *		RETURN
  *	// タイムウィンドウ for DOM1									... (C-1)
  *	== TASK1 ==
- *	12:	DO(SET(task3_flag))
+ *	12:	SET(task3_flag)
  *		sus_tsk(TASK3)
- *		DO(WAIT(task1_flag))
+ *		WAIT(task1_flag)
  *	== CYC1-9 ==
  *	13:	get_tid(&tskid)
  *		assert(tskid == TASK1)
@@ -174,7 +174,7 @@
  *		assert(tskid == TSK_NONE)
  *		get_did(&domid)
  *		assert(domid == TDOM_NONE)
- *		DO(SET(task1_flag))
+ *		SET(task1_flag)
  *		RETURN
  *	// タイムウィンドウ for DOM1									... (C-3)
  *	== TASK1 ==
@@ -182,7 +182,7 @@
  *		rsm_tsk(TASK3)
  *		slp_tsk()
  *	== TASK3 ==
- *	17:	DO(WAIT(task3_flag))
+ *	17:	WAIT(task3_flag)
  *	== CYC1-13 ==
  *	18:	get_tid(&tskid)
  *		assert(tskid == TASK3)
@@ -191,9 +191,9 @@
  *		RETURN
  *	// タイムウィンドウ for DOM2									... (A-4)
  *	== TASK2 ==
- *	19:	DO(SET(task3_flag))
+ *	19:	SET(task3_flag)
  *		sus_tsk(TASK3)
- *		DO(WAIT(task2_flag))
+ *		WAIT(task2_flag)
  *	== CYC1-14 ==
  *	20:	get_tid(&tskid)
  *		assert(tskid == TASK2)
@@ -215,14 +215,14 @@
  *		assert(tskid == TSK_NONE)
  *		get_did(&domid)
  *		assert(domid == TDOM_NONE)
- *		DO(SET(task2_flag))
+ *		SET(task2_flag)
  *		RETURN
  *	// タイムウィンドウ for DOM2									... (A-6)
  *	== TASK2 ==
  *	23:	rsm_tsk(TASK3)
  *		slp_tsk()
  *	== TASK3 ==
- *	24:	DO(WAIT(task3_flag))
+ *	24:	WAIT(task3_flag)
  *	== CYC1-18 ==
  *	25:	get_tid(&tskid)
  *		assert(tskid == TASK3)
@@ -264,7 +264,7 @@
  *		RETURN
  *	// タイムウィンドウ for DOM1									... (C-1)
  *	== TASK1 ==
- *	30:	DO(SET(task3_flag))
+ *	30:	SET(task3_flag)
  *		sus_tsk(TASK3)
  *		slp_tsk()
  *	== CYC1-25 ==
@@ -286,14 +286,11 @@
 #include <t_syslog.h>
 #include "syssvc/test_svc.h"
 #include "kernel_cfg.h"
-#include "test_tprot1.h"
+#include "test_common.h"
 
 volatile bool_t	task1_flag;
 volatile bool_t	task2_flag;
 volatile bool_t	task3_flag;
-
-#define WAIT(flag)	do { (flag) = false; while (!(flag)); } while (false)
-#define SET(flag)	do { (flag) = true; } while (false)
 
 /* DO NOT DELETE THIS LINE -- gentest depends on it. */
 

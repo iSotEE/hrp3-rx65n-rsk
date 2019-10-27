@@ -5,7 +5,7 @@
  * 
  *  Copyright (C) 2000-2003 by Embedded and Real-Time Systems Laboratory
  *                              Toyohashi Univ. of Technology, JAPAN
- *  Copyright (C) 2004-2018 by Embedded and Real-Time Systems Laboratory
+ *  Copyright (C) 2004-2019 by Embedded and Real-Time Systems Laboratory
  *              Graduate School of Information Science, Nagoya Univ., JAPAN
  * 
  *  上記著作権者は，以下の(1)〜(4)の条件を満たす場合に限り，本ソフトウェ
@@ -37,7 +37,7 @@
  *  アの利用により直接的または間接的に生じたいかなる損害に関しても，そ
  *  の責任を負わない．
  * 
- *  $Id: kernel.h 676 2019-03-11 04:52:04Z ertl-hiro $
+ *  $Id: kernel.h 775 2019-10-02 16:49:21Z ertl-hiro $
  */
 
 /*
@@ -458,8 +458,8 @@ typedef struct t_rmem {
  */
 #define TKERNEL_MAKER	UINT_C(0x0118)	/* カーネルのメーカーコード */
 #define TKERNEL_PRID	UINT_C(0x0006)	/* カーネルの識別番号 */
-#define TKERNEL_SPVER	UINT_C(0xf633)	/* カーネル仕様のバージョン番号 */
-#define TKERNEL_PRVER	UINT_C(0x3010)	/* カーネルのバージョン番号 */
+#define TKERNEL_SPVER	UINT_C(0xf634)	/* カーネル仕様のバージョン番号 */
+#define TKERNEL_PRVER	UINT_C(0x3020)	/* カーネルのバージョン番号 */
 
 /*
  *  キューイング回数の最大値

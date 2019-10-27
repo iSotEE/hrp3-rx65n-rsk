@@ -37,7 +37,7 @@
  *  アの利用により直接的または間接的に生じたいかなる損害に関しても，そ
  *  の責任を負わない．
  * 
- *  $Id: kernel.h 676 2019-03-11 04:52:04Z ertl-hiro $
+ *  $Id: kernel.h 775 2019-10-02 16:49:21Z ertl-hiro $
  */
 
 /*
@@ -592,8 +592,8 @@ typedef struct t_rmem {
  */
 #define TKERNEL_MAKER	UINT_C(0x0118)	/* カーネルのメーカーコード */
 #define TKERNEL_PRID	UINT_C(0x0006)	/* カーネルの識別番号 */
-#define TKERNEL_SPVER	UINT_C(0xf633)	/* カーネル仕様のバージョン番号 */
-#define TKERNEL_PRVER	UINT_C(0x3010)	/* カーネルのバージョン番号 */
+#define TKERNEL_SPVER	UINT_C(0xf634)	/* カーネル仕様のバージョン番号 */
+#define TKERNEL_PRVER	UINT_C(0x3020)	/* カーネルのバージョン番号 */
 
 /*
  *  キューイング回数の最大値

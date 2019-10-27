@@ -5,7 +5,7 @@
  * 
  *  Copyright (C) 2000-2003 by Embedded and Real-Time Systems Laboratory
  *                              Toyohashi Univ. of Technology, JAPAN
- *  Copyright (C) 2005-2018 by Embedded and Real-Time Systems Laboratory
+ *  Copyright (C) 2005-2019 by Embedded and Real-Time Systems Laboratory
  *              Graduate School of Information Science, Nagoya Univ., JAPAN
  * 
  *  上記著作権者は，以下の(1)〜(4)の条件を満たす場合に限り，本ソフトウェ
@@ -37,7 +37,7 @@
  *  アの利用により直接的または間接的に生じたいかなる損害に関しても，そ
  *  の責任を負わない．
  * 
- *  $Id: task_manage.c 520 2018-11-01 12:41:13Z ertl-hiro $
+ *  $Id: task_manage.c 727 2019-06-08 05:53:25Z ertl-hiro $
  */
 
 /*
@@ -230,9 +230,6 @@ acre_tsk(const T_CTSK *pk_ctsk)
 												/*［NGKI1057］［NGKI1066］*/
 	}
 	CHECK_ACPTN(p_dominib->acvct.acptn1);		/*［NGKI3966］*/
-	if (INT_PRIORITY(itskpri) < p_dominib->minpriority) {
-		CHECK_ACPTN(p_dominib->acvct.acptn2);	/*［NGKI5123］*/
-	}
 
 	lock_cpu();
 	if (queue_empty(&(p_dominib->p_domcb->free_tcb))) {
@@ -586,10 +583,6 @@ chg_pri(ID tskid, PRI tskpri)
 	}
 	else if (TSTAT_DORMANT(p_tcb->tstat)) {
 		ercd = E_OBJ;							/*［NGKI1191］*/
-	}
-	else if (newbpri < p_tcb->p_dominib->minpriority
-				&& VIOLATE_ACPTN(p_tcb->p_dominib->acvct.acptn2)) {
-		ercd = E_OACV;							/*［NGKI3751］*/
 	}
 	else if ((p_tcb->p_lastmtx != NULL || TSTAT_WAIT_MTX(p_tcb->tstat))
 						&& !((*mtxhook_check_ceilpri)(p_tcb, newbpri))) {

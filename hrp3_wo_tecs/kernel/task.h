@@ -37,7 +37,7 @@
  *  アの利用により直接的または間接的に生じたいかなる損害に関しても，そ
  *  の責任を負わない．
  * 
- *  $Id: task.h 514 2018-10-31 05:07:37Z ertl-hiro $
+ *  $Id: task.h 743 2019-07-13 04:04:51Z ertl-hiro $
  */
 
 /*
@@ -248,7 +248,7 @@ struct task_control_block {
 	BIT_FIELD_UINT	tstat : 8;		/* タスク状態（内部表現）*/
 	BIT_FIELD_UINT	svclevel : 8;	/* 拡張サービスコールのネストレベル */
 	BIT_FIELD_UINT	bpriority : 8;	/* ベース優先度（内部表現）*/
-	BIT_FIELD_UINT	priority : 8	/* 現在の優先度（内部表現）*/;
+	BIT_FIELD_UINT	priority : 8;	/* 現在の優先度（内部表現）*/
 #endif /* UINT8_MAX */
 	BIT_FIELD_BOOL	actque : 1;		/* 起動要求キューイング */
 	BIT_FIELD_BOOL	wupque : 1;		/* 起床要求キューイング */

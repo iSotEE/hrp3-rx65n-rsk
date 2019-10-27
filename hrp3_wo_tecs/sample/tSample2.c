@@ -37,7 +37,7 @@
  *  アの利用により直接的または間接的に生じたいかなる損害に関しても，そ
  *  の責任を負わない．
  * 
- *  $Id: tSample2.c 681 2019-03-13 04:03:02Z ertl-hiro $
+ *  $Id: tSample2.c 796 2019-10-05 22:59:08Z ertl-hiro $
  */
 
 /* 
@@ -55,6 +55,12 @@
  *  いる．Task1，Task2，AlarmTask，アラーム通知は保護ドメイン1
  *  （rDomain1）に，Task3は保護ドメイン2（rDomain2）に，その他はカーネ
  *  ルドメインに属する．
+ *
+ *  システム周期を15ミリ秒とし，システム動作モードを3つ用意する．シス
+ *  テム動作モード1（SOM1）では，DOM1とDOM2に各4ミリ秒のタイムウィンド
+ *  ウを割り当てる．システム動作モード2（SOM2）とシステム動作モード
+ *  3（SOM3）は，2つを巡回するようにし，いずれのシステム動作モードでも，
+ *  DOM1の方に長いタイムウィンドウを割り当てる．
  *
  *  並行実行されるタスクは，task_loop回のループを実行する度に，タスク
  *  が実行中であることをあらわすメッセージを表示する．ループを実行する
@@ -544,7 +550,7 @@ eMainTask_main(void)
 			consume_time(1000LU);
 			hrtcnt2 = fetchHighResolutionTimer();
 			syslog(LOG_NOTICE, "hrtcnt1 = %tu, hrtcnt2 = %tu",
-											hrtcnt1, hrtcnt2);
+								(uint32_t) hrtcnt1, (uint32_t) hrtcnt2);
 			break;
 
 		case 'v':

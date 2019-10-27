@@ -68,6 +68,9 @@ extern ER _kernel_pget_mpf(ID mpfid, void **p_blk) throw();
 extern ER _kernel_tget_mpf(ID mpfid, void **p_blk, TMO tmout) throw();
 extern ER _kernel_rel_mpf(ID mpfid, void *blk) throw();
 extern HRTCNT _kernel_fch_hrt(void) throw();
+#ifdef TOPPERS_SUPPORT_FCH_MNT
+extern uint64_t _kernel_fch_mnt(void) throw();
+#endif /* TOPPERS_SUPPORT_FCH_MNT */
 #ifdef TOPPERS_SUPPORT_OVRHDR
 extern ER _kernel_ref_ovr(ID tskid, T_ROVR *pk_rovr) throw();
 #endif /* TOPPERS_SUPPORT_OVRHDR */
@@ -308,6 +311,9 @@ extern ER _kernel_mget_nth(ID schedno, PRI tskpri, uint_t nth, ID *p_tskid) thro
 #define tget_mpf _kernel_tget_mpf
 #define rel_mpf _kernel_rel_mpf
 #define fch_hrt _kernel_fch_hrt
+#ifdef TOPPERS_SUPPORT_FCH_MNT
+#define fch_mnt _kernel_fch_mnt
+#endif /* TOPPERS_SUPPORT_FCH_MNT */
 #ifdef TOPPERS_SUPPORT_OVRHDR
 #define ref_ovr _kernel_ref_ovr
 #endif /* TOPPERS_SUPPORT_OVRHDR */

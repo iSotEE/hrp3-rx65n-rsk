@@ -2,7 +2,7 @@
  *  TOPPERS Software
  *      Toyohashi Open Platform for Embedded Real-Time Systems
  * 
- *  Copyright (C) 2015-2016 by Embedded and Real-Time Systems Laboratory
+ *  Copyright (C) 2015-2019 by Embedded and Real-Time Systems Laboratory
  *              Graduate School of Information Science, Nagoya Univ., JAPAN
  * 
  *  上記著作権者は，以下の(1)〜(4)の条件を満たす場合に限り，本ソフトウェ
@@ -34,7 +34,7 @@
  *  アの利用により直接的または間接的に生じたいかなる損害に関しても，そ
  *  の責任を負わない．
  * 
- *  $Id: test_tprot4.c 505 2018-10-27 14:01:12Z ertl-hiro $
+ *  $Id: test_tprot4.c 791 2019-10-04 07:05:47Z ertl-hiro $
  */
 
 /* 
@@ -89,21 +89,21 @@
  *	== TASK12-1 ==
  *	1:	ext_tsk()
  *	== TASK11 ==
- *	2:	DO(WAIT(task11_flag))
+ *	2:	WAIT(task11_flag)
  *	// タイムウィンドウ for DOM2
  *	== TASK2 ==
- *	3:	DO(WAIT(task2_flag))
+ *	3:	WAIT(task2_flag)
  *	// アイドルウィンドウ
  *	== TASK3 ==
- *	4:	DO(SET(task11_flag))
- *		DO(SET(task2_flag))
- *		DO(WAIT(task3_flag))
+ *	4:	SET(task11_flag)
+ *		SET(task2_flag)
+ *		WAIT(task3_flag)
  *	// タイムウィンドウ for DOM1
  *	// CYC11が実行される
  *	== TASK12-2 ==
  *	5:	ext_tsk()
  *	== TASK11 ==
- *	6:	DO(SET(task3_flag))
+ *	6:	SET(task3_flag)
  *		set_flg(FLG1, 0x80U)
  *		sta_alm(ALM1, 500U)
  *		sta_alm(ALM2, 500U)
@@ -134,38 +134,38 @@
  *	10:	ext_tsk()
  *	== TASK11 ==
  *	11:	assert(flgptn == 0x9fU)
- *		DO(WAIT(task11_flag))
+ *		WAIT(task11_flag)
  *	// タイムウィンドウ for DOM2
  *	== TASK2 ==
  *	12:	assert(flgptn == 0x9fU)
- *		DO(WAIT(task2_flag))
+ *		WAIT(task2_flag)
  *	// アイドルウィンドウ
  *	== TASK3 ==
  *	13:	assert(flgptn == 0x9fU)
- *		DO(SET(task11_flag))
- *		DO(SET(task2_flag))
+ *		SET(task11_flag)
+ *		SET(task2_flag)
  *		sta_cyc(CYC12)
- *		DO(WAIT(task3_flag))
+ *		WAIT(task3_flag)
  *	// タイムウィンドウ for DOM1
  *	// CYC12が実行される．CYC12がタイムウィンドウを使い切る	... (B-1)
  *	// CYC11は実行されない．
  *	// TASK11が一瞬実行される可能性がある
  *	== TASK11 ==
- *		DO(WAIT_WO_RESET(task11_flag_1))
+ *		WAIT_WO_RESET(task11_flag_1)
  *	// タイムウィンドウ for DOM2
  *	== TASK2 ==
- *	14:	DO(SET(task3_flag_1))
- *		DO(SET(task11_flag_1))
+ *	14:	SET(task3_flag_1)
+ *		SET(task11_flag_1)
  *		stp_cyc(CYC12)
  *		sta_cyc(CYC3)
  *		ref_sem(SEM1, &pk_rsem)
  *		DO(syslog_1(LOG_NOTICE, "semaphore count of SEM1 = %d", pk_rsem.semcnt))
- *		DO(WAIT(task2_flag))
+ *		WAIT(task2_flag)
  *	// アイドルウィンドウ
  *	// CYC3が実行される．CYC3がタイムウィンドウを使い切る		... (B-2)
  *	// TASK3が一瞬実行される可能性がある
  *	== TASK3 ==
- *		DO(WAIT_WO_RESET(task3_flag_1))
+ *		WAIT_WO_RESET(task3_flag_1)
  *	// タイムウィンドウ for DOM1
  *	// CYC11が2回実行される．
  *	== TASK12-4 ==
@@ -182,20 +182,15 @@
 #include <t_syslog.h>
 #include "syssvc/test_svc.h"
 #include "kernel_cfg.h"
-#include "test_tprot4.h"
+#include "test_common.h"
 
 volatile bool_t	task11_flag;
 volatile bool_t	task12_flag;
 volatile bool_t	task2_flag;
 volatile bool_t	task3_flag;
 
-#define WAIT(flag)	do { (flag) = false; while (!(flag)); } while (false)
-#define SET(flag)	do { (flag) = true; } while (false)
-
 volatile bool_t	task11_flag_1 = false;
 volatile bool_t	task3_flag_1 = false;
-
-#define WAIT_WO_RESET(flag)		do { while (!(flag)); } while (false)
 
 FLGPTN
 poll_flag_change(ID flgid, FLGPTN orig_flgptn)
@@ -272,7 +267,7 @@ task11(intptr_t exinf)
 	syslog_1(LOG_NOTICE, "semaphore count of SEM3 = %d", pk_rsem.semcnt);
 
 	check_finish(17);
-	check_point(0);
+	check_assert(false);
 }
 
 static uint_t	task12_count = 0;
@@ -290,21 +285,21 @@ task12(intptr_t exinf)
 		ercd = ext_tsk();
 		check_ercd(ercd, E_OK);
 
-		check_point(0);
+		check_assert(false);
 
 	case 2:
 		check_point(5);
 		ercd = ext_tsk();
 		check_ercd(ercd, E_OK);
 
-		check_point(0);
+		check_assert(false);
 
 	case 3:
 		check_point(10);
 		ercd = ext_tsk();
 		check_ercd(ercd, E_OK);
 
-		check_point(0);
+		check_assert(false);
 
 	case 4:
 		check_point(15);
@@ -314,12 +309,12 @@ task12(intptr_t exinf)
 		ercd = ext_tsk();
 		check_ercd(ercd, E_OK);
 
-		check_point(0);
+		check_assert(false);
 
 	default:
-		check_point(0);
+		check_assert(false);
 	}
-	check_point(0);
+	check_assert(false);
 }
 
 void
@@ -363,7 +358,7 @@ task2(intptr_t exinf)
 
 	WAIT(task2_flag);
 
-	check_point(0);
+	check_assert(false);
 }
 
 void
@@ -401,5 +396,5 @@ task3(intptr_t exinf)
 
 	WAIT_WO_RESET(task3_flag_1);
 
-	check_point(0);
+	check_assert(false);
 }

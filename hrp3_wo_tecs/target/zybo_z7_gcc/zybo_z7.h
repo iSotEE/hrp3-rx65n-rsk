@@ -1,10 +1,10 @@
 /*
  *  TOPPERS Software
  *      Toyohashi Open Platform for Embedded Real-Time Systems
- * 
- *  Copyright (C) 2015 by Embedded and Real-Time Systems Laboratory
+ *
+ *  Copyright (C) 2012-2018 by Embedded and Real-Time Systems Laboratory
  *              Graduate School of Information Science, Nagoya Univ., JAPAN
- * 
+ *
  *  上記著作権者は，以下の(1)〜(4)の条件を満たす場合に限り，本ソフトウェ
  *  ア（本ソフトウェアを改変したものを含む．以下同じ）を使用・複製・改
  *  変・再配布（以下，利用と呼ぶ）することを無償で許諾する．
@@ -27,47 +27,49 @@
  *      また，本ソフトウェアのユーザまたはエンドユーザからのいかなる理
  *      由に基づく請求からも，上記著作権者およびTOPPERSプロジェクトを
  *      免責すること．
- * 
+ *
  *  本ソフトウェアは，無保証で提供されているものである．上記著作権者お
  *  よびTOPPERSプロジェクトは，本ソフトウェアに関して，特定の使用目的
  *  に対する適合性も含めて，いかなる保証も行わない．また，本ソフトウェ
  *  アの利用により直接的または間接的に生じたいかなる損害に関しても，そ
  *  の責任を負わない．
- * 
- *  $Id: test_lmtdom1.h 14 2015-08-10 16:03:50Z ertl-hiro $
+ *
+ *  $Id: zybo_z7.h 761 2019-09-30 03:18:30Z ertl-honda $
  */
-
-/* 
- *		保護ドメインに対する制限に関するテスト(1)
- */
-
-#include <kernel.h>
 
 /*
- *  ターゲット依存の定義
+ *		ZYBO_Z7のハードウェア資源の定義
  */
-#include "target_test.h"
+#ifndef TOPPERS_ZYBO_Z7_H
+#define TOPPERS_ZYBO_Z7_H
 
 /*
- *  各タスクの優先度の定義
+ *  各クロック周波数の定義
  */
-#define MID_PRIORITY	10
+#define ZYNQ_CPU_6X4X_MHZ		667U		/* 667MHz */
+#define ZYNQ_CPU_3X2X_MHZ		356U		/* 356MHz */
+#define ZYNQ_CPU_2X_MHZ			222U		/* 222MHz */
+#define ZYNQ_CPU_1X_MHZ			111U		/* 111MHz */
 
 /*
- *  ターゲットに依存する可能性のある定数の定義
+ *  各タイマのプリスケール値と周波数の定義
+ *
+ *  周辺デバイス向けクロック（ZYNQ_CPU_3X2X_MZ，325MHz）を65分周して，
+ *  5MHzの周波数で使用する．
  */
-#ifndef STACK_SIZE
-#define	STACK_SIZE		4096		/* タスクのスタックサイズ */
-#endif /* STACK_SIZE */
+#define MPCORE_TMR_PS_VALUE		64
+#define MPCORE_TMR_FREQ			5
+
+#define MPCORE_WDG_PS_VALUE		64
+#define MPCORE_WDG_FREQ			5
+
+#define MPCORE_GTC_PS_VALUE		64
+#define MPCORE_GTC_FREQ			5
 
 /*
- *  関数のプロトタイプ宣言
+ *  UARTの設定値の定義（115.2Kbpsで動作させる場合）
  */
-#ifndef TOPPERS_MACRO_ONLY
+#define XUARTPS_BAUDGEN_115K	0x7cU
+#define XUARTPS_BAUDDIV_115K	0x06U
 
-extern void	task1(intptr_t exinf);
-extern void	task2(intptr_t exinf);
-extern void	task3(intptr_t exinf);
-extern void	task4(intptr_t exinf);
-
-#endif /* TOPPERS_MACRO_ONLY */
+#endif /* TOPPERS_ZYBO_Z7_H */

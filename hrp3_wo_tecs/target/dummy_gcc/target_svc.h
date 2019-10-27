@@ -5,7 +5,7 @@
  * 
  *  Copyright (C) 2000-2003 by Embedded and Real-Time Systems Laboratory
  *                              Toyohashi Univ. of Technology, JAPAN
- *  Copyright (C) 2004-2018 by Embedded and Real-Time Systems Laboratory
+ *  Copyright (C) 2004-2019 by Embedded and Real-Time Systems Laboratory
  *              Graduate School of Information Science, Nagoya Univ., JAPAN
  * 
  *  上記著作権者は，以下の(1)〜(4)の条件を満たす場合に限り，本ソフトウェ
@@ -37,7 +37,7 @@
  *  アの利用により直接的または間接的に生じたいかなる損害に関しても，そ
  *  の責任を負わない．
  * 
- *  $Id: target_svc.h 536 2018-11-16 07:03:31Z ertl-hiro $
+ *  $Id: target_svc.h 793 2019-10-05 01:35:51Z ertl-hiro $
  */
 
 /*
@@ -90,6 +90,10 @@ extern ER	call_svc(FN fncd, intptr_t par1, intptr_t par2,
 
 #define CAL_SVC_1M_SYSTIM(TYPE, FNCD, TYPE1, PAR1) do {					\
 	return((TYPE) call_svc(FNCD, (SYSTIM)(PAR1), 0, 0, 0, 0));			\
+} while (false)
+
+#define CAL_SVC_0M_R_UINT64(TYPE, FNCD) do {							\
+	return((TYPE) call_svc(FNCD, 0, 0, 0, 0, 0));						\
 } while (false)
 
 /*

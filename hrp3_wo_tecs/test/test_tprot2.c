@@ -2,7 +2,7 @@
  *  TOPPERS Software
  *      Toyohashi Open Platform for Embedded Real-Time Systems
  * 
- *  Copyright (C) 2015-2016 by Embedded and Real-Time Systems Laboratory
+ *  Copyright (C) 2015-2019 by Embedded and Real-Time Systems Laboratory
  *              Graduate School of Information Science, Nagoya Univ., JAPAN
  * 
  *  上記著作権者は，以下の(1)〜(4)の条件を満たす場合に限り，本ソフトウェ
@@ -34,7 +34,7 @@
  *  アの利用により直接的または間接的に生じたいかなる損害に関しても，そ
  *  の責任を負わない．
  * 
- *  $Id: test_tprot2.c 195 2016-04-10 09:30:59Z ertl-hiro $
+ *  $Id: test_tprot2.c 792 2019-10-04 07:07:42Z ertl-hiro $
  */
 
 /* 
@@ -165,12 +165,12 @@
  *	21:	wup_tsk(TASK3)
  *		RETURN													... (A-15)
  *	== TASK3 ==
- *	22:	DO(WAIT(task3_flag))
+ *	22:	WAIT(task3_flag)
  *	// タイムウィンドウ for DOM2
  *	== TASK2 ==
- *	23:	DO(SET(task3_flag))
+ *	23:	SET(task3_flag)
  *		wup_tsk(TASK11)
- *		DO(WAIT(task2_flag))
+ *		WAIT(task2_flag)
  *	//		高：なし，中：TASK11，TASK2，TASK3
  *	// アイドルウィンドウ
  *	== TASK3 ==
@@ -228,15 +228,12 @@
 #include <t_syslog.h>
 #include "syssvc/test_svc.h"
 #include "kernel_cfg.h"
-#include "test_tprot2.h"
+#include "test_common.h"
 
 volatile bool_t	task11_flag;
 volatile bool_t	task12_flag;
 volatile bool_t	task2_flag;
 volatile bool_t	task3_flag;
-
-#define WAIT(flag)	do { (flag) = false; while (!(flag)); } while (false)
-#define SET(flag)	do { (flag) = true; } while (false)
 
 /* DO NOT DELETE THIS LINE -- gentest depends on it. */
 
@@ -255,7 +252,7 @@ alarm1_handler(intptr_t exinf)
 
 		return;
 
-		check_point(0);
+		check_assert(false);
 
 	case 2:
 		check_point(17);
@@ -264,7 +261,7 @@ alarm1_handler(intptr_t exinf)
 
 		return;
 
-		check_point(0);
+		check_assert(false);
 
 	case 3:
 		check_point(21);
@@ -273,7 +270,7 @@ alarm1_handler(intptr_t exinf)
 
 		return;
 
-		check_point(0);
+		check_assert(false);
 
 	case 4:
 		check_point(32);
@@ -282,7 +279,7 @@ alarm1_handler(intptr_t exinf)
 
 		return;
 
-		check_point(0);
+		check_assert(false);
 
 	case 5:
 		check_point(35);
@@ -291,12 +288,12 @@ alarm1_handler(intptr_t exinf)
 
 		return;
 
-		check_point(0);
+		check_assert(false);
 
 	default:
-		check_point(0);
+		check_assert(false);
 	}
-	check_point(0);
+	check_assert(false);
 }
 
 void
@@ -340,7 +337,7 @@ task11(intptr_t exinf)
 	check_ercd(ercd, E_OK);
 
 	check_finish(38);
-	check_point(0);
+	check_assert(false);
 }
 
 void
@@ -359,7 +356,7 @@ task12(intptr_t exinf)
 	ercd = slp_tsk();
 	check_ercd(ercd, E_OK);
 
-	check_point(0);
+	check_assert(false);
 }
 
 void
@@ -375,7 +372,7 @@ task2(intptr_t exinf)
 
 	WAIT(task2_flag);
 
-	check_point(0);
+	check_assert(false);
 }
 
 void
@@ -422,7 +419,7 @@ task3(intptr_t exinf)
 	ercd = slp_tsk();
 	check_ercd(ercd, E_OK);
 
-	check_point(0);
+	check_assert(false);
 }
 
 void
@@ -450,7 +447,7 @@ task4(intptr_t exinf)
 	ercd = slp_tsk();
 	check_ercd(ercd, E_OK);
 
-	check_point(0);
+	check_assert(false);
 }
 
 void
@@ -512,7 +509,7 @@ task51(intptr_t exinf)
 	ercd = slp_tsk();
 	check_ercd(ercd, E_OK);
 
-	check_point(0);
+	check_assert(false);
 }
 
 void
@@ -534,5 +531,5 @@ task52(intptr_t exinf)
 	ercd = slp_tsk();
 	check_ercd(ercd, E_OK);
 
-	check_point(0);
+	check_assert(false);
 }

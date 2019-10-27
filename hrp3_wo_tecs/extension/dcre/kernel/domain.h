@@ -35,7 +35,7 @@
  *  アの利用により直接的または間接的に生じたいかなる損害に関しても，そ
  *  の責任を負わない．
  * 
- *  $Id: domain.h 674 2019-03-08 03:46:38Z ertl-hiro $
+ *  $Id: domain.h 727 2019-06-08 05:53:25Z ertl-hiro $
  */
 
 /*
@@ -266,7 +266,6 @@ struct domain_initialization_block {
 	ACPTN		domptn;			/* 保護ドメインのビットパターン */
 	SCHEDCB		*p_schedcb;		/* スケジューリング単位管理ブロック */
 	TMEVTN		*p_tmevt_heap;	/* タイムイベントヒープ */
-	uint_t		minpriority;	/* 設定できるタスク優先度の最小値 */
 #ifdef USE_DOMINICTXB
 	DOMINICTXB	domctxb;		/* 保護ドメイン初期化コンテキストブロック */
 #endif /* USE_DOMINICTXB */

@@ -3,7 +3,7 @@
  *      Toyohashi Open Platform for Embedded Real-Time Systems/
  *      High Reliable system Profile Kernel
  * 
- *  Copyright (C) 2008-2018 by Embedded and Real-Time Systems Laboratory
+ *  Copyright (C) 2008-2019 by Embedded and Real-Time Systems Laboratory
  *              Graduate School of Information Science, Nagoya Univ., JAPAN
  * 
  *  上記著作権者は，以下の(1)〜(4)の条件を満たす場合に限り，本ソフトウェ
@@ -35,7 +35,7 @@
  *  アの利用により直接的または間接的に生じたいかなる損害に関しても，そ
  *  の責任を負わない．
  * 
- *  $Id: domain.h 512 2018-10-27 17:31:50Z ertl-hiro $
+ *  $Id: domain.h 727 2019-06-08 05:53:25Z ertl-hiro $
  */
 
 /*
@@ -250,7 +250,6 @@ struct domain_initialization_block {
 	ACPTN		domptn;			/* 保護ドメインのビットパターン */
 	SCHEDCB		*p_schedcb;		/* スケジューリング単位管理ブロック */
 	TMEVTN		*p_tmevt_heap;	/* タイムイベントヒープ */
-	uint_t		minpriority;	/* 設定できるタスク優先度の最小値 */
 #ifdef USE_DOMINICTXB
 	DOMINICTXB	domctxb;		/* 保護ドメイン初期化コンテキストブロック */
 #endif /* USE_DOMINICTXB */

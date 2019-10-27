@@ -256,10 +256,10 @@ TOPPERS_EMPTY_LABEL(const SOMINIB, _kernel_sominib_table);
 
 const ID _kernel_tmax_domid = (TMIN_DOMID + TNUM_DOMID - 1);
 
-const DOMINIB _kernel_dominib_kernel = { TACP_KERNEL, &(_kernel_schedcb_kernel), _kernel_tmevt_heap_kernel, INT_PRIORITY(TMIN_TPRI + 1), { TACP_KERNEL, TACP_KERNEL, TACP_KERNEL, TACP_KERNEL } };
+const DOMINIB _kernel_dominib_kernel = { TACP_KERNEL, &(_kernel_schedcb_kernel), _kernel_tmevt_heap_kernel, { TACP_KERNEL, TACP_KERNEL, TACP_KERNEL, TACP_KERNEL } };
 
 const DOMINIB _kernel_dominib_table[TNUM_DOMID] = {
-	{ TACP(DOM1), &(_kernel_schedcb_idle), _kernel_tmevt_heap_kernel, INT_PRIORITY(TMIN_TPRI + 1), { TACP(DOM1), TACP_KERNEL, TACP_KERNEL, TACP(DOM1) } },
-	{ TACP(DOM2), &(_kernel_schedcb_idle), _kernel_tmevt_heap_kernel, INT_PRIORITY(TMIN_TPRI + 1), { TACP(DOM2), TACP_KERNEL, TACP_KERNEL, TACP(DOM2) } }
+	{ TACP(DOM1), &(_kernel_schedcb_idle), _kernel_tmevt_heap_kernel, { TACP(DOM1), TACP_KERNEL, TACP_KERNEL, TACP(DOM1) } },
+	{ TACP(DOM2), &(_kernel_schedcb_idle), _kernel_tmevt_heap_kernel, { TACP(DOM2), TACP_KERNEL, TACP_KERNEL, TACP(DOM2) } }
 };
 

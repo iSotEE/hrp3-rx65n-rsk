@@ -37,7 +37,7 @@
 #   アの利用により直接的または間接的に生じたいかなる損害に関しても，そ
 #   の責任を負わない．
 # 
-#   $Id: kernel.trb 675 2019-03-08 04:05:36Z ertl-hiro $
+#   $Id: kernel.trb 734 2019-06-27 05:35:48Z ertl-hiro $
 # 
 
 #
@@ -149,7 +149,7 @@ class KernelObject
 
       # 割り付け可能なオブジェクト数のカウント
       numAutoObjid += params[@noobj]
-	  if $domData[params[:domain]].has_key?(@tnum_aobjid)
+      if $domData[params[:domain]].has_key?(@tnum_aobjid)
         $domData[params[:domain]][@tnum_aobjid] += params[@noobj]
       end
     end
@@ -389,7 +389,6 @@ def generateNotifyHandler(key, params, objid)
     if nfymode2 != 0
       # エラー通知処理の処理
       $kernelCfgC.add("\tif (ercd != E_OK) {")
-
 
       if nfymode2 == $TENFY_SETVAR
         # 変数の設定

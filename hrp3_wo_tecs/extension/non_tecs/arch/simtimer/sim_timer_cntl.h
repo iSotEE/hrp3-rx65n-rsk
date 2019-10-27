@@ -2,7 +2,7 @@
  *  TOPPERS Software
  *      Toyohashi Open Platform for Embedded Real-Time Systems
  * 
- *  Copyright (C) 2018 by Embedded and Real-Time Systems Laboratory
+ *  Copyright (C) 2018-2019 by Embedded and Real-Time Systems Laboratory
  *              Graduate School of Information Science, Nagoya Univ., JAPAN
  * 
  *  上記著作権者は，以下の(1)〜(4)の条件を満たす場合に限り，本ソフトウェ
@@ -34,7 +34,7 @@
  *  アの利用により直接的または間接的に生じたいかなる損害に関しても，そ
  *  の責任を負わない．
  * 
- *  $Id: sim_timer_cntl.h 590 2018-12-03 09:28:35Z ertl-hiro $
+ *  $Id: sim_timer_cntl.h 738 2019-07-10 01:01:21Z ertl-hiro $
  */
 
 /*
@@ -119,6 +119,7 @@ extern ER_UINT	extsvc_simtim_add(intptr_t time, intptr_t par2,
  */
 #ifdef HOOK_HRT_EVENT
 #define hook_hrt_set_event		_kernel_hook_hrt_set_event
+#define hook_hrt_clear_event	_kernel_hook_hrt_clear_event
 #define hook_hrt_raise_event	_kernel_hook_hrt_raise_event
 #endif /* HOOK_HRT_EVENT */
 

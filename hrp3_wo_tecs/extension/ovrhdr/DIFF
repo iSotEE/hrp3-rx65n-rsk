@@ -50,9 +50,9 @@ Only in ./include: t_stdlib.h
 Only in ./include: t_syslog.h
 diff -r ./kernel/Makefile.kernel extension/ovrhdr/kernel/Makefile.kernel
 40c40
-< #  $Id: DIFF 688 2019-03-20 04:45:24Z ertl-hiro $
+< #  $Id: DIFF 773 2019-10-02 09:01:03Z ertl-hiro $
 ---
-> #  $Id: DIFF 688 2019-03-20 04:45:24Z ertl-hiro $
+> #  $Id: DIFF 773 2019-10-02 09:01:03Z ertl-hiro $
 56c56
 < 				sys_manage.c mem_manage.c interrupt.c exception.c
 ---
@@ -67,9 +67,9 @@ Only in ./kernel: alarm.h
 Only in ./kernel: alarm.trb
 diff -r ./kernel/allfunc.h extension/ovrhdr/kernel/allfunc.h
 38c38
-<  *  $Id: DIFF 688 2019-03-20 04:45:24Z ertl-hiro $
+<  *  $Id: DIFF 773 2019-10-02 09:01:03Z ertl-hiro $
 ---
->  *  $Id: DIFF 688 2019-03-20 04:45:24Z ertl-hiro $
+>  *  $Id: DIFF 773 2019-10-02 09:01:03Z ertl-hiro $
 255a256,263
 > /* overrun.c */
 > #define TOPPERS_ovrsta
@@ -109,7 +109,7 @@ diff -r ./kernel/interrupt.c extension/ovrhdr/kernel/interrupt.c
 Only in ./kernel: interrupt.h
 Only in ./kernel: interrupt.trb
 diff -r ./kernel/kernel.trb extension/ovrhdr/kernel/kernel.trb
-436a437
+435a436
 > IncludeTrb("kernel/overrun.trb")
 diff -r ./kernel/kernel_api.def extension/ovrhdr/kernel/kernel_api.def
 20a21
@@ -143,9 +143,9 @@ diff -r ./kernel/kernel_int.h extension/ovrhdr/kernel/kernel_int.h
 ---
 >  *  Copyright (C) 2005-2018 by Embedded and Real-Time Systems Laboratory
 40c40
-<  *  $Id: DIFF 688 2019-03-20 04:45:24Z ertl-hiro $
+<  *  $Id: DIFF 773 2019-10-02 09:01:03Z ertl-hiro $
 ---
->  *  $Id: DIFF 688 2019-03-20 04:45:24Z ertl-hiro $
+>  *  $Id: DIFF 773 2019-10-02 09:01:03Z ertl-hiro $
 69a70
 > #include "overrun.h"
 Only in ./kernel: kernel_lib.trb
@@ -176,7 +176,7 @@ diff -r ./kernel/kernel_sym.def extension/ovrhdr/kernel/kernel_sym.def
 > TOPPERS_SUPPORT_OVRHDR,true,bool,defined(TOPPERS_SUPPORT_OVRHDR),false
 139a141
 > sizeof_OVRHDR,sizeof(OVRHDR)
-221a224,226
+220a223,225
 > sizeof_OVRINIB,sizeof(OVRINIB),,defined(TOPPERS_SUPPORT_OVRHDR)
 > offsetof_OVRINIB_ovratr,"offsetof(OVRINIB,ovratr)",,defined(TOPPERS_SUPPORT_OVRHDR)
 > offsetof_OVRINIB_ovrhdr,"offsetof(OVRINIB,ovrhdr)",,defined(TOPPERS_SUPPORT_OVRHDR)
@@ -220,9 +220,13 @@ Only in ./kernel: svc_manage.h
 Only in ./kernel: svc_manage.trb
 Only in ./kernel: svc_table.c
 diff -r ./kernel/sys_manage.c extension/ovrhdr/kernel/sys_manage.c
+40c40
+<  *  $Id: DIFF 773 2019-10-02 09:01:03Z ertl-hiro $
+---
+>  *  $Id: DIFF 773 2019-10-02 09:01:03Z ertl-hiro $
 50a51
 > #include "overrun.h"
-640a642,646
+638a640,644
 > #ifdef TOPPERS_SUPPORT_OVRHDR
 > 			if (p_runtsk->staovr) {
 > 				(void) target_ovrtimer_stop();
@@ -234,6 +238,10 @@ diff -r ./kernel/task.c extension/ovrhdr/kernel/task.c
 > 	p_tcb->staovr = false;
 > #endif /* TOPPERS_SUPPORT_OVRHDR */
 diff -r ./kernel/task.h extension/ovrhdr/kernel/task.h
+40c40
+<  *  $Id: DIFF 773 2019-10-02 09:01:03Z ertl-hiro $
+---
+>  *  $Id: DIFF 773 2019-10-02 09:01:03Z ertl-hiro $
 226c226
 <  *  		p_tinib，p_dominib，p_schedcb，tstat，actque
 ---
@@ -252,9 +260,9 @@ Only in ./kernel: task_refer.c
 Only in ./kernel: task_sync.c
 diff -r ./kernel/task_term.c extension/ovrhdr/kernel/task_term.c
 40c40
-<  *  $Id: DIFF 688 2019-03-20 04:45:24Z ertl-hiro $
+<  *  $Id: DIFF 773 2019-10-02 09:01:03Z ertl-hiro $
 ---
->  *  $Id: DIFF 688 2019-03-20 04:45:24Z ertl-hiro $
+>  *  $Id: DIFF 773 2019-10-02 09:01:03Z ertl-hiro $
 51a52
 > #include "overrun.h"
 145a147,151
@@ -280,6 +288,10 @@ Only in .: library
 Only in ./sample: Makefile
 Only in ./sample: Makefile_mml
 diff -r ./sample/sample1.c extension/ovrhdr/sample/sample1.c
+40c40
+<  *  $Id: DIFF 773 2019-10-02 09:01:03Z ertl-hiro $
+---
+>  *  $Id: DIFF 773 2019-10-02 09:01:03Z ertl-hiro $
 54,56c54,57
 <  *  ム通知，割込みサービスルーチン，CPU例外ハンドラをそれぞれ1つ用いる．
 <  *  TASK1，TASK2，ALM_TASK，アラーム通知は保護ドメイン1（DOM1）に，
@@ -351,9 +363,9 @@ diff -r ./sample/sample1.c extension/ovrhdr/sample/sample1.c
 Only in ./sample: sample1.cdl
 diff -r ./sample/sample1.cfg extension/ovrhdr/sample/sample1.cfg
 4c4
-<  *  $Id: DIFF 688 2019-03-20 04:45:24Z ertl-hiro $
+<  *  $Id: DIFF 773 2019-10-02 09:01:03Z ertl-hiro $
 ---
->  *  $Id: DIFF 688 2019-03-20 04:45:24Z ertl-hiro $
+>  *  $Id: DIFF 773 2019-10-02 09:01:03Z ertl-hiro $
 39a40,42
 > #ifdef TOPPERS_SUPPORT_OVRHDR
 > 	DEF_OVR({ TA_NULL, overrun_handler });
@@ -364,9 +376,9 @@ diff -r ./sample/sample1.h extension/ovrhdr/sample/sample1.h
 ---
 >  *  Copyright (C) 2004-2018 by Embedded and Real-Time Systems Laboratory
 40c40
-<  *  $Id: DIFF 688 2019-03-20 04:45:24Z ertl-hiro $
+<  *  $Id: DIFF 773 2019-10-02 09:01:03Z ertl-hiro $
 ---
->  *  $Id: DIFF 688 2019-03-20 04:45:24Z ertl-hiro $
+>  *  $Id: DIFF 773 2019-10-02 09:01:03Z ertl-hiro $
 98a99,101
 > #ifdef TOPPERS_SUPPORT_OVRHDR
 > extern void	overrun_handler(ID tskid, intptr_t exinf);
@@ -407,12 +419,18 @@ Only in extension/ovrhdr/test: simt_ovrhdr3.h
 Only in ./test: simt_systim1.c
 Only in ./test: simt_systim1.cfg
 Only in ./test: simt_systim1.h
+Only in ./test: simt_systim1_64hrt.c
+Only in ./test: simt_systim1_64hrt.cfg
 Only in ./test: simt_systim2.c
 Only in ./test: simt_systim2.cfg
 Only in ./test: simt_systim2.h
+Only in ./test: simt_systim2_64hrt.c
+Only in ./test: simt_systim2_64hrt.cfg
 Only in ./test: simt_systim3.c
 Only in ./test: simt_systim3.cfg
 Only in ./test: simt_systim3.h
+Only in ./test: simt_systim3_64hrt.c
+Only in ./test: simt_systim3_64hrt.cfg
 Only in ./test: simt_systim4.c
 Only in ./test: simt_systim4.cfg
 Only in ./test: simt_systim4.h
@@ -469,12 +487,6 @@ Only in ./test: test_hrt1.h
 Only in ./test: test_int1.c
 Only in ./test: test_int1.cfg
 Only in ./test: test_int1.h
-Only in ./test: test_lmtdom1.c
-Only in ./test: test_lmtdom1.cfg
-Only in ./test: test_lmtdom1.h
-Only in ./test: test_lmtdom2.c
-Only in ./test: test_lmtdom2.cfg
-Only in ./test: test_lmtdom2.h
 Only in ./test: test_messagebuf1.c
 Only in ./test: test_messagebuf1.cfg
 Only in ./test: test_messagebuf1.h
@@ -551,6 +563,8 @@ Only in ./test: test_suspend1.h
 Only in ./test: test_sysman1.c
 Only in ./test: test_sysman1.cfg
 Only in ./test: test_sysman1.h
+Only in ./test: test_sysman2.c
+Only in ./test: test_sysman2.cfg
 Only in ./test: test_sysstat1.c
 Only in ./test: test_sysstat1.cfg
 Only in ./test: test_sysstat1.h

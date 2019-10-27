@@ -36,7 +36,7 @@
 #   アの利用により直接的または間接的に生じたいかなる損害に関しても，そ
 #   の責任を負わない．
 #
-#   $Id: domain_prep.trb 665 2019-02-03 17:06:18Z ertl-hiro $
+#   $Id: domain_prep.trb 727 2019-06-08 05:53:25Z ertl-hiro $
 #
 
 #
@@ -113,38 +113,7 @@ $cfgData[:ACV_DOM].each do |key, params|
 end
 
 #
-#  保護ドメインに対する制限の設定（LMT_DOM）
-#
-# LMT_DOMに関するエラーチェック
-$cfgData[:LMT_DOM].each do |key, params|
-  #	保護ドメインの囲みの中に記述されていない場合（E_RSATR）［NGKI3747］
-  if !params.has_key?(:domain) || params[:domain] == $TDOM_NONE
-    error_ercd("E_RSATR", params, "%apiname must be within a protection domain")
-    # 以降のエラーの抑止
-    params[:domain] = $TDOM_NONE
-  end
-
-  #	保護ドメイン中に複数のLMT_DOMがある場合（E_OBJ）［NGKI3444］
-  $cfgData[:LMT_DOM].each do |key2, params2|
-    break if key2 == key
-    if params2[:domain] == params[:domain]
-      error_ercd("E_OBJ", params, \
-						"%apiname is duplicated in a protection domain")
-    end
-  end
-
-  # mintpriが有効範囲外の場合（E_PAR）［NGKI3445］
-  #（TMIN_TPRI <= mintpri && mintpri <= TMAX_TPRIでない場合）
-  if !($TMIN_TPRI <= params[:mintpri] && params[:mintpri] <= $TMAX_TPRI)
-    error_illegal("E_PAR", params, :mintpri)
-  end
-
-  # LMT_DOMのデータを$domDataに取り込む
-  $domData[params[:domain]][:mintpri] = params[:mintpri]
-end
-
-#
-#  ACV_DOM／LMT_DOMがない時のデフォルト値の設定
+#  ACV_DOMがない時のデフォルト値の設定
 #
 $domData.each do |key, params|
   # ACV_DOMがない時のデフォルト値［NGKI0569］［NGKI0617］
@@ -152,11 +121,6 @@ $domData.each do |key, params|
   params[:acptn2] ||= $acptnKernel
   params[:acptn3] ||= $acptnKernel
   params[:acptn4] ||= $defaultAcptn[key]
-
-  if key != $TDOM_NONE
-    # LMT_DOMがない時のデフォルト値［NGKI3448］
-    params[:mintpri] ||= NumStr.new($TMIN_TPRI + 1, "TMIN_TPRI + 1")
-  end
 end
 
 #

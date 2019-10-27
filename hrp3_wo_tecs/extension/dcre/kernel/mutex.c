@@ -35,7 +35,7 @@
  *  アの利用により直接的または間接的に生じたいかなる損害に関しても，そ
  *  の責任を負わない．
  * 
- *  $Id: mutex.c 674 2019-03-08 03:46:38Z ertl-hiro $
+ *  $Id: mutex.c 727 2019-06-08 05:53:25Z ertl-hiro $
  */
 
 /*
@@ -577,11 +577,6 @@ loc_mtx(ID mtxid)
 	else if (VIOLATE_ACPTN(p_mtxcb->p_mtxinib->acvct.acptn1)) {
 		ercd = E_OACV;
 	}
-	else if (MTX_CEILING(p_mtxcb)
-			&& p_mtxcb->p_mtxinib->ceilpri < p_runtsk->p_dominib->minpriority
-			&& VIOLATE_ACPTN(p_runtsk->p_dominib->acvct.acptn2)) {
-		ercd = E_OACV;									/*［NGKI5124］*/
-	}
 	else if (p_runtsk->raster) {
 		ercd = E_RASTER;
 	}
@@ -640,11 +635,6 @@ ploc_mtx(ID mtxid)
 		ercd = E_OACV;
 	}
 	else if (MTX_CEILING(p_mtxcb)
-			&& p_mtxcb->p_mtxinib->ceilpri < p_runtsk->p_dominib->minpriority
-			&& VIOLATE_ACPTN(p_runtsk->p_dominib->acvct.acptn2)) {
-		ercd = E_OACV;									/*［NGKI5124］*/
-	}
-	else if (MTX_CEILING(p_mtxcb)
 				&& p_runtsk->bpriority < p_mtxcb->p_mtxinib->ceilpri) {
 		ercd = E_ILUSE;
 	}
@@ -697,11 +687,6 @@ tloc_mtx(ID mtxid, TMO tmout)
 	}
 	else if (VIOLATE_ACPTN(p_mtxcb->p_mtxinib->acvct.acptn1)) {
 		ercd = E_OACV;
-	}
-	else if (MTX_CEILING(p_mtxcb)
-			&& p_mtxcb->p_mtxinib->ceilpri < p_runtsk->p_dominib->minpriority
-			&& VIOLATE_ACPTN(p_runtsk->p_dominib->acvct.acptn2)) {
-		ercd = E_OACV;									/*［NGKI5124］*/
 	}
 	else if (p_runtsk->raster) {
 		ercd = E_RASTER;

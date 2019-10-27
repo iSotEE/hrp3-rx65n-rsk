@@ -37,7 +37,7 @@
 #  アの利用により直接的または間接的に生じたいかなる損害に関しても，そ
 #  の責任を負わない．
 # 
-#  $Id: Makefile 715 2019-04-03 05:39:42Z ertl-hiro $
+#  $Id: Makefile 777 2019-10-03 14:04:54Z ertl-hiro $
 # 
 
 #
@@ -178,7 +178,7 @@ endif
 CDEFS := $(CDEFS) @(CDEFS)
 INCLUDES := -I. -I$(SRCDIR)/include $(INCLUDES) -I$(SRCDIR)
 LDFLAGS := $(LDFLAGS) @(LDFLAGS)
-LIBS := $(LIBS) $(CXXLIBS)
+LIBS := @(LIBS) $(LIBS) $(CXXLIBS)
 CFLAGS = $(COPTS) $(CDEFS) $(INCLUDES)
 
 #

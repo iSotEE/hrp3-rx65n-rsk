@@ -3,7 +3,7 @@
  *      Toyohashi Open Platform for Embedded Real-Time Systems/
  *      High Reliable system Profile Kernel
  * 
- *  Copyright (C) 2006-2018 by Embedded and Real-Time Systems Laboratory
+ *  Copyright (C) 2006-2019 by Embedded and Real-Time Systems Laboratory
  *              Graduate School of Information Science, Nagoya Univ., JAPAN
  * 
  *  上記著作権者は，以下の(1)〜(4)の条件を満たす場合に限り，本ソフトウェ
@@ -35,7 +35,7 @@
  *  アの利用により直接的または間接的に生じたいかなる損害に関しても，そ
  *  の責任を負わない．
  * 
- *  $Id: target_kernel.h 607 2018-12-17 00:33:28Z ertl-hiro $
+ *  $Id: target_kernel.h 744 2019-07-15 18:59:37Z ertl-hiro $
  */
 
 /*
@@ -58,6 +58,9 @@
 
 /*
  *  サポートできる機能の定義
+ *
+ *  ena_int／dis_int／clr_int／ras_int／prb_intとオーバランハンドラを
+ *  サポートすることができる．
  */
 #define TOPPERS_TARGET_SUPPORT_ENA_INT		/* ena_int */
 #define TOPPERS_TARGET_SUPPORT_DIS_INT		/* dis_int */
@@ -91,6 +94,15 @@
 #define TSTEP_HRTCNT	10U				/* 高分解能タイマのカウント値の進み幅 */
 #define HRTCNT_BOUND	(0x10000U * 9U)	/* 割込みタイミングに指定する最大値 */
 #endif /* HRT_CONFIG2 */
+
+ /*
+ *  1μ秒毎にカウントアップする64ビットタイマ
+ */
+#ifdef HRT_CONFIG3
+/* TCYC_HRTCNTは定義しない．*/			/* 高分解能タイマのタイマ周期 */
+#define TSTEP_HRTCNT	1U				/* 高分解能タイマのカウント値の進み幅 */
+/* HRTCNT_BOUNDは定義しない */			/* 割込みタイミングに指定する最大値 */
+#endif /* HRT_CONFIG3 */
 
 /*
  *  スプリアス割込みへの対策

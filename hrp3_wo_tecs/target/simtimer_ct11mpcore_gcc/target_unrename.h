@@ -17,6 +17,7 @@
 #undef target_timer_terminate
 #undef target_hrt_get_current
 #undef target_hrt_set_event
+#undef target_hrt_clear_event
 #undef target_hrt_raise_event
 #undef target_hrt_handler
 #undef target_twdtimer_start
@@ -31,6 +32,7 @@
 #undef simtim_advance
 #undef simtim_add
 #undef hook_hrt_set_event
+#undef hook_hrt_clear_event
 #undef hook_hrt_raise_event
 
 

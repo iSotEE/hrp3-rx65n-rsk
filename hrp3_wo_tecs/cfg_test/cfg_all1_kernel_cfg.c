@@ -567,7 +567,7 @@ TOPPERS_EMPTY_LABEL(const SOMINIB, _kernel_sominib_table);
 
 const ID _kernel_tmax_domid = (TMIN_DOMID + TNUM_DOMID - 1);
 
-const DOMINIB _kernel_dominib_kernel = { TACP_KERNEL, &(_kernel_schedcb_kernel), _kernel_tmevt_heap_kernel, INT_PRIORITY(3), { TACP_SHARED, TACP_KERNEL, TACP_KERNEL, TACP_SHARED } };
+const DOMINIB _kernel_dominib_kernel = { TACP_KERNEL, &(_kernel_schedcb_kernel), _kernel_tmevt_heap_kernel, { TACP_SHARED, TACP_KERNEL, TACP_KERNEL, TACP_SHARED } };
 
 TOPPERS_EMPTY_LABEL(const DOMINIB, _kernel_dominib_table);
 

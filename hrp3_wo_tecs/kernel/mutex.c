@@ -3,7 +3,7 @@
  *      Toyohashi Open Platform for Embedded Real-Time Systems/
  *      High Reliable system Profile Kernel
  * 
- *  Copyright (C) 2005-2018 by Embedded and Real-Time Systems Laboratory
+ *  Copyright (C) 2005-2019 by Embedded and Real-Time Systems Laboratory
  *              Graduate School of Information Science, Nagoya Univ., JAPAN
  * 
  *  上記著作権者は，以下の(1)〜(4)の条件を満たす場合に限り，本ソフトウェ
@@ -35,7 +35,7 @@
  *  アの利用により直接的または間接的に生じたいかなる損害に関しても，そ
  *  の責任を負わない．
  * 
- *  $Id: mutex.c 477 2018-10-18 13:32:54Z ertl-hiro $
+ *  $Id: mutex.c 727 2019-06-08 05:53:25Z ertl-hiro $
  */
 
 /*
@@ -339,10 +339,6 @@ loc_mtx(ID mtxid)
 	CHECK_ID(VALID_MTXID(mtxid));
 	p_mtxcb = get_mtxcb(mtxid);
 	CHECK_ACPTN(p_mtxcb->p_mtxinib->acvct.acptn1);
-	if (MTX_CEILING(p_mtxcb)
-			&& p_mtxcb->p_mtxinib->ceilpri < p_runtsk->p_dominib->minpriority) {
-		CHECK_ACPTN(p_runtsk->p_dominib->acvct.acptn2);		/*［NGKI5124］*/
-	}
 
 	lock_cpu_dsp();
 	if (p_runtsk->raster) {
@@ -395,10 +391,6 @@ ploc_mtx(ID mtxid)
 	CHECK_ID(VALID_MTXID(mtxid));
 	p_mtxcb = get_mtxcb(mtxid);
 	CHECK_ACPTN(p_mtxcb->p_mtxinib->acvct.acptn1);
-	if (MTX_CEILING(p_mtxcb)
-			&& p_mtxcb->p_mtxinib->ceilpri < p_runtsk->p_dominib->minpriority) {
-		CHECK_ACPTN(p_runtsk->p_dominib->acvct.acptn2);		/*［NGKI5124］*/
-	}
 
 	lock_cpu();
 	if (MTX_CEILING(p_mtxcb)
@@ -448,10 +440,6 @@ tloc_mtx(ID mtxid, TMO tmout)
 	CHECK_PAR(VALID_TMOUT(tmout));
 	p_mtxcb = get_mtxcb(mtxid);
 	CHECK_ACPTN(p_mtxcb->p_mtxinib->acvct.acptn1);
-	if (MTX_CEILING(p_mtxcb)
-			&& p_mtxcb->p_mtxinib->ceilpri < p_runtsk->p_dominib->minpriority) {
-		CHECK_ACPTN(p_runtsk->p_dominib->acvct.acptn2);		/*［NGKI5124］*/
-	}
 
 	lock_cpu_dsp();
 	if (p_runtsk->raster) {

@@ -63,5 +63,6 @@ cfg_test/pass2_dom1_error.txt
 cfg_test/cfg_testexec.rb
 
 extension/dcre/DIFF
+extension/fch_mnt/DIFF
 extension/non_tecs/DIFF
 extension/ovrhdr/DIFF

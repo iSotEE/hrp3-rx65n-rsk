@@ -36,7 +36,7 @@
 #   アの利用により直接的または間接的に生じたいかなる損害に関しても，そ
 #   の責任を負わない．
 #
-#   $Id: kernel_lib.trb 674 2019-03-08 03:46:38Z ertl-hiro $
+#   $Id: kernel_lib.trb 727 2019-06-08 05:53:25Z ertl-hiro $
 #
 
 #
@@ -53,12 +53,14 @@ $pointerMax = $pointerLimit - 1
 #  データセクションのLMAからVMAへのコピー
 #
 def CopyLma
-  $datasecList.each do |key|
-    params = $memObj[key]
-    startData = SYMBOL("__start_#{params[:SLABEL]}")
-    endData= SYMBOL("__end_#{params[:SLABEL]}")
-    startIdata = SYMBOL("__start_#{params[:ILABEL]}")
-    BCOPY(startIdata, startData, endData - startData)
+  if defined?($datasecList)
+    $datasecList.each do |key|
+      params = $memObj[key]
+      startData = SYMBOL("__start_#{params[:SLABEL]}")
+      endData= SYMBOL("__end_#{params[:SLABEL]}")
+      startIdata = SYMBOL("__start_#{params[:ILABEL]}")
+      BCOPY(startIdata, startData, endData - startData)
+    end
   end
 
   if defined?($lmaList)
@@ -76,6 +78,15 @@ def CopyLma
         BCOPY(startIdata, startData, endData - startData)
       end
     end
+  end
+end
+
+#
+#  メモリオブジェクトの先頭／終了ラベルの宣言の生成のデフォルト定義
+#
+unless defined? GenerateDeclareLabel()
+  def GenerateDeclareLabel(genFile, label)
+    genFile.add("extern char #{label}[];")
   end
 end
 
@@ -157,8 +168,7 @@ def GenerateDominib(genFile)
   # カーネルドメインの保護ドメイン初期化ブロックの生成
   params = $domData[$TDOM_KERNEL]
   genFile.append("const DOMINIB _kernel_dominib_kernel = { TACP_KERNEL, " \
-						"&(#{params[:schedcb]}), #{params[:tmevtHeap]}, " \
-						"INT_PRIORITY(#{params[:mintpri]}), ")
+						"&(#{params[:schedcb]}), #{params[:tmevtHeap]}, ")
   if $USE_DOMINICTXB
     genFile.append("#{$kernelDominictxb}, ")
   end
@@ -177,7 +187,6 @@ def GenerateDominib(genFile)
 
       genFile.append("\t{ TACP(#{params[:domid]}), &(#{params[:schedcb]}), ")
       genFile.append("#{params[:tmevtHeap]}, ")
-      genFile.append("INT_PRIORITY(#{params[:mintpri]}), ")
       if $USE_DOMINICTXB
         genFile.append("#{GenerateDominictxb(key, params)}, ")
       end
@@ -196,7 +205,7 @@ def GenerateDominib(genFile)
   # 無所属に対する保護ドメイン初期化ブロックの生成
   params = $domData[$TDOM_NONE]
   genFile.append("const DOMINIB _kernel_dominib_none = { " \
-								"TACP_SHARED, NULL, NULL, 0, ")
+								"TACP_SHARED, NULL, NULL, ")
   if $USE_DOMINICTXB
     if defined?($noneDominictxb)
       genFile.append("#{$noneDominictxb}, ")
@@ -343,9 +352,9 @@ def GenerateMeminib
   $sortedMemtopList.each do |key|
     params = $memObj[key]
     if params[:linker]
-      $kernelMemC.add("extern char __start_#{params[:MLABEL]}[];")
+      GenerateDeclareLabel($kernelMemC, "__start_#{params[:MLABEL]}")
       if !params[:suppressend]
-        $kernelMemC.add("extern char __aend_#{params[:MAEND_MLABEL]}[];")
+        GenerateDeclareLabel($kernelMemC, "__aend_#{params[:MAEND_MLABEL]}")
       end
     end
   end

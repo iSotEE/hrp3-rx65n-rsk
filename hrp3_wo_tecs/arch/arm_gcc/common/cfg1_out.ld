@@ -1,13 +1,13 @@
 /*
- *  $Id: cfg1_out.ld 714 2019-04-02 21:40:13Z ertl-hiro $
+ *  $Id: cfg1_out.ld 735 2019-07-04 06:45:21Z ertl-hiro $
  */
 
 OUTPUT_FORMAT("elf32-littlearm", "elf32-bigarm","elf32-littlearm") 
 OUTPUT_ARCH(arm)
 
-PROVIDE(_gp = 0);
 PROVIDE(hardware_init_hook = 0);
 PROVIDE(software_init_hook = 0);
+PROVIDE(software_term_hook = 0);
 
 SECTIONS
 {

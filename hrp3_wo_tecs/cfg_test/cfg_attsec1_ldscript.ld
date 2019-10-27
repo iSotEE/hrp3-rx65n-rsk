@@ -6,9 +6,9 @@ MEMORY {
 	RAM : ORIGIN = 0x1800000, LENGTH = 0x800000
 }
 
-PROVIDE(_gp = 0);
 PROVIDE(hardware_init_hook = 0);
 PROVIDE(software_init_hook = 0);
+PROVIDE(software_term_hook = 0);
 
 SECTIONS {
 	.discard (NOLOAD) : {

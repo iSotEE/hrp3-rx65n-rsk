@@ -1,7 +1,7 @@
 #
 #		Makefile のチップ依存部（RZ/A1用）
 #
-#  $Id: Makefile.chip 548 2018-11-19 17:52:07Z ertl-hiro $
+#  $Id: Makefile.chip 779 2019-10-03 15:55:42Z ertl-hiro $
 # 
 
 #
@@ -13,8 +13,8 @@ CHIPDIR = $(SRCDIR)/arch/$(CORE)_$(TOOL)/$(CHIP)
 #  コンパイルオプション
 #
 INCLUDES := $(INCLUDES) -I$(CHIPDIR)
-COPTS := $(COPTS) -mcpu=cortex-a9
-LDFLAGS := $(LDFLAGS) -mcpu=cortex-a9
+COPTS := $(COPTS) -mcpu=cortex-a9 -mfpu=vfpv3-d16
+LDFLAGS := $(LDFLAGS) -mcpu=cortex-a9 -mfpu=vfpv3-d16
 CDEFS := $(CDEFS) -D__TARGET_ARCH_ARM=7
 
 #

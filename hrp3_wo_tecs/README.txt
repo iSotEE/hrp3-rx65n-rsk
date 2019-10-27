@@ -1,5 +1,5 @@
 
-	TOPPERS/HRP3 Kernel（Release 3.1）
+	TOPPERS/HRP3 Kernel（Release 3.2）
 		Toyohashi Open Platform for Embedded Real-Time Systems/
 		High Reliable system Profile Kernel
 

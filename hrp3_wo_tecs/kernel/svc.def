@@ -5,7 +5,7 @@
 # 
 #  Copyright (C) 2001 by Embedded and Real-Time Systems Laboratory
 #                              Toyohashi Univ. of Technology, JAPAN
-#  Copyright (C) 2005-2018 by Embedded and Real-Time Systems Laboratory
+#  Copyright (C) 2005-2019 by Embedded and Real-Time Systems Laboratory
 #              Graduate School of Information Science, Nagoya Univ., JAPAN
 # 
 #  上記著作権者は，以下の(1)〜(4)の条件を満たす場合に限り，本ソフトウェ
@@ -37,7 +37,7 @@
 #  アの利用により直接的または間接的に生じたいかなる損害に関しても，そ
 #  の責任を負わない．
 # 
-#  $Id: svc.def 572 2018-11-27 08:35:22Z ertl-hiro $
+#  $Id: svc.def 749 2019-07-17 06:35:11Z ertl-hiro $
 # 
 
 #
@@ -166,8 +166,8 @@
 		S				ER		tget_mpf(ID mpfid, void **p_blk, TMO tmout)
 		S				ER		rel_mpf(ID mpfid, void *blk)
 -93		-
-		S				HRTCNT	fch_hrt()
-		-
+		S<R_HRTCNT>		HRTCNT	fch_hrt()
+		S<R_UINT64>[FCH_MNT]	uint64_t	fch_mnt()
 		S[OVRHDR]		ER		ref_ovr(ID tskid, T_ROVR *pk_rovr)
 -97		S				ER		sta_cyc(ID cycid)
 		S				ER		stp_cyc(ID cycid)
@@ -227,7 +227,7 @@
 		-
 		-
 -153	-				ER		sac_dom(ID domid, const ACVCT *p_acvct)
-		-				ER		slt_dom(ID domid, const T_LDOM *pk_ldom)
+		-
 		-
 		-
 -157	P				ER		chg_som(ID somid)
@@ -315,9 +315,9 @@
 		-
 		-
 -241	-
-		-				ER		def_ovr(const T_DOVR *pk_dovr)
-		-				ER		def_inh(INHNO inhno, const T_DINH *pk_dinh)
-		-				ER		def_exc(EXCNO excno, const T_DEXC *pk_dexc)
+		-
+		-
+		-
 -245	-				ER		def_svc(FN fncd, const T_DSVC *pk_dsvc)
 		-
 		-

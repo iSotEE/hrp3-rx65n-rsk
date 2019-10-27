@@ -13,6 +13,10 @@ no_support(void)
 #define set_dft no_support
 #endif /* TOPPERS_SUPPORT_DRIFT */
 
+#ifndef TOPPERS_SUPPORT_FCH_MNT
+#define fch_mnt no_support
+#endif /* TOPPERS_SUPPORT_FCH_MNT */
+
 #ifndef TOPPERS_SUPPORT_OVRHDR
 #define ref_ovr no_support
 #define sta_ovr no_support
@@ -180,7 +184,7 @@ const SVC svc_table[-TMIN_FNCD+1] = {
 	(SVC)(rel_mpf),
 	(SVC)(no_support),
 	(SVC)(fch_hrt),
-	(SVC)(no_support),
+	(SVC)(fch_mnt),
 	(SVC)(ref_ovr),
 	(SVC)(sta_cyc),
 	(SVC)(stp_cyc),

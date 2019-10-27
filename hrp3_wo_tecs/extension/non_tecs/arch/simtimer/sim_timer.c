@@ -2,7 +2,7 @@
  *  TOPPERS Software
  *      Toyohashi Open Platform for Embedded Real-Time Systems
  * 
- *  Copyright (C) 2018 by Embedded and Real-Time Systems Laboratory
+ *  Copyright (C) 2018-2019 by Embedded and Real-Time Systems Laboratory
  *              Graduate School of Information Science, Nagoya Univ., JAPAN
  * 
  *  上記著作権者は，以下の(1)〜(4)の条件を満たす場合に限り，本ソフトウェ
@@ -34,7 +34,7 @@
  *  アの利用により直接的または間接的に生じたいかなる損害に関しても，そ
  *  の責任を負わない．
  * 
- *  $Id: sim_timer.c 609 2018-12-17 02:01:30Z ertl-hiro $
+ *  $Id: sim_timer.c 759 2019-09-13 04:27:54Z ertl-hiro $
  */
 
 /*
@@ -86,6 +86,15 @@
 typedef uint64_t	SIMTIM;
 
 /*
+ *  タイマ割込みの発生時刻の設定状況
+ */
+typedef struct {
+	bool_t		enable;				/* 発生時刻が設定されているか？ */
+	SIMTIM		simtim;				/* 発生時刻 */
+	void		(*raise)(void);		/* タイマ割込みの要求 */
+} INT_EVENT;
+
+/*
  *  現在のシミュレーション時刻
  */
 static SIMTIM	current_simtim;
@@ -98,8 +107,7 @@ static void		select_event(void);
 /*
  *  高分解能タイマ割込みの発生時刻
  */
-static bool_t	hrt_event_flag;		/* 発生時刻が設定されているか？ */
-static SIMTIM	hrt_event_simtim;	/* 発生時刻 */
+static INT_EVENT	hrt_event;
 
 Inline SIMTIM
 truncate_simtim(SIMTIM simtim)
@@ -136,10 +144,28 @@ target_hrt_set_event(HRTCNT hrtcnt)
 	hook_hrt_set_event(hrtcnt);
 #endif /* HOOK_HRT_EVENT */
 
-	hrt_event_flag = true;
-	hrt_event_simtim = roundup_simtim(current_simtim + hrtcnt);
+	hrt_event.enable = true;
+	hrt_event.simtim = roundup_simtim(current_simtim + hrtcnt);
 	select_event();
 }
+
+/*
+ *  高分解能タイマへの割込みタイミングのクリア
+ */
+#ifdef USE_64BIT_HRTCNT
+
+void
+target_hrt_clear_event(void)
+{
+#ifdef HOOK_HRT_EVENT
+	hook_hrt_clear_event();
+#endif /* HOOK_HRT_EVENT */
+
+	hrt_event.enable = false;
+	select_event();
+}
+
+#endif /* USE_64BIT_HRTCNT */
 
 /*
  *  高分解能タイマ割込みの要求
@@ -167,8 +193,7 @@ target_hrt_handler(void)
 /*
  *  タイムウィンドウタイマ割込みの発生時刻
  */
-static bool_t	twd_event_flag;		/* 発生時刻が設定されているか？ */
-static SIMTIM	twd_event_simtim;	/* 発生時刻 */
+static INT_EVENT	twd_event;
 
 /*
  *  タイムウィンドウタイマの動作開始
@@ -177,13 +202,13 @@ void
 target_twdtimer_start(PRCTIM twdtim)
 {
 	if (twdtim == 0) {
-		twd_event_flag = false;
+		twd_event.enable = false;
 		select_event();
 		target_raise_twd_int();
 	}
 	else {
-		twd_event_flag = true;
-		twd_event_simtim = current_simtim + twdtim;
+		twd_event.enable = true;
+		twd_event.simtim = current_simtim + twdtim;
 		select_event();
 	}
 }
@@ -200,13 +225,13 @@ target_twdtimer_stop(void)
 {
 	PRCTIM	twdtim;
 
-	if (twd_event_simtim <= current_simtim) {
+	if (twd_event.simtim <= current_simtim) {
 		twdtim = 0U;
 	}
 	else {
-		twdtim = twd_event_simtim - current_simtim;
+		twdtim = twd_event.simtim - current_simtim;
 	}
-	twd_event_flag = false;
+	twd_event.enable = false;
 	select_event();
 	target_clear_twd_int();
 	return(twdtim);
@@ -218,11 +243,11 @@ target_twdtimer_stop(void)
 PRCTIM
 target_twdtimer_get_current(void)
 {
-	if (twd_event_simtim <= current_simtim) {
+	if (twd_event.simtim <= current_simtim) {
 		return(0U);
 	}
 	else {
-		return(twd_event_simtim - current_simtim);
+		return(twd_event.simtim - current_simtim);
 	}
 }
 
@@ -240,8 +265,7 @@ target_twdtimer_handler(void)
 /*
  *  オーバランタイマ割込みの発生時刻
  */
-static bool_t	ovr_event_flag;		/* 発生時刻が設定されているか？ */
-static SIMTIM	ovr_event_simtim;	/* 発生時刻 */
+static INT_EVENT	ovr_event;
 
 /*
  *  オーバランタイマの動作開始
@@ -250,13 +274,13 @@ void
 target_ovrtimer_start(PRCTIM ovrtim)
 {
 	if (ovrtim == 0) {
-		ovr_event_flag = false;
+		ovr_event.enable = false;
 		select_event();
 		target_raise_ovr_int();
 	}
 	else {
-		ovr_event_flag = true;
-		ovr_event_simtim = current_simtim + ovrtim;
+		ovr_event.enable = true;
+		ovr_event.simtim = current_simtim + ovrtim;
 		select_event();
 	}
 }
@@ -273,13 +297,13 @@ target_ovrtimer_stop(void)
 {
 	PRCTIM	ovrtim;
 
-	if (ovr_event_simtim <= current_simtim) {
+	if (ovr_event.simtim <= current_simtim) {
 		ovrtim = 0U;
 	}
 	else {
-		ovrtim = ovr_event_simtim - current_simtim;
+		ovrtim = ovr_event.simtim - current_simtim;
 	}
-	ovr_event_flag = false;
+	ovr_event.enable = false;
 	select_event();
 	target_clear_ovr_int();
 	return(ovrtim);
@@ -291,11 +315,11 @@ target_ovrtimer_stop(void)
 PRCTIM
 target_ovrtimer_get_current(void)
 {
-	if (ovr_event_simtim <= current_simtim) {
+	if (ovr_event.simtim <= current_simtim) {
 		return(0U);
 	}
 	else {
-		return(ovr_event_simtim - current_simtim);
+		return(ovr_event.simtim - current_simtim);
 	}
 }
 
@@ -314,9 +338,7 @@ target_ovrtimer_handler(void)
 /*
  *  最初に発生するタイマ割込みの情報
  */
-static bool_t	*p_event_flag;			/* 発生時刻が設定されているか？ */
-static SIMTIM	*p_event_simtim;		/* 発生時刻 */
-static void		(*p_raise_event)(void);	/* 割込みの要求処理 */
+static INT_EVENT	*p_next_event;
 
 /*
  *  タイマの起動処理
@@ -325,12 +347,15 @@ void
 target_timer_initialize(intptr_t exinf)
 {
 	current_simtim = SIMTIM_INIT_CURRENT;
-	hrt_event_flag = false;
-	twd_event_flag = false;
+	hrt_event.enable = false;
+	hrt_event.raise = &target_raise_hrt_int;
+	twd_event.enable = false;
+	twd_event.raise = &target_raise_twd_int;
 #ifdef TOPPERS_SUPPORT_OVRHDR
-	ovr_event_flag = false;
+	ovr_event.enable = false;
+	ovr_event.raise = &target_raise_ovr_int;
 #endif /* TOPPERS_SUPPORT_OVRHDR */
-	p_event_flag = &hrt_event_flag;
+	p_next_event = NULL;
 }
 
 /*
@@ -339,10 +364,10 @@ target_timer_initialize(intptr_t exinf)
 void
 target_timer_terminate(intptr_t exinf)
 {
-	hrt_event_flag = false;
-	twd_event_flag = false;
+	hrt_event.enable = false;
+	twd_event.enable = false;
 #ifdef TOPPERS_SUPPORT_OVRHDR
-	ovr_event_flag = false;
+	ovr_event.enable = false;
 #endif /* TOPPERS_SUPPORT_OVRHDR */
 }
 
@@ -352,23 +377,22 @@ target_timer_terminate(intptr_t exinf)
 static void
 select_event(void)
 {
-	p_event_flag = &hrt_event_flag;
-	p_event_simtim = &hrt_event_simtim;
-	p_raise_event = &target_raise_hrt_int;
+	if (hrt_event.enable) {
+		p_next_event = &hrt_event;
+	}
+	else {
+		p_next_event = NULL;
+	}
 
-	if (twd_event_flag &&
-			(!(*p_event_flag) || twd_event_simtim <= *p_event_simtim)) {
-		p_event_flag = &twd_event_flag;
-		p_event_simtim = &twd_event_simtim;
-		p_raise_event = &target_raise_twd_int;
+	if (twd_event.enable && (p_next_event == NULL
+								|| twd_event.simtim <= p_next_event->simtim)) {
+		p_next_event = &twd_event;
 	}
 
 #ifdef TOPPERS_SUPPORT_OVRHDR
-	if (ovr_event_flag &&
-			(!(*p_event_flag) || ovr_event_simtim <= *p_event_simtim)) {
-		p_event_flag = &ovr_event_flag;
-		p_event_simtim = &ovr_event_simtim;
-		p_raise_event = &target_raise_ovr_int;
+	if (ovr_event.enable && (p_next_event == NULL
+								|| ovr_event.simtim <= p_next_event->simtim)) {
+		p_next_event = &ovr_event;
 	}
 #endif /* TOPPERS_SUPPORT_OVRHDR */
 }
@@ -380,10 +404,10 @@ void
 target_custom_idle(void)
 {
 	lock_cpu();
-	if (*p_event_flag) {
-		current_simtim = *p_event_simtim;
-		*p_event_flag = false;
-		(*p_raise_event)();
+	if (p_next_event != NULL) {
+		current_simtim = p_next_event->simtim;
+		p_next_event->enable = false;
+		(*(p_next_event->raise))();
 		select_event();
 	}
 	unlock_cpu();
@@ -402,17 +426,17 @@ simtim_advance(uint_t time)
 		loc_cpu();
 	}
 
-	while (*p_event_flag && *p_event_simtim <= current_simtim + time) {
+	while (p_next_event != NULL
+					&& p_next_event->simtim <= current_simtim + time) {
 		/*
-		 *  時刻をtime進めると，高分解能タイマ割込みの発生時刻を過ぎ
-		 *  る場合
+		 *  時刻をtime進めると，タイマ割込みの発生時刻を過ぎる場合
 		 */
-		if (current_simtim < *p_event_simtim) {
-			time -= (*p_event_simtim - current_simtim);
-			current_simtim = *p_event_simtim;
+		if (current_simtim < p_next_event->simtim) {
+			time -= (p_next_event->simtim - current_simtim);
+			current_simtim = p_next_event->simtim;
 		}
-		*p_event_flag = false;
-		(*p_raise_event)();
+		p_next_event->enable = false;
+		(*(p_next_event->raise))();
 		select_event();
 
 		/*

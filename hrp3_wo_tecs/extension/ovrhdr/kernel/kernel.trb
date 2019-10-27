@@ -37,7 +37,7 @@
 #   アの利用により直接的または間接的に生じたいかなる損害に関しても，そ
 #   の責任を負わない．
 # 
-#   $Id: kernel.trb 665 2019-02-03 17:06:18Z ertl-hiro $
+#   $Id: kernel.trb 734 2019-06-27 05:35:48Z ertl-hiro $
 # 
 
 #
@@ -343,7 +343,6 @@ def generateNotifyHandler(key, params, objid)
     if nfymode2 != 0
       # エラー通知処理の処理
       $kernelCfgC.add("\tif (ercd != E_OK) {")
-
 
       if nfymode2 == $TENFY_SETVAR
         # 変数の設定

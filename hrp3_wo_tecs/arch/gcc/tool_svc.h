@@ -5,6 +5,12 @@
 
 #ifndef TOPPERS_MACRO_ONLY
 
+#ifndef USE_64BIT_HRTCNT
+#define CAL_SVC_0M_R_HRTCNT(TYPE, FNCD)		CAL_SVC_0M(TYPE, FNCD)
+#else /* USE_64BIT_HRTCNT */
+#define CAL_SVC_0M_R_HRTCNT(TYPE, FNCD)		CAL_SVC_0M_R_UINT64(TYPE, FNCD)
+#endif /* USE_64BIT_HRTCNT */
+
 Inline ER
 act_tsk(ID tskid)
 {
@@ -370,8 +376,16 @@ rel_mpf(ID mpfid, void *blk)
 Inline HRTCNT
 fch_hrt(void)
 {
-	CAL_SVC_0M(HRTCNT, TFN_FCH_HRT);
+	CAL_SVC_0M_R_HRTCNT(HRTCNT, TFN_FCH_HRT);
 }
+
+#ifdef TOPPERS_SUPPORT_FCH_MNT
+Inline uint64_t
+fch_mnt(void)
+{
+	CAL_SVC_0M_R_UINT64(uint64_t, TFN_FCH_MNT);
+}
+#endif /* TOPPERS_SUPPORT_FCH_MNT */
 
 #ifdef TOPPERS_SUPPORT_OVRHDR
 Inline ER

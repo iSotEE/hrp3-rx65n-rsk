@@ -158,7 +158,6 @@ sizeof_DOMINIB,sizeof(DOMINIB)
 offsetof_DOMINIB_domptn,"offsetof(DOMINIB,domptn)"
 offsetof_DOMINIB_p_schedcb,"offsetof(DOMINIB,p_schedcb)"
 offsetof_DOMINIB_p_tmevt_heap,"offsetof(DOMINIB,p_tmevt_heap)"
-offsetof_DOMINIB_minpriority,"offsetof(DOMINIB,minpriority)"
 offsetof_DOMINIB_domctxb,"offsetof(DOMINIB,domctxb)",,defined(USE_DOMINICTXB)
 offsetof_DOMINIB_acvct,"offsetof(DOMINIB,acvct)"
 sizeof_TINIB,sizeof(TINIB)

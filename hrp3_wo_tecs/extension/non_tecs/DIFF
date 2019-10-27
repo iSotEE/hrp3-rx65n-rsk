@@ -43,7 +43,6 @@ Only in ./arch/arm_gcc/common: mpcore_timer.cfg
 Only in ./arch/arm_gcc/common: mpcore_timer.h
 Only in ./arch/arm_gcc/common: pl310.c
 Only in ./arch/arm_gcc/common: pl310.h
-Only in ./arch/arm_gcc/common: sp804.h
 Only in ./arch/arm_gcc/common: start.S
 Only in ./arch/arm_gcc/common: tUartPL011.c
 Only in ./arch/arm_gcc/common: tUartPL011.cdl
@@ -54,9 +53,9 @@ diff -r ./arch/arm_gcc/common/uart_pl011.h extension/non_tecs/arch/arm_gcc/commo
 ---
 >  *  Copyright (C) 2006-2018 by Embedded and Real-Time Systems Laboratory
 39c39
-<  *  $Id: DIFF 686 2019-03-20 04:40:21Z ertl-hiro $
+<  *  $Id: DIFF 773 2019-10-02 09:01:03Z ertl-hiro $
 ---
->  *  $Id: DIFF 686 2019-03-20 04:40:21Z ertl-hiro $
+>  *  $Id: DIFF 773 2019-10-02 09:01:03Z ertl-hiro $
 43c43
 <  *		ARM PrimCell UART（PL011）に関する定義
 ---
@@ -218,9 +217,9 @@ diff -r ./arch/arm_gcc/rza1/scif.h extension/non_tecs/arch/arm_gcc/rza1/scif.h
 ---
 >  *  Copyright (C) 2007-2018 by Embedded and Real-Time Systems Laboratory
 39c39
-<  *  $Id: DIFF 686 2019-03-20 04:40:21Z ertl-hiro $
+<  *  $Id: DIFF 773 2019-10-02 09:01:03Z ertl-hiro $
 ---
->  *  $Id: DIFF 686 2019-03-20 04:40:21Z ertl-hiro $
+>  *  $Id: DIFF 773 2019-10-02 09:01:03Z ertl-hiro $
 43c43,44
 <  *		FIFO内蔵シリアルコミュニケーションインタフェースに関する定義
 ---
@@ -403,6 +402,7 @@ Only in ./arch/arm_gcc/rza1: tSCIF.c
 Only in ./arch/arm_gcc/rza1: tSCIF.cdl
 Only in ./arch/arm_gcc/rza1: tSIOPortRZA1.cdl
 Only in ./arch/arm_gcc/rza1: tSIOPortRZA1Main_inline.h
+Only in ./arch/arm_gcc: test
 Only in ./arch/arm_gcc/zynq7000: MANIFEST
 Only in ./arch/arm_gcc/zynq7000: Makefile.chip
 Only in ./arch/arm_gcc/zynq7000: chip_kernel.h
@@ -598,11 +598,7 @@ diff -r ./arch/arm_gcc/zynq7000/xuartps.h extension/non_tecs/arch/arm_gcc/zynq70
 Only in ./arch/arm_gcc/zynq7000: zynq7000.h
 Only in ./arch: gcc
 diff -r ./arch/simtimer/sim_timer.c extension/non_tecs/arch/simtimer/sim_timer.c
-37c37
-<  *  $Id: DIFF 686 2019-03-20 04:40:21Z ertl-hiro $
----
->  *  $Id: DIFF 686 2019-03-20 04:40:21Z ertl-hiro $
-452a453,475
+476a477,499
 > 
 > /*
 >  *  拡張サービスコールとして登録するための関数
@@ -628,9 +624,9 @@ diff -r ./arch/simtimer/sim_timer.c extension/non_tecs/arch/simtimer/sim_timer.c
 > #endif /* TOPPERS_OMIT_TECS */
 diff -r ./arch/simtimer/sim_timer.cfg extension/non_tecs/arch/simtimer/sim_timer.cfg
 4c4
-<  *  $Id: DIFF 686 2019-03-20 04:40:21Z ertl-hiro $
+<  *  $Id: DIFF 773 2019-10-02 09:01:03Z ertl-hiro $
 ---
->  *  $Id: DIFF 686 2019-03-20 04:40:21Z ertl-hiro $
+>  *  $Id: DIFF 773 2019-10-02 09:01:03Z ertl-hiro $
 9a10,16
 > #ifdef TOPPERS_OMIT_TECS
 > 	DEF_SVC(TFN_SIMTIM_ADVANCE, { TA_NULL, extsvc_simtim_advance,
@@ -716,9 +712,9 @@ diff -r ./include/extsvc_fncode.h extension/non_tecs/include/extsvc_fncode.h
 ---
 >  *  Copyright (C) 2006-2018 by Embedded and Real-Time Systems Laboratory
 37c37
-<  *  $Id: DIFF 686 2019-03-20 04:40:21Z ertl-hiro $
+<  *  $Id: DIFF 773 2019-10-02 09:01:03Z ertl-hiro $
 ---
->  *  $Id: DIFF 686 2019-03-20 04:40:21Z ertl-hiro $
+>  *  $Id: DIFF 773 2019-10-02 09:01:03Z ertl-hiro $
 46a47,48
 > #ifndef TOPPERS_OMIT_TECS
 > 
@@ -784,10 +780,14 @@ Only in ./include: svc_call.h
 Only in ./include: t_stddef.h
 Only in ./include: t_stdlib.h
 diff -r ./include/t_syslog.h extension/non_tecs/include/t_syslog.h
-40c40
-<  *  $Id: DIFF 686 2019-03-20 04:40:21Z ertl-hiro $
+8c8
+<  *  Copyright (C) 2004-2019 by Embedded and Real-Time Systems Laboratory
 ---
->  *  $Id: DIFF 686 2019-03-20 04:40:21Z ertl-hiro $
+>  *  Copyright (C) 2004-2018 by Embedded and Real-Time Systems Laboratory
+40c40
+<  *  $Id: DIFF 773 2019-10-02 09:01:03Z ertl-hiro $
+---
+>  *  $Id: DIFF 773 2019-10-02 09:01:03Z ertl-hiro $
 68a69
 > #ifndef TOPPERS_OMIT_TECS
 69a71,74
@@ -795,10 +795,21 @@ diff -r ./include/t_syslog.h extension/non_tecs/include/t_syslog.h
 > #include <kernel.h>
 > #include <extsvc_fncode.h>
 > #endif /* TOPPERS_OMIT_TECS */
-141a147,148
+83,84c88,89
+< #define LOG_TYPE_CYC		UINT_C(0x13)	/* 周期通知 */
+< #define LOG_TYPE_ALM		UINT_C(0x14)	/* アラーム通知 */
+---
+> #define LOG_TYPE_CYC		UINT_C(0x13)	/* 周期ハンドラ */
+> #define LOG_TYPE_ALM		UINT_C(0x14)	/* アラームハンドラ */
+90,91d94
+< #define LOG_TYPE_SCYC		UINT_C(0x51)	/* システム周期 */
+< #define LOG_TYPE_TWD		UINT_C(0x52)	/* タイムウィンドウ */
+94d96
+< #define LOG_START			UINT_C(0x00)	/* 開始 */
+144a147,148
 > #ifndef TOPPERS_OMIT_TECS
 > 
-143a151,161
+146a151,161
 > #else /* TOPPERS_OMIT_TECS */
 > 
 > Inline ER
@@ -810,10 +821,10 @@ diff -r ./include/t_syslog.h extension/non_tecs/include/t_syslog.h
 > 
 > #endif /* TOPPERS_OMIT_TECS */
 > 
-154a173,174
+157a173,174
 > #ifndef TOPPERS_OMIT_TECS
 > 
-159a180,188
+162a180,188
 > #else /* TOPPERS_OMIT_TECS */
 > 
 > extern ER	_syslog_wri_log(uint_t prio, const SYSLOG *p_syslog) throw();
@@ -831,9 +842,9 @@ Only in ./sample: sample1.c
 Only in ./sample: sample1.cdl
 diff -r ./sample/sample1.cfg extension/non_tecs/sample/sample1.cfg
 4c4
-<  *  $Id: DIFF 686 2019-03-20 04:40:21Z ertl-hiro $
+<  *  $Id: DIFF 773 2019-10-02 09:01:03Z ertl-hiro $
 ---
->  *  $Id: DIFF 686 2019-03-20 04:40:21Z ertl-hiro $
+>  *  $Id: DIFF 773 2019-10-02 09:01:03Z ertl-hiro $
 5a6
 > #ifndef TOPPERS_OMIT_TECS
 6a8,13
@@ -866,9 +877,9 @@ diff -r ./syssvc/histogram.h extension/non_tecs/syssvc/histogram.h
 >  *      Toyohashi Open Platform for Embedded Real-Time Systems/
 >  *      High Reliable system Profile Kernel
 37c38
-<  *  $Id: DIFF 686 2019-03-20 04:40:21Z ertl-hiro $
+<  *  $Id: DIFF 773 2019-10-02 09:01:03Z ertl-hiro $
 ---
->  *  $Id: DIFF 686 2019-03-20 04:40:21Z ertl-hiro $
+>  *  $Id: DIFF 773 2019-10-02 09:01:03Z ertl-hiro $
 52a54,76
 > #ifdef TOPPERS_OMIT_TECS
 > 
@@ -979,9 +990,9 @@ diff -r ./syssvc/serial.h extension/non_tecs/syssvc/serial.h
 ---
 >  *  Copyright (C) 2004-2018 by Embedded and Real-Time Systems Laboratory
 39c40
-<  *  $Id: DIFF 686 2019-03-20 04:40:21Z ertl-hiro $
+<  *  $Id: DIFF 773 2019-10-02 09:01:03Z ertl-hiro $
 ---
->  *  $Id: DIFF 686 2019-03-20 04:40:21Z ertl-hiro $
+>  *  $Id: DIFF 773 2019-10-02 09:01:03Z ertl-hiro $
 54a56,88
 > #ifdef TOPPERS_OMIT_TECS
 > #include <extsvc_fncode.h>
@@ -1139,9 +1150,9 @@ diff -r ./syssvc/syslog.h extension/non_tecs/syssvc/syslog.h
 ---
 >  *  Copyright (C) 2005-2018 by Embedded and Real-Time Systems Laboratory
 39c40
-<  *  $Id: DIFF 686 2019-03-20 04:40:21Z ertl-hiro $
+<  *  $Id: DIFF 773 2019-10-02 09:01:03Z ertl-hiro $
 ---
->  *  $Id: DIFF 686 2019-03-20 04:40:21Z ertl-hiro $
+>  *  $Id: DIFF 773 2019-10-02 09:01:03Z ertl-hiro $
 55a57,85
 > #ifdef TOPPERS_OMIT_TECS
 > #include <extsvc_fncode.h>
@@ -1284,9 +1295,9 @@ diff -r ./syssvc/test_svc.h extension/non_tecs/syssvc/test_svc.h
 >  *      Toyohashi Open Platform for Embedded Real-Time Systems/
 >  *      High Reliable system Profile Kernel
 37c38
-<  *  $Id: DIFF 686 2019-03-20 04:40:21Z ertl-hiro $
+<  *  $Id: DIFF 773 2019-10-02 09:01:03Z ertl-hiro $
 ---
->  *  $Id: DIFF 686 2019-03-20 04:40:21Z ertl-hiro $
+>  *  $Id: DIFF 773 2019-10-02 09:01:03Z ertl-hiro $
 53a55,91
 > #ifdef TOPPERS_OMIT_TECS
 > #include <extsvc_fncode.h>
@@ -1422,6 +1433,7 @@ Only in ./target/ct11mpcore_gcc: E_PACKAGE
 Only in ./target/ct11mpcore_gcc: MANIFEST
 Only in ./target/ct11mpcore_gcc: Makefile.target
 Only in ./target/ct11mpcore_gcc: ct11mpcore.h
+Only in ./target/ct11mpcore_gcc: sp804.h
 Only in ./target/ct11mpcore_gcc: tSIOPortCT11MPCore.cdl
 Only in ./target/ct11mpcore_gcc: tSIOPortCT11MPCoreMain_inline.h
 Only in ./target/ct11mpcore_gcc: target.cdl
@@ -1432,9 +1444,9 @@ Only in ./target/ct11mpcore_gcc: target_kernel.h
 Only in ./target/ct11mpcore_gcc: target_kernel.trb
 diff -r ./target/ct11mpcore_gcc/target_kernel_impl.c extension/non_tecs/target/ct11mpcore_gcc/target_kernel_impl.c
 38c38
-<  *  $Id: DIFF 686 2019-03-20 04:40:21Z ertl-hiro $
+<  *  $Id: DIFF 773 2019-10-02 09:01:03Z ertl-hiro $
 ---
->  *  $Id: DIFF 686 2019-03-20 04:40:21Z ertl-hiro $
+>  *  $Id: DIFF 773 2019-10-02 09:01:03Z ertl-hiro $
 51c51,54
 <  *
 ---
@@ -1454,7 +1466,7 @@ diff -r ./target/ct11mpcore_gcc/target_kernel_impl.c extension/non_tecs/target/c
 > #else /* TOPPERS_OMIT_TECS */
 > 	sio_initialize(0);
 > 	target_fput_initialize();
-111a125,172
+123a137,184
 > 
 > #ifdef TOPPERS_OMIT_TECS
 > /*
@@ -1517,9 +1529,9 @@ Only in ./target/ct11mpcore_gcc: target_stddef.h
 Only in ./target/ct11mpcore_gcc: target_svc.h
 diff -r ./target/ct11mpcore_gcc/target_syssvc.h extension/non_tecs/target/ct11mpcore_gcc/target_syssvc.h
 8c8
-<  *  $Id: DIFF 686 2019-03-20 04:40:21Z ertl-hiro $
+<  *  $Id: DIFF 773 2019-10-02 09:01:03Z ertl-hiro $
 ---
->  *  $Id: DIFF 686 2019-03-20 04:40:21Z ertl-hiro $
+>  *  $Id: DIFF 773 2019-10-02 09:01:03Z ertl-hiro $
 13a14,57
 > #ifdef TOPPERS_OMIT_TECS
 > 
@@ -1570,6 +1582,7 @@ Only in ./target/ct11mpcore_gcc: target_timer.c
 Only in ./target/ct11mpcore_gcc: target_timer.cfg
 Only in ./target/ct11mpcore_gcc: target_timer.h
 Only in ./target/ct11mpcore_gcc: target_unrename.h
+Only in ./target/ct11mpcore_gcc: target_user.txt
 Only in ./target/dummy_gcc: MANIFEST
 Only in ./target/dummy_gcc: Makefile.target
 Only in ./target/dummy_gcc: dummy.h
@@ -1651,9 +1664,9 @@ diff -r ./target/gr_peach_gcc/target_kernel_impl.c extension/non_tecs/target/gr_
 ---
 >  *  Copyright (C) 2007-2018 by Embedded and Real-Time Systems Laboratory
 38c38
-<  *  $Id: DIFF 686 2019-03-20 04:40:21Z ertl-hiro $
+<  *  $Id: DIFF 773 2019-10-02 09:01:03Z ertl-hiro $
 ---
->  *  $Id: DIFF 686 2019-03-20 04:40:21Z ertl-hiro $
+>  *  $Id: DIFF 773 2019-10-02 09:01:03Z ertl-hiro $
 171c171,174
 <  *
 ---
@@ -1673,7 +1686,7 @@ diff -r ./target/gr_peach_gcc/target_kernel_impl.c extension/non_tecs/target/gr_
 > #else /* TOPPERS_OMIT_TECS */
 > 	sio_initialize(0);
 > 	target_fput_initialize();
-248a262,309
+260a274,321
 > 
 > #ifdef TOPPERS_OMIT_TECS
 > /*
@@ -1740,9 +1753,9 @@ diff -r ./target/gr_peach_gcc/target_syssvc.h extension/non_tecs/target/gr_peach
 ---
 >  *		システムサービスのターゲット依存部（GR-PEACH用）
 8c8
-<  *  $Id: DIFF 686 2019-03-20 04:40:21Z ertl-hiro $
+<  *  $Id: DIFF 773 2019-10-02 09:01:03Z ertl-hiro $
 ---
->  *  $Id: DIFF 686 2019-03-20 04:40:21Z ertl-hiro $
+>  *  $Id: DIFF 773 2019-10-02 09:01:03Z ertl-hiro $
 13a14,59
 > #ifdef TOPPERS_OMIT_TECS
 > 
@@ -1794,6 +1807,7 @@ Only in ./target/gr_peach_gcc: target_test.h
 Only in ./target/gr_peach_gcc: target_timer.cfg
 Only in ./target/gr_peach_gcc: target_timer.h
 Only in ./target/gr_peach_gcc: target_unrename.h
+Only in ./target/gr_peach_gcc: target_user.txt
 Only in ./target: simtimer_ct11mpcore_gcc
 Only in ./target/zybo_gcc: E_PACKAGE
 Only in ./target/zybo_gcc: MANIFEST
@@ -1807,9 +1821,9 @@ Only in ./target/zybo_gcc: target_kernel.h
 Only in ./target/zybo_gcc: target_kernel.trb
 diff -r ./target/zybo_gcc/target_kernel_impl.c extension/non_tecs/target/zybo_gcc/target_kernel_impl.c
 38c38
-<  *  $Id: DIFF 686 2019-03-20 04:40:21Z ertl-hiro $
+<  *  $Id: DIFF 773 2019-10-02 09:01:03Z ertl-hiro $
 ---
->  *  $Id: DIFF 686 2019-03-20 04:40:21Z ertl-hiro $
+>  *  $Id: DIFF 773 2019-10-02 09:01:03Z ertl-hiro $
 53c53,56
 <  *
 ---
@@ -1829,12 +1843,12 @@ diff -r ./target/zybo_gcc/target_kernel_impl.c extension/non_tecs/target/zybo_gc
 > #else /* TOPPERS_OMIT_TECS */
 > 	sio_initialize(0);
 > 	target_fput_initialize();
-113,114c126
+125,126c138
 < 	Asm("ldr r1, =#0x20026\n\t"		/* ADP_Stopped_ApplicationExit */ 
 < 		"mov r0, #0x18\n\t"			/* angel_SWIreason_ReportException */
 ---
 > 	Asm("mov r0, #24\n\t"
-118a131,178
+130a143,190
 > 
 > #ifdef TOPPERS_OMIT_TECS
 > /*
@@ -1900,9 +1914,9 @@ diff -r ./target/zybo_gcc/target_syssvc.h extension/non_tecs/target/zybo_gcc/tar
 ---
 >  *		システムサービスのターゲット依存部（ZYBO用）
 8c8
-<  *  $Id: DIFF 686 2019-03-20 04:40:21Z ertl-hiro $
+<  *  $Id: DIFF 773 2019-10-02 09:01:03Z ertl-hiro $
 ---
->  *  $Id: DIFF 686 2019-03-20 04:40:21Z ertl-hiro $
+>  *  $Id: DIFF 773 2019-10-02 09:01:03Z ertl-hiro $
 13a14,59
 > #ifdef TOPPERS_OMIT_TECS
 > 
@@ -1954,6 +1968,7 @@ Only in ./target/zybo_gcc: target_test.h
 Only in ./target/zybo_gcc: target_timer.cfg
 Only in ./target/zybo_gcc: target_timer.h
 Only in ./target/zybo_gcc: target_unrename.h
+Only in ./target/zybo_gcc: xilinx_sdk
 Only in ./target/zybo_gcc: zybo.h
 Only in .: tecs_kernel
 Only in .: tecsgen

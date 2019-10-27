@@ -34,7 +34,7 @@
  *  アの利用により直接的または間接的に生じたいかなる損害に関しても，そ
  *  の責任を負わない．
  * 
- *  $Id: test_tprot3.c 634 2019-01-04 10:24:40Z ertl-hiro $
+ *  $Id: test_tprot3.c 789 2019-10-04 07:00:42Z ertl-hiro $
  */
 
 /* 
@@ -81,64 +81,64 @@
  *	== TASK2 ==
  *	1:	get_som(&somid)
  *		assert(somid == SOM1)
- *		DO(WAIT(task2_flag))
+ *		WAIT(task2_flag)
  *	// タイムウィンドウ for DOM1
  *	== TASK1 ==
- *	2:	DO(WAIT(task1_flag))
+ *	2:	WAIT(task1_flag)
  *	// アイドルウィンドウ
  *	== TASK3 ==
- *	3:	DO(WAIT(task3_flag))
+ *	3:	WAIT(task3_flag)
  *	// システム動作モード：SOM1										... (A-1)
  *	// タイムウィンドウ for DOM2
  *	== TASK2 ==
  *	4:	chg_som(SOM2)												... (B-1-1)
  *		get_som(&somid)
  *		assert(somid == SOM1)
- *		DO(WAIT(task2_flag))
+ *		WAIT(task2_flag)
  *	// タイムウィンドウ for DOM1
  *	== TASK1 ==
- *	5:	DO(WAIT(task1_flag))
+ *	5:	WAIT(task1_flag)
  *	// アイドルウィンドウ
  *	== TASK3 ==
- *	6:	DO(WAIT(task3_flag))
+ *	6:	WAIT(task3_flag)
  *	// システム動作モード：SOM2										... (B-1-2)
  *	// タイムウィンドウ for DOM1
  *	== TASK1 ==
  *	7:	get_som(&somid)
  *		assert(somid == SOM2)
- *		DO(WAIT(task1_flag))
+ *		WAIT(task1_flag)
  *	// タイムウィンドウ for DOM2
  *	== TASK2 ==
- *	8:	DO(WAIT(task2_flag))
+ *	8:	WAIT(task2_flag)
  *	// アイドルウィンドウ
  *	== TASK3 ==
- *	9:	DO(WAIT(task3_flag))
+ *	9:	WAIT(task3_flag)
  *	// システム動作モード：SOM3										... (A-2)
  *	// タイムウィンドウ for DOM1
  *	== TASK1 ==
  *	10:	get_som(&somid)
  *		assert(somid == SOM3)
- *		DO(WAIT(task1_flag))
+ *		WAIT(task1_flag)
  *	// アイドルウィンドウ
  *	== TASK3 ==
- *	11:	DO(WAIT(task3_flag))
+ *	11:	WAIT(task3_flag)
  *	// システム動作モード：SOM4										... (A-2)
  *	== TASK3 ==
- *	12:	DO(WAIT(task3_flag))
+ *	12:	WAIT(task3_flag)
  *	// システム動作モード：SOM2										... (A-2)
  *	// タイムウィンドウ for DOM1
  *	== TASK1 ==
  *	13:	get_som(&somid)
  *		assert(somid == SOM2)
- *		DO(WAIT(task1_flag))
+ *		WAIT(task1_flag)
  *	== TASK2 ==
- *	14:	DO(WAIT(task2_flag))
+ *	14:	WAIT(task2_flag)
  *	// アイドルウィンドウ
  *	== TASK3 ==
  *	15:	chg_som(TSOM_STP)											... (B-2-1)
  *		get_som(&somid)
  *		assert(somid == SOM2)
- *	16:	DO(WAIT(task3_flag))
+ *	16:	WAIT(task3_flag)
  *	// システム動作モード：TSOM_STP									... (B-2-2)
  *	== TASK4 ==
  *	17:	get_som(&somid)
@@ -154,14 +154,14 @@
  *	19:	sta_cyc(CYC1)
  *		get_som(&somid)
  *		assert(somid == SOM1)
- *		DO(WAIT(task2_flag))
+ *		WAIT(task2_flag)
  *	// タイムウィンドウ for DOM1
  *	== TASK1 ==
- *	20:	DO(WAIT(task1_flag))
+ *	20:	WAIT(task1_flag)
  *	// アイドルウィンドウ
  *	== TASK3 ==
  *	21:	chg_som(TSOM_STP)
- *		DO(WAIT(task3_flag))
+ *		WAIT(task3_flag)
  *	// システム動作モード：TSOM_STP
  *	== TASK4 ==
  *	22:	get_som(&somid)
@@ -176,14 +176,14 @@
  *		assert(somid == SOM1)
  *		chg_pri(TSK_SELF, LOW_PRIORITY)
  *	== TASK2 ==
- *	25:	DO(WAIT(task2_flag))
+ *	25:	WAIT(task2_flag)
  *	// タイムウィンドウ for DOM1
  *	== TASK1 ==
- *	26:	DO(WAIT(task1_flag))
+ *	26:	WAIT(task1_flag)
  *	// アイドルウィンドウ
  *	== TASK3 ==
  *	27:	chg_som(TSOM_STP)
- *		DO(WAIT(task3_flag))
+ *		WAIT(task3_flag)
  *	// システム動作モード：TSOM_STP
  *	== TASK4 ==
  *	28:	get_som(&somid)
@@ -198,10 +198,10 @@
  *	// システム動作モード：SOM1
  *	// タイムウィンドウ for DOM2
  *	== TASK2 ==
- *	30:	DO(WAIT(task2_flag))
+ *	30:	WAIT(task2_flag)
  *	// タイムウィンドウ for DOM1
  *	== TASK1 ==
- *	31:	DO(WAIT(task1_flag))
+ *	31:	WAIT(task1_flag)
  *	// アイドルウィンドウ
  *	== TASK3 ==
  *	32:	END
@@ -211,14 +211,11 @@
 #include <t_syslog.h>
 #include "syssvc/test_svc.h"
 #include "kernel_cfg.h"
-#include "test_tprot3.h"
+#include "test_common.h"
 
 volatile bool_t	task1_flag;
 volatile bool_t	task2_flag;
 volatile bool_t	task3_flag;
-
-#define WAIT(flag)	do { (flag) = false; while (!(flag)); } while (false)
-#define SET(flag)	do { (flag) = true; } while (false)
 
 void
 cyclic1_handler(intptr_t exinf)
@@ -298,7 +295,7 @@ task1(intptr_t exinf)
 	check_point(31);
 	WAIT(task1_flag);
 
-	check_point(0);
+	check_assert(false);
 }
 
 void
@@ -351,7 +348,7 @@ task2(intptr_t exinf)
 	check_point(30);
 	WAIT(task2_flag);
 
-	check_point(0);
+	check_assert(false);
 }
 
 void
@@ -400,7 +397,7 @@ task3(intptr_t exinf)
 	WAIT(task3_flag);
 
 	check_finish(32);
-	check_point(0);
+	check_assert(false);
 }
 
 void
@@ -480,5 +477,5 @@ task4(intptr_t exinf)
 	ercd = ena_dsp();
 	check_ercd(ercd, E_OK);
 
-	check_point(0);
+	check_assert(false);
 }

@@ -105,6 +105,16 @@ dcre/kernel/time_manage.c
 dcre/sample/sample1.c
 dcre/sample/sample1.cfg
 
+fch_mnt/include/kernel.h
+
+fch_mnt/kernel/Makefile.kernel
+fch_mnt/kernel/allfunc.h
+fch_mnt/kernel/time_event.c
+fch_mnt/kernel/time_event.h
+fch_mnt/kernel/time_manage.c
+
+fch_mnt/sample/sample1.c
+
 non_tecs/include/extsvc_fncode.h
 non_tecs/include/t_syslog.h
 

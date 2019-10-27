@@ -1,4 +1,3 @@
-../../cfg_test/pass2_dom1.cfg:82: error: E_RSATR: LMT_DOM must be within a protection domain
 ../../cfg_test/pass2_dom1.cfg:64: error: E_RSATR: DEF_SCY must be outside of protection domains
 ../../cfg_test/pass2_dom1.cfg:39: error: E_RSATR: CRE_SOM must be outside of protection domains
 ../../cfg_test/pass2_dom1.cfg:40: error: E_RSATR: ATT_TWD must be outside of protection domains
@@ -34,9 +33,9 @@
 ../../cfg_test/pass2_dom1.cfg:38: error: E_RSATR: DEF_SVC of `1' must be within the kernel domain
 ../../cfg_test/pass2_dom1.cfg:81: error: E_RSATR: DEF_SVC of `2' must be within the kernel domain
 ../../cfg_test/pass2_dom1.cfg:75: error: E_RSATR: SAC_SYS must be within the kernel domain
-../../cfg_test/pass2_dom1.cfg:85: error: E_RSATR: DEF_ICS must be within the kernel domain
+../../cfg_test/pass2_dom1.cfg:84: error: E_RSATR: DEF_ICS must be within the kernel domain
 ../../cfg_test/pass2_dom1.cfg:41: error: E_RSATR: ATT_INI must be within the kernel domain
-../../cfg_test/pass2_dom1.cfg:86: error: E_RSATR: ATT_INI must be within the kernel domain
+../../cfg_test/pass2_dom1.cfg:85: error: E_RSATR: ATT_INI must be within the kernel domain
 ../../cfg_test/pass2_dom1.cfg:42: error: E_RSATR: ATT_TER must be within the kernel domain
-../../cfg_test/pass2_dom1.cfg:87: error: E_RSATR: ATT_TER must be within the kernel domain
+../../cfg_test/pass2_dom1.cfg:86: error: E_RSATR: ATT_TER must be within the kernel domain
 make: *** [kernel_cfg.timestamp] Error 1

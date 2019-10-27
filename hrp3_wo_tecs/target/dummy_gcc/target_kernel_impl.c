@@ -35,7 +35,7 @@
  *  アの利用により直接的または間接的に生じたいかなる損害に関しても，そ
  *  の責任を負わない．
  * 
- *  $Id: target_kernel_impl.c 606 2018-12-13 16:13:01Z ertl-hiro $
+ *  $Id: target_kernel_impl.c 735 2019-07-04 06:45:21Z ertl-hiro $
  */
 
 /*
@@ -247,7 +247,27 @@ target_initialize(void)
 void
 target_exit(void)
 {
+	extern void	software_term_hook(void);
+	void (*volatile fp)(void) = software_term_hook;
+
+	/*
+	 *  software_term_hookへのポインタを，一旦volatile指定のあるfpに代
+	 *  入してから使うのは，0との比較が最適化で削除されないようにするた
+	 *  めである．
+	 */
+	if (fp != 0) {
+		(*fp)();
+	}
+
 	while (true) ;
+}
+
+/*
+ *  リンクエラーを防ぐための定義
+ */
+void
+software_term_hook(void)
+{
 }
 
 /*

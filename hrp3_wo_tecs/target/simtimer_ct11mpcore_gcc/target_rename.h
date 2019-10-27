@@ -16,6 +16,7 @@
 #define target_timer_terminate		_kernel_target_timer_terminate
 #define target_hrt_get_current		_kernel_target_hrt_get_current
 #define target_hrt_set_event		_kernel_target_hrt_set_event
+#define target_hrt_clear_event		_kernel_target_hrt_clear_event
 #define target_hrt_raise_event		_kernel_target_hrt_raise_event
 #define target_hrt_handler			_kernel_target_hrt_handler
 #define target_twdtimer_start		_kernel_target_twdtimer_start
@@ -30,6 +31,7 @@
 #define simtim_advance				_kernel_simtim_advance
 #define simtim_add					_kernel_simtim_add
 #define hook_hrt_set_event			_kernel_hook_hrt_set_event
+#define hook_hrt_clear_event		_kernel_hook_hrt_clear_event
 #define hook_hrt_raise_event		_kernel_hook_hrt_raise_event
 
 

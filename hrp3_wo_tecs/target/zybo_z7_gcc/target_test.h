@@ -1,8 +1,9 @@
 /*
- *  TOPPERS Software
- *      Toyohashi Open Platform for Embedded Real-Time Systems
+ *  TOPPERS/HRP Kernel
+ *      Toyohashi Open Platform for Embedded Real-Time Systems/
+ *      High Reliable system Profile Kernel
  * 
- *  Copyright (C) 2015-2016 by Embedded and Real-Time Systems Laboratory
+ *  Copyright (C) 2007-2018 by Embedded and Real-Time Systems Laboratory
  *              Graduate School of Information Science, Nagoya Univ., JAPAN
  * 
  *  上記著作権者は，以下の(1)〜(4)の条件を満たす場合に限り，本ソフトウェ
@@ -34,59 +35,41 @@
  *  アの利用により直接的または間接的に生じたいかなる損害に関しても，そ
  *  の責任を負わない．
  * 
- *  $Id: test_tprot1.h 508 2018-10-27 15:57:48Z ertl-hiro $
+ *  $Id: target_test.h 761 2019-09-30 03:18:30Z ertl-honda $
  */
 
 /*
- *		時間パーティショニングに関するテスト(1)
+ *		テストプログラムのターゲット依存部（ZYBO_Z7用）
  */
 
-#include <kernel.h>
+#ifndef TOPPERS_TARGET_TEST_H
+#define TOPPERS_TARGET_TEST_H
 
 /*
- *  ターゲット依存の定義
+ *  サンプルプログラム／テストプログラムで使用する割込みに関する定義
  */
-#include "target_test.h"
+#define INTNO1				35U			/* USBからの割込み */
+#define INTNO1_INTATR		TA_ENAINT|TA_EDGE
+#define INTNO1_INTPRI		(-15)
+#define intno1_clear()
 
 /*
- *  システム周期
+ *  サンプルプログラムのためのその他の定義
  */
-#define SYSTEM_CYCLE	(20 * TEST_TIME_CP)
+#ifdef TOPPERS_USE_QEMU
+#define MEASURE_TWICE
+#endif /* TOPPERS_USE_QEMU */
 
 /*
- *  タイムウィンドウの長さ
+ *  テストプログラムで使用する時間パラメータに関する定義
  */
-#define TWD_DOM1_TIME	(5 * TEST_TIME_CP)
-#define TWD_DOM2_TIME	(5 * TEST_TIME_CP)
+#ifdef TOPPERS_USE_QEMU
+#define TEST_TIME_CP	10000U
+#endif /* TOPPERS_USE_QEMU */
 
 /*
- *  各タスクの優先度の定義
+ *  コアで共通な定義（チップ依存部は飛ばす）
  */
-#define MID_PRIORITY	10
+#include "core_test.h"
 
-/*
- *  ターゲットに依存する可能性のある定数の定義
- */
-#ifndef STACK_SIZE
-#define	STACK_SIZE		4096		/* タスクのスタックサイズ */
-#endif /* STACK_SIZE */
-
-#ifndef TEST_TIME_CP
-#define TEST_TIME_CP	50000U		/* チェックポイント到達情報の出力時間 */
-#endif /* TEST_TIME_CP */
-
-#ifndef TEST_TIME_PROC
-#define TEST_TIME_PROC	1000U		/* チェックポイントを通らない場合の時間 */
-#endif /* TEST_TIME_PROC */
-
-/*
- *  関数のプロトタイプ宣言
- */
-#ifndef TOPPERS_MACRO_ONLY
-
-extern void	task1(intptr_t exinf);
-extern void	task2(intptr_t exinf);
-extern void	task3(intptr_t exinf);
-extern void	cyclic1_handler(intptr_t exinf);
-
-#endif /* TOPPERS_MACRO_ONLY */
+#endif /* TOPPERS_TARGET_TEST_H */

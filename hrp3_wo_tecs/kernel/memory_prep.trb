@@ -36,7 +36,7 @@
 #   アの利用により直接的または間接的に生じたいかなる損害に関しても，そ
 #   の責任を負わない．
 # 
-#   $Id: memory_prep.trb 665 2019-02-03 17:06:18Z ertl-hiro $
+#   $Id: memory_prep.trb 730 2019-06-20 07:37:01Z ertl-hiro $
 # 
 
 #
@@ -531,6 +531,9 @@ end
 
 #
 #  ターゲット依存のメモリオブジェクト情報の操作
+#
+#  ターゲット依存で不要なメモリオブジェクトがある場合，TargetMemoryObject
+#  において，該当する$memObjの要素をdeleteで削除すれば良い．
 #
 if defined? TargetMemoryObject()
   TargetMemoryObject()

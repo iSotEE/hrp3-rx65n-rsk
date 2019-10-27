@@ -6,7 +6,7 @@
 # 
 #  Copyright (C) 2001 by Embedded and Real-Time Systems Laboratory
 #                              Toyohashi Univ. of Technology, JAPAN
-#  Copyright (C) 2005-2018 by Embedded and Real-Time Systems Laboratory
+#  Copyright (C) 2005-2019 by Embedded and Real-Time Systems Laboratory
 #              Graduate School of Information Science, Nagoya Univ., JAPAN
 # 
 #  上記著作権者は，以下の(1)〜(4)の条件を満たす場合に限り，本ソフトウェ
@@ -38,7 +38,7 @@
 #  アの利用により直接的または間接的に生じたいかなる損害に関しても，そ
 #  の責任を負わない．
 # 
-#  $Id: gensvc.rb 524 2018-11-04 13:01:46Z ertl-hiro $
+#  $Id: gensvc.rb 745 2019-07-15 19:12:48Z ertl-hiro $
 # 
 
 #
@@ -379,6 +379,12 @@ outFile.puts(<<EOS)
 #define TOPPERS_TOOL_SVC_H
 
 #ifndef TOPPERS_MACRO_ONLY
+
+#ifndef USE_64BIT_HRTCNT
+#define CAL_SVC_0M_R_HRTCNT(TYPE, FNCD)		CAL_SVC_0M(TYPE, FNCD)
+#else /* USE_64BIT_HRTCNT */
+#define CAL_SVC_0M_R_HRTCNT(TYPE, FNCD)		CAL_SVC_0M_R_UINT64(TYPE, FNCD)
+#endif /* USE_64BIT_HRTCNT */
 
 EOS
 

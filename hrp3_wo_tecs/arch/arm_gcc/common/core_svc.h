@@ -5,7 +5,7 @@
  * 
  *  Copyright (C) 2000-2003 by Embedded and Real-Time Systems Laboratory
  *                              Toyohashi Univ. of Technology, JAPAN
- *  Copyright (C) 2004-2018 by Embedded and Real-Time Systems Laboratory
+ *  Copyright (C) 2004-2019 by Embedded and Real-Time Systems Laboratory
  *              Graduate School of Information Science, Nagoya Univ., JAPAN
  * 
  *  上記著作権者は，以下の(1)〜(4)の条件を満たす場合に限り，本ソフトウェ
@@ -37,7 +37,7 @@
  *  アの利用により直接的または間接的に生じたいかなる損害に関しても，そ
  *  の責任を負わない．
  * 
- *  $Id: core_svc.h 592 2018-12-08 01:59:36Z ertl-hiro $
+ *  $Id: core_svc.h 745 2019-07-15 19:12:48Z ertl-hiro $
  */
 
 /*
@@ -132,14 +132,25 @@
 } while (false)
 
 #define CAL_SVC_1M_SYSTIM(TYPE, FNCD, TYPE1, PAR1) do {					\
-	register intptr_t r0 asm("r0") = (intptr_t)((PAR1) & 0xffffffffU); 	\
-	register intptr_t r1 asm("r1") = (intptr_t)((PAR1) >> 32);			\
+	register uint32_t r0 asm("r0") = (uint32_t)((PAR1) & 0xffffffffU); 	\
+	register uint32_t r1 asm("r1") = (uint32_t)((PAR1) >> 32);			\
 	register FN r5 asm("r5") = FNCD;									\
 	Asm("svc %2"														\
 	  : "=r"(r0),"=r"(r1)												\
 	  : "I"(SVC_SERVICE_CALL),"0"(r0),"1"(r1),"r"(r5)					\
 	  : "r2","r3","r12","lr","memory","cc");							\
 	return((TYPE) r0);													\
+} while (false)
+
+#define CAL_SVC_0M_R_UINT64(TYPE, FNCD) do {							\
+	register uint32_t r0 asm("r0");										\
+	register uint32_t r1 asm("r1");										\
+	register FN r5 asm("r5") = FNCD;									\
+	Asm("svc %2"														\
+	  : "=r"(r0),"=r"(r1)												\
+	  : "I"(SVC_SERVICE_CALL),"0"(r0),"1"(r1),"r"(r5)					\
+	  : "r2","r3","r12","lr","memory","cc");							\
+	return((((TYPE) r1) << 32) + ((TYPE) r0));							\
 } while (false)
 
 /*

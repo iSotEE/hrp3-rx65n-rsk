@@ -5,7 +5,7 @@
  * 
  *  Copyright (C) 2000-2003 by Embedded and Real-Time Systems Laboratory
  *                              Toyohashi Univ. of Technology, JAPAN
- *  Copyright (C) 2005-2015 by Embedded and Real-Time Systems Laboratory
+ *  Copyright (C) 2005-2019 by Embedded and Real-Time Systems Laboratory
  *              Graduate School of Information Science, Nagoya Univ., JAPAN
  * 
  *  上記著作権者は，以下の(1)〜(4)の条件を満たす場合に限り，本ソフトウェ
@@ -37,7 +37,7 @@
  *  アの利用により直接的または間接的に生じたいかなる損害に関しても，そ
  *  の責任を負わない．
  * 
- *  $Id: task_manage.c 520 2018-11-01 12:41:13Z ertl-hiro $
+ *  $Id: task_manage.c 727 2019-06-08 05:53:25Z ertl-hiro $
  */
 
 /*
@@ -270,9 +270,6 @@ chg_pri(ID tskid, PRI tskpri)
 	else {
 		CHECK_PAR(VALID_TPRI(tskpri));			/*［NGKI1188］*/
 		newbpri = INT_PRIORITY(tskpri);
-	}
-	if (newbpri < p_tcb->p_dominib->minpriority) {
-		CHECK_ACPTN(p_tcb->p_dominib->acvct.acptn2);	/*［NGKI3751］*/
 	}
 
 	lock_cpu();

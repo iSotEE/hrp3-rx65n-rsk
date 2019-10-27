@@ -34,7 +34,7 @@
  *  アの利用により直接的または間接的に生じたいかなる損害に関しても，そ
  *  の責任を負わない．
  * 
- *  $Id: test_common.h 630 2019-01-02 08:54:52Z ertl-hiro $
+ *  $Id: test_common.h 786 2019-10-04 06:30:31Z ertl-hiro $
  */
 
 /*
@@ -42,6 +42,7 @@
  */
 
 #include <kernel.h>
+#include <sil.h>
 
 /*
  *  ターゲット依存の定義
@@ -85,15 +86,40 @@
 #define TSKID_SMALL_TASK		(TSK_SELF - 1)
 #define TSKID_SMALL_INT			(0)
 
+#define TPRI_LARGE				(TMAX_TPRI + 1)
+#define TPRI_SMALL_TASK			(TPRI_SELF - 1)
+#define TPRI_SMALL_INT			(TMIN_TPRI - 1)
+
+#define DOMID_LARGE				((TNUM_DOMID) + 1)
+#define DOMID_SMALL				(TDOM_NONE)
+
 #define PRCID_LARGE				((TNUM_PRCID) + 1)
 #define PRCID_SMALL				(TPRC_INI - 1)
 
 /*
  *  ポーリング同期用フラグ変数の操作
  */
-#define SET(flag)	do { (flag) = true; } while (false)
-#define WAIT(flag)	do { (flag) = false; while (!(flag)); } while (false)
-#define WAIT_WO_RESET(flag)		do { while (!(flag)); } while (false)
+#define SET(flag) do {							\
+	sil_swrb_mem((uint8_t *) &flag, true);		\
+} while (false)
+
+#define RESET(flag) do {						\
+	sil_swrb_mem((uint8_t *) &flag, false);		\
+} while (false)
+
+#define WAIT(flag) do {							\
+	sil_swrb_mem((uint8_t *) &flag, false);		\
+	while (!sil_reb_mem((uint8_t *) &flag)) ;	\
+} while (false)
+
+#define WAIT_WO_RESET(flag) do {				\
+	while (!sil_reb_mem((uint8_t *) &flag)) ;	\
+} while (false)
+
+#define WAIT_RESET(flag) do {					\
+	while (!sil_reb_mem((uint8_t *) &flag)) ;	\
+	sil_swrb_mem((uint8_t *) &flag, false);		\
+} while (false)
 
 /*
  *  関数のプロトタイプ宣言
@@ -106,8 +132,25 @@ extern void	task3(intptr_t exinf);
 extern void	task4(intptr_t exinf);
 extern void	task5(intptr_t exinf);
 extern void	task6(intptr_t exinf);
+extern void	task7(intptr_t exinf);
+extern void	task8(intptr_t exinf);
+extern void	task9(intptr_t exinf);
+extern void	task10(intptr_t exinf);
+extern void	task11(intptr_t exinf);
+extern void	task12(intptr_t exinf);
+extern void	task51(intptr_t exinf);
+extern void	task52(intptr_t exinf);
+
+extern void	cyclic1_handler(intptr_t exinf);
 
 extern void	alarm1_handler(intptr_t exinf);
+extern void	alarm2_handler(intptr_t exinf);
+
+extern void	cpuexc1_handler(void *p_excinf);
+extern void	cpuexc2_handler(void *p_excinf);
+extern void	cpuexc3_handler(void *p_excinf);
+extern void	cpuexc4_handler(void *p_excinf);
+extern void	cpuexc5_handler(void *p_excinf);
 
 extern ER_UINT extsvc1_routine(intptr_t par1, intptr_t par2, intptr_t par3,
 									intptr_t par4, intptr_t par5, ID cdmid);

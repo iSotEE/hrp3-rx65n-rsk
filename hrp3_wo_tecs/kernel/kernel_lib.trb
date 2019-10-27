@@ -36,7 +36,7 @@
 #   アの利用により直接的または間接的に生じたいかなる損害に関しても，そ
 #   の責任を負わない．
 #
-#   $Id: kernel_lib.trb 720 2019-05-21 06:08:59Z ertl-hiro $
+#   $Id: kernel_lib.trb 727 2019-06-08 05:53:25Z ertl-hiro $
 #
 
 #
@@ -143,8 +143,7 @@ def GenerateDominib(genFile)
   # カーネルドメインの保護ドメイン初期化ブロックの生成
   params = $domData[$TDOM_KERNEL]
   genFile.append("const DOMINIB _kernel_dominib_kernel = { TACP_KERNEL, " \
-						"&(#{params[:schedcb]}), #{params[:tmevtHeap]}, " \
-						"INT_PRIORITY(#{params[:mintpri]}), ")
+						"&(#{params[:schedcb]}), #{params[:tmevtHeap]}, ")
   if $USE_DOMINICTXB
     genFile.append("#{$kernelDominictxb}, ")
   end
@@ -160,7 +159,6 @@ def GenerateDominib(genFile)
 
       genFile.append("\t{ TACP(#{params[:domid]}), &(#{params[:schedcb]}), ")
       genFile.append("#{params[:tmevtHeap]}, ")
-      genFile.append("INT_PRIORITY(#{params[:mintpri]}), ")
       if $USE_DOMINICTXB
         genFile.append("#{GenerateDominictxb(key, params)}, ")
       end

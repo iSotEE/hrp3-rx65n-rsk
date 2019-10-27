@@ -7,7 +7,7 @@ Only in ./arch: arm_gcc
 Only in ./arch/gcc: ldscript.trb
 Only in ./arch/gcc: tool_stddef.h
 diff -r ./arch/gcc/tool_svc.h extension/dcre/arch/gcc/tool_svc.h
-697a698,961
+711a712,975
 > #ifdef TOPPERS_SUPPORT_DYNAMIC_CRE
 > Inline ER_ID
 > acre_tsk(const T_CTSK *pk_ctsk)
@@ -472,7 +472,7 @@ Only in ./include: log_output.h
 Only in ./include: queue.h
 Only in ./include: sil.h
 diff -r ./include/svc_call.h extension/dcre/include/svc_call.h
-137a138,236
+140a141,239
 > #ifdef TOPPERS_SUPPORT_DYNAMIC_CRE
 > extern ER_ID _kernel_acre_tsk(const T_CTSK *pk_ctsk) throw();
 > #endif /* TOPPERS_SUPPORT_DYNAMIC_CRE */
@@ -572,7 +572,7 @@ diff -r ./include/svc_call.h extension/dcre/include/svc_call.h
 > #ifdef TOPPERS_SUPPORT_DYNAMIC_CRE
 > extern ER _kernel_sac_isr(ID isrid, const ACVCT *p_acvct) throw();
 > #endif /* TOPPERS_SUPPORT_DYNAMIC_CRE */
-278a378,476
+284a384,482
 > #ifdef TOPPERS_SUPPORT_DYNAMIC_CRE
 > #define acre_tsk _kernel_acre_tsk
 > #endif /* TOPPERS_SUPPORT_DYNAMIC_CRE */
@@ -738,9 +738,9 @@ diff -r ./kernel/Makefile.kernel extension/dcre/kernel/Makefile.kernel
 > 		dis_int.o ena_int.o clr_int.o ras_int.o prb_int.o chg_ipm.o get_ipm.o
 diff -r ./kernel/alarm.c extension/dcre/kernel/alarm.c
 40c40
-<  *  $Id: DIFF 688 2019-03-20 04:45:24Z ertl-hiro $
+<  *  $Id: DIFF 773 2019-10-02 09:01:03Z ertl-hiro $
 ---
->  *  $Id: DIFF 688 2019-03-20 04:45:24Z ertl-hiro $
+>  *  $Id: DIFF 773 2019-10-02 09:01:03Z ertl-hiro $
 48a49
 > #include "domain.h"
 61a63,86
@@ -1083,9 +1083,9 @@ diff -r ./kernel/alarm.h extension/dcre/kernel/alarm.h
 ---
 >  *  Copyright (C) 2005-2018 by Embedded and Real-Time Systems Laboratory
 40c40
-<  *  $Id: DIFF 688 2019-03-20 04:45:24Z ertl-hiro $
+<  *  $Id: DIFF 773 2019-10-02 09:01:03Z ertl-hiro $
 ---
->  *  $Id: DIFF 688 2019-03-20 04:45:24Z ertl-hiro $
+>  *  $Id: DIFF 773 2019-10-02 09:01:03Z ertl-hiro $
 54a55,58
 >  *
 >  *  動的生成するアラーム通知については，p_tmevt_heap，almatrはシステム
@@ -1116,9 +1116,9 @@ diff -r ./kernel/alarm.trb extension/dcre/kernel/alarm.trb
 >     @inibList["T_NFYINFO"] = "aalm_nfyinfo_table"
 diff -r ./kernel/allfunc.h extension/dcre/kernel/allfunc.h
 38c38
-<  *  $Id: DIFF 688 2019-03-20 04:45:24Z ertl-hiro $
+<  *  $Id: DIFF 773 2019-10-02 09:01:03Z ertl-hiro $
 ---
->  *  $Id: DIFF 688 2019-03-20 04:45:24Z ertl-hiro $
+>  *  $Id: DIFF 773 2019-10-02 09:01:03Z ertl-hiro $
 50a51
 > #define TOPPERS_kermem
 94a96,101
@@ -1178,17 +1178,13 @@ diff -r ./kernel/allfunc.h extension/dcre/kernel/allfunc.h
 > #define TOPPERS_sac_isr
 > #define TOPPERS_del_isr
 diff -r ./kernel/check.h extension/dcre/kernel/check.h
-40c40
-<  *  $Id: DIFF 688 2019-03-20 04:45:24Z ertl-hiro $
----
->  *  $Id: DIFF 688 2019-03-20 04:45:24Z ertl-hiro $
 67a68
 > #define VALID_ISRID(isrid)	(TMIN_ISRID <= (isrid) && (isrid) <= tmax_isrid)
 72a74,76
 > #define VALID_DPRI(dpri)	(TMIN_DPRI <= (dpri) && (dpri) <= TMAX_DPRI)
 > #define VALID_ISRPRI(isrpri) \
 > 					(TMIN_ISRPRI <= (isrpri) && (isrpri) <= TMAX_ISRPRI)
-91a96,163
+90a95,162
 >  *  アラインしているかの判定
 >  */
 > #define ALIGNED(val, align)		((((uintptr_t)(val)) & ((align) - 1U)) == 0U)
@@ -1257,7 +1253,7 @@ diff -r ./kernel/check.h extension/dcre/kernel/check.h
 > #endif /* CHECK_FUNC_NONNULL */
 > 
 > /*
-151a224,243
+150a223,242
 >  *  属性が無効なビットが立っていないかのチェック（E_RSATR）
 >  */
 > #define CHECK_VALIDATR(atr, valid_atr) do {					\
@@ -1278,7 +1274,7 @@ diff -r ./kernel/check.h extension/dcre/kernel/check.h
 > } while (false)
 > 
 > /*
-171a264,273
+170a263,272
 >  *  未サポート機能エラーのチェック（E_NOSPT）
 >  */
 > #define CHECK_NOSPT(exp) do {								\
@@ -1289,7 +1285,7 @@ diff -r ./kernel/check.h extension/dcre/kernel/check.h
 > } while (false)
 > 
 > /*
-201a304,313
+200a303,312
 >  *  その他のオブジェクトアクセス違反のチェック（E_OACV）
 >  */
 > #define CHECK_OACV(exp) do {								\
@@ -1300,7 +1296,7 @@ diff -r ./kernel/check.h extension/dcre/kernel/check.h
 > } while (false)
 > 
 > /*
-231a344,353
+230a343,352
 > /*
 >  *  その他のメモリアクセス違反のチェック（E_MACV）
 >  */
@@ -1313,9 +1309,9 @@ diff -r ./kernel/check.h extension/dcre/kernel/check.h
 > 
 diff -r ./kernel/cyclic.c extension/dcre/kernel/cyclic.c
 40c40
-<  *  $Id: DIFF 688 2019-03-20 04:45:24Z ertl-hiro $
+<  *  $Id: DIFF 773 2019-10-02 09:01:03Z ertl-hiro $
 ---
->  *  $Id: DIFF 688 2019-03-20 04:45:24Z ertl-hiro $
+>  *  $Id: DIFF 773 2019-10-02 09:01:03Z ertl-hiro $
 48a49
 > #include "domain.h"
 61a63,86
@@ -1663,9 +1659,9 @@ diff -r ./kernel/cyclic.h extension/dcre/kernel/cyclic.h
 ---
 >  *  Copyright (C) 2005-2018 by Embedded and Real-Time Systems Laboratory
 40c40
-<  *  $Id: DIFF 688 2019-03-20 04:45:24Z ertl-hiro $
+<  *  $Id: DIFF 773 2019-10-02 09:01:03Z ertl-hiro $
 ---
->  *  $Id: DIFF 688 2019-03-20 04:45:24Z ertl-hiro $
+>  *  $Id: DIFF 773 2019-10-02 09:01:03Z ertl-hiro $
 54a55,57
 >  *
 >  *  動的生成する周期通知については，p_tmevt_heap，cycatrはシステム初期
@@ -1699,9 +1695,9 @@ diff -r ./kernel/dataqueue.c extension/dcre/kernel/dataqueue.c
 ---
 >  *  Copyright (C) 2005-2019 by Embedded and Real-Time Systems Laboratory
 40c40
-<  *  $Id: DIFF 688 2019-03-20 04:45:24Z ertl-hiro $
+<  *  $Id: DIFF 773 2019-10-02 09:01:03Z ertl-hiro $
 ---
->  *  $Id: DIFF 688 2019-03-20 04:45:24Z ertl-hiro $
+>  *  $Id: DIFF 773 2019-10-02 09:01:03Z ertl-hiro $
 48a49
 > #include "domain.h"
 55a57,80
@@ -2140,9 +2136,9 @@ diff -r ./kernel/dataqueue.h extension/dcre/kernel/dataqueue.h
 ---
 >  *  Copyright (C) 2005-2018 by Embedded and Real-Time Systems Laboratory
 40c40
-<  *  $Id: DIFF 688 2019-03-20 04:45:24Z ertl-hiro $
+<  *  $Id: DIFF 773 2019-10-02 09:01:03Z ertl-hiro $
 ---
->  *  $Id: DIFF 688 2019-03-20 04:45:24Z ertl-hiro $
+>  *  $Id: DIFF 773 2019-10-02 09:01:03Z ertl-hiro $
 113a114
 > extern const ID	tmax_sdtqid;
 118a120
@@ -2163,14 +2159,6 @@ diff -r ./kernel/dataqueue.h extension/dcre/kernel/dataqueue.h
 Only in ./kernel: dataqueue.trb
 Only in ./kernel: domain.c
 diff -r ./kernel/domain.h extension/dcre/kernel/domain.h
-6c6
-<  *  Copyright (C) 2008-2018 by Embedded and Real-Time Systems Laboratory
----
->  *  Copyright (C) 2008-2019 by Embedded and Real-Time Systems Laboratory
-38c38
-<  *  $Id: DIFF 688 2019-03-20 04:45:24Z ertl-hiro $
----
->  *  $Id: DIFF 688 2019-03-20 04:45:24Z ertl-hiro $
 59,63d58
 <  *  保護ドメイン初期化ブロックの型の前方参照
 <  */
@@ -2199,7 +2187,7 @@ diff -r ./kernel/domain.h extension/dcre/kernel/domain.h
 > } DOMCB;
 > 
 > /*
-257a274,287
+256a273,286
 > 
 > 	DOMCB		*p_domcb;		/* 管理ブロックへのポインタ */
 > 	uint_t		tnum_atskid;	/* 割付け可能なタスクIDの数 */
@@ -2214,19 +2202,19 @@ diff -r ./kernel/domain.h extension/dcre/kernel/domain.h
 > 	uint_t		tnum_aalmid;	/* 割付け可能なアラーム通知IDの数 */
 > 	size_t		mpksz;			/* カーネルメモリプール領域のサイズ */
 > 	MB_T		*mpk;			/* カーネルメモリプール領域の先頭番地 */
-281a312,316
+280a311,315
 >  *  保護ドメイン管理ブロックのエリア（kernel_cfg.c）
 >  */
 > extern DOMCB	domcb_table[];
 > 
 > /*
-291a327,331
+290a326,330
 >  *  無所属に対する保護ドメイン初期化ブロック（kernel_cfg.c）
 >  */
 > extern const DOMINIB	dominib_none;
 > 
 > /*
-302a343,375
+301a342,374
 >  *  オブジェクト属性中のドメインIDを操作するためのマクロ
 >  */
 > #define TA_DOMMASK					(0xffU << 16)
@@ -2272,19 +2260,19 @@ diff -r ./kernel/domain_prep.trb extension/dcre/kernel/domain_prep.trb
 > end
 > 
 > #
-326a336,340
+290a300,304
 > $cfgData[:AID_TSK].each do |_, params|
 >   if params.has_key?(:domain)		# タスクに関するエラー処理前のため必要
 >     $domData[params[:domain]][:tmevtCount] += params[:notsk]
 >   end
 > end
-331a346,350
+295a310,314
 > $cfgData[:AID_CYC].each do |_, params|
 >   if params.has_key?(:domain)		# 周期通知に関するエラー処理前のため必要
 >     $domData[params[:domain]][:tmevtCount] += params[:nocyc]
 >   end
 > end
-336a356,360
+300a320,324
 > $cfgData[:AID_ALM].each do |_, params|
 >   if params.has_key?(:domain)		# アラーム通知に関するエラー処理前のため必要
 >     $domData[params[:domain]][:tmevtCount] += params[:noalm]
@@ -2296,9 +2284,9 @@ diff -r ./kernel/eventflag.c extension/dcre/kernel/eventflag.c
 ---
 >  *  Copyright (C) 2005-2019 by Embedded and Real-Time Systems Laboratory
 40c40
-<  *  $Id: DIFF 688 2019-03-20 04:45:24Z ertl-hiro $
+<  *  $Id: DIFF 773 2019-10-02 09:01:03Z ertl-hiro $
 ---
->  *  $Id: DIFF 688 2019-03-20 04:45:24Z ertl-hiro $
+>  *  $Id: DIFF 773 2019-10-02 09:01:03Z ertl-hiro $
 48a49
 > #include "domain.h"
 55a57,80
@@ -2707,9 +2695,9 @@ diff -r ./kernel/eventflag.h extension/dcre/kernel/eventflag.h
 ---
 >  *  Copyright (C) 2005-2018 by Embedded and Real-Time Systems Laboratory
 40c40
-<  *  $Id: DIFF 688 2019-03-20 04:45:24Z ertl-hiro $
+<  *  $Id: DIFF 773 2019-10-02 09:01:03Z ertl-hiro $
 ---
->  *  $Id: DIFF 688 2019-03-20 04:45:24Z ertl-hiro $
+>  *  $Id: DIFF 773 2019-10-02 09:01:03Z ertl-hiro $
 100a101
 > extern const ID	tmax_sflgid;
 105a107
@@ -3075,9 +3063,9 @@ diff -r ./kernel/interrupt.h extension/dcre/kernel/interrupt.h
 ---
 >  *  Copyright (C) 2005-2018 by Embedded and Real-Time Systems Laboratory
 40c40
-<  *  $Id: DIFF 688 2019-03-20 04:45:24Z ertl-hiro $
+<  *  $Id: DIFF 773 2019-10-02 09:01:03Z ertl-hiro $
 ---
->  *  $Id: DIFF 688 2019-03-20 04:45:24Z ertl-hiro $
+>  *  $Id: DIFF 773 2019-10-02 09:01:03Z ertl-hiro $
 50a51,138
 > #include <queue.h>
 > 
@@ -3169,9 +3157,9 @@ diff -r ./kernel/interrupt.h extension/dcre/kernel/interrupt.h
 > extern void call_isr(QUEUE *p_isr_queue);
 diff -r ./kernel/interrupt.trb extension/dcre/kernel/interrupt.trb
 40c40
-< #   $Id: DIFF 688 2019-03-20 04:45:24Z ertl-hiro $
+< #   $Id: DIFF 773 2019-10-02 09:01:03Z ertl-hiro $
 ---
-> #   $Id: DIFF 688 2019-03-20 04:45:24Z ertl-hiro $
+> #   $Id: DIFF 773 2019-10-02 09:01:03Z ertl-hiro $
 48,57d47
 < #  kernel_cfg.hの生成
 < #
@@ -3347,10 +3335,6 @@ diff -r ./kernel/interrupt.trb extension/dcre/kernel/interrupt.trb
 > $kernelCfgC.add
 > $kernelCfgC.add2("};")
 diff -r ./kernel/kernel.trb extension/dcre/kernel/kernel.trb
-40c40
-< #   $Id: DIFF 688 2019-03-20 04:45:24Z ertl-hiro $
----
-> #   $Id: DIFF 688 2019-03-20 04:45:24Z ertl-hiro $
 121a122,123
 >     @noobj = ("no" + obj).to_sym
 >     @tnum_aobjid = ("tnum_a" + obj + "id").to_sym
@@ -3379,7 +3363,7 @@ diff -r ./kernel/kernel.trb extension/dcre/kernel/kernel.trb
 > 
 >       # 割り付け可能なオブジェクト数のカウント
 >       numAutoObjid += params[@noobj]
-> 	  if $domData[params[:domain]].has_key?(@tnum_aobjid)
+>       if $domData[params[:domain]].has_key?(@tnum_aobjid)
 >         $domData[params[:domain]][@tnum_aobjid] += params[@noobj]
 >       end
 >     end
@@ -3424,7 +3408,7 @@ diff -r ./kernel/kernel.trb extension/dcre/kernel/kernel.trb
 <       # オブジェクトが1つもない場合
 <       $kernelCfgC.add("TOPPERS_EMPTY_LABEL(const #{@OBJ_S}INIB, " \
 < 										"_kernel_#{@obj_s}inib_table);")
-530a577,631
+529a576,630
 > #  カーネルメモリプール領域
 > #
 > $kernelCfgC.comment_header("Kernel Memory Pool Area")
@@ -3504,7 +3488,7 @@ diff -r ./kernel/kernel_api.def extension/dcre/kernel/kernel_api.def
 29a40,41
 > AID_ISR .noisr
 > SAC_ISR %isrid* { .acptn1 .acptn2 .acptn3 .acptn4 }
-38a51
+37a50
 > DEF_MPK { .mpksz &mpk? }
 diff -r ./kernel/kernel_api_mml.def extension/dcre/kernel/kernel_api_mml.def
 1a2
@@ -3530,7 +3514,7 @@ diff -r ./kernel/kernel_api_mml.def extension/dcre/kernel/kernel_api_mml.def
 29a40,41
 > AID_ISR .noisr
 > SAC_ISR %isrid* { .acptn1 .acptn2 .acptn3 .acptn4 }
-38a51
+37a50
 > DEF_MPK { .mpksz &mpk? }
 diff -r ./kernel/kernel_check.trb extension/dcre/kernel/kernel_check.trb
 479a480,497
@@ -3648,11 +3632,7 @@ diff -r ./kernel/kernel_impl.h extension/dcre/kernel/kernel_impl.h
 > 
 Only in ./kernel: kernel_int.h
 diff -r ./kernel/kernel_lib.trb extension/dcre/kernel/kernel_lib.trb
-39c39
-< #   $Id: DIFF 688 2019-03-20 04:45:24Z ertl-hiro $
----
-> #   $Id: DIFF 688 2019-03-20 04:45:24Z ertl-hiro $
-109a110,129
+120a121,140
 > #  保護ドメイン毎に持つ割り付け可能なオブジェクトIDの数のシンボルのリスト
 > #
 > $tnum_aobjid_list = [
@@ -3673,26 +3653,26 @@ diff -r ./kernel/kernel_lib.trb extension/dcre/kernel/kernel_lib.trb
 > end
 > 
 > #
-126a147,151
+137a158,162
 >   # 保護ドメイン管理ブロックの生成
 >   genFile.add("DOMCB _kernel_domcb_kernel;")
 >   genFile.add("DOMCB _kernel_domcb_table[TNUM_DOMID];")
 >   genFile.add2("DOMCB _kernel_domcb_none;")
 > 
-140a166,168
+150a176,178
 >   genFile.append(", ")
 >   genFile.append("&_kernel_domcb_kernel, ")
 >   GenerateDominibResource(genFile, params)
-156a185,187
+165a194,196
 >       genFile.append(", ")
 >       genFile.append("&(_kernel_domcb_table[#{index}]), ")
 >       GenerateDominibResource(genFile, params)
-163a195,211
+172a204,220
 > 
 >   # 無所属に対する保護ドメイン初期化ブロックの生成
 >   params = $domData[$TDOM_NONE]
 >   genFile.append("const DOMINIB _kernel_dominib_none = { " \
-> 								"TACP_SHARED, NULL, NULL, 0, ")
+> 								"TACP_SHARED, NULL, NULL, ")
 >   if $USE_DOMINICTXB
 >     if defined?($noneDominictxb)
 >       genFile.append("#{$noneDominictxb}, ")
@@ -3882,7 +3862,7 @@ diff -r ./kernel/kernel_sym.def extension/dcre/kernel/kernel_sym.def
 > CHECK_MPK_ALIGN,,,defined(CHECK_MPK_ALIGN),1
 > CHECK_MPK_NONNULL,true,bool,defined(CHECK_MPK_NONNULL),false
 > CHECK_MB_ALIGN,,,defined(CHECK_MB_ALIGN),1
-161a165,177
+160a164,176
 > offsetof_DOMINIB_p_domcb,"offsetof(DOMINIB,p_domcb)"
 > offsetof_DOMINIB_tnum_atskid,"offsetof(DOMINIB,tnum_atskid)"
 > offsetof_DOMINIB_tnum_asemid,"offsetof(DOMINIB,tnum_asemid)"
@@ -3896,7 +3876,7 @@ diff -r ./kernel/kernel_sym.def extension/dcre/kernel/kernel_sym.def
 > offsetof_DOMINIB_tnum_aalmid,"offsetof(DOMINIB,tnum_aalmid)"
 > offsetof_DOMINIB_mpksz,"offsetof(DOMINIB,mpksz)"
 > offsetof_DOMINIB_mpk,"offsetof(DOMINIB,mpk)"
-221a238,244
+220a237,243
 > sizeof_ISRINIB,sizeof(ISRINIB)
 > offsetof_ISRINIB_isratr,"offsetof(ISRINIB,isratr)"
 > offsetof_ISRINIB_exinf,"offsetof(ISRINIB,exinf)"
@@ -4223,9 +4203,9 @@ diff -r ./kernel/memory.h extension/dcre/kernel/memory.h
 ---
 >  *  Copyright (C) 2005-2018 by Embedded and Real-Time Systems Laboratory
 40c40
-<  *  $Id: DIFF 688 2019-03-20 04:45:24Z ertl-hiro $
+<  *  $Id: DIFF 773 2019-10-02 09:01:03Z ertl-hiro $
 ---
->  *  $Id: DIFF 688 2019-03-20 04:45:24Z ertl-hiro $
+>  *  $Id: DIFF 773 2019-10-02 09:01:03Z ertl-hiro $
 160a161,184
 >  *  指定した保護ドメインからのメモリへの書込み権のチェック
 >  *
@@ -4284,9 +4264,9 @@ diff -r ./kernel/mempfix.c extension/dcre/kernel/mempfix.c
 ---
 >  *  Copyright (C) 2005-2019 by Embedded and Real-Time Systems Laboratory
 40c40
-<  *  $Id: DIFF 688 2019-03-20 04:45:24Z ertl-hiro $
+<  *  $Id: DIFF 773 2019-10-02 09:01:03Z ertl-hiro $
 ---
->  *  $Id: DIFF 688 2019-03-20 04:45:24Z ertl-hiro $
+>  *  $Id: DIFF 773 2019-10-02 09:01:03Z ertl-hiro $
 48a49
 > #include "domain.h"
 55a57,80
@@ -4699,9 +4679,9 @@ diff -r ./kernel/mempfix.h extension/dcre/kernel/mempfix.h
 ---
 >  *  Copyright (C) 2005-2018 by Embedded and Real-Time Systems Laboratory
 40c40
-<  *  $Id: DIFF 688 2019-03-20 04:45:24Z ertl-hiro $
+<  *  $Id: DIFF 773 2019-10-02 09:01:03Z ertl-hiro $
 ---
->  *  $Id: DIFF 688 2019-03-20 04:45:24Z ertl-hiro $
+>  *  $Id: DIFF 773 2019-10-02 09:01:03Z ertl-hiro $
 112a113
 > extern const ID	tmax_smpfid;
 117a119
@@ -4709,9 +4689,9 @@ diff -r ./kernel/mempfix.h extension/dcre/kernel/mempfix.h
 Only in ./kernel: mempfix.trb
 diff -r ./kernel/messagebuf.c extension/dcre/kernel/messagebuf.c
 40c40
-<  *  $Id: DIFF 688 2019-03-20 04:45:24Z ertl-hiro $
+<  *  $Id: DIFF 773 2019-10-02 09:01:03Z ertl-hiro $
 ---
->  *  $Id: DIFF 688 2019-03-20 04:45:24Z ertl-hiro $
+>  *  $Id: DIFF 773 2019-10-02 09:01:03Z ertl-hiro $
 48a49
 > #include "domain.h"
 57a59,82
@@ -5146,14 +5126,6 @@ diff -r ./kernel/messagebuf.h extension/dcre/kernel/messagebuf.h
 > extern MBFINIB			ambfinib_table[];
 Only in ./kernel: messagebuf.trb
 diff -r ./kernel/mutex.c extension/dcre/kernel/mutex.c
-6c6
-<  *  Copyright (C) 2005-2018 by Embedded and Real-Time Systems Laboratory
----
->  *  Copyright (C) 2005-2019 by Embedded and Real-Time Systems Laboratory
-38c38
-<  *  $Id: DIFF 688 2019-03-20 04:45:24Z ertl-hiro $
----
->  *  $Id: DIFF 688 2019-03-20 04:45:24Z ertl-hiro $
 46a47
 > #include "domain.h"
 54a56,79
@@ -5401,13 +5373,9 @@ diff -r ./kernel/mutex.c extension/dcre/kernel/mutex.c
 > #endif /* TOPPERS_del_mtx */
 > 
 > /*
-341,345d571
+341d571
 < 	CHECK_ACPTN(p_mtxcb->p_mtxinib->acvct.acptn1);
-< 	if (MTX_CEILING(p_mtxcb)
-< 			&& p_mtxcb->p_mtxinib->ceilpri < p_runtsk->p_dominib->minpriority) {
-< 		CHECK_ACPTN(p_runtsk->p_dominib->acvct.acptn2);		/*［NGKI5124］*/
-< 	}
-348c574,585
+344c574,580
 < 	if (p_runtsk->raster) {
 ---
 > 	if (p_mtxcb->p_mtxinib->mtxatr == TA_NOEXS) {
@@ -5416,19 +5384,10 @@ diff -r ./kernel/mutex.c extension/dcre/kernel/mutex.c
 > 	else if (VIOLATE_ACPTN(p_mtxcb->p_mtxinib->acvct.acptn1)) {
 > 		ercd = E_OACV;
 > 	}
-> 	else if (MTX_CEILING(p_mtxcb)
-> 			&& p_mtxcb->p_mtxinib->ceilpri < p_runtsk->p_dominib->minpriority
-> 			&& VIOLATE_ACPTN(p_runtsk->p_dominib->acvct.acptn2)) {
-> 		ercd = E_OACV;									/*［NGKI5124］*/
-> 	}
 > 	else if (p_runtsk->raster) {
-397,401d633
+393d628
 < 	CHECK_ACPTN(p_mtxcb->p_mtxinib->acvct.acptn1);
-< 	if (MTX_CEILING(p_mtxcb)
-< 			&& p_mtxcb->p_mtxinib->ceilpri < p_runtsk->p_dominib->minpriority) {
-< 		CHECK_ACPTN(p_runtsk->p_dominib->acvct.acptn2);		/*［NGKI5124］*/
-< 	}
-404c636,647
+396c631,637
 < 	if (MTX_CEILING(p_mtxcb)
 ---
 > 	if (p_mtxcb->p_mtxinib->mtxatr == TA_NOEXS) {
@@ -5438,18 +5397,9 @@ diff -r ./kernel/mutex.c extension/dcre/kernel/mutex.c
 > 		ercd = E_OACV;
 > 	}
 > 	else if (MTX_CEILING(p_mtxcb)
-> 			&& p_mtxcb->p_mtxinib->ceilpri < p_runtsk->p_dominib->minpriority
-> 			&& VIOLATE_ACPTN(p_runtsk->p_dominib->acvct.acptn2)) {
-> 		ercd = E_OACV;									/*［NGKI5124］*/
-> 	}
-> 	else if (MTX_CEILING(p_mtxcb)
-450,454d692
+442d682
 < 	CHECK_ACPTN(p_mtxcb->p_mtxinib->acvct.acptn1);
-< 	if (MTX_CEILING(p_mtxcb)
-< 			&& p_mtxcb->p_mtxinib->ceilpri < p_runtsk->p_dominib->minpriority) {
-< 		CHECK_ACPTN(p_runtsk->p_dominib->acvct.acptn2);		/*［NGKI5124］*/
-< 	}
-457c695,706
+445c685,691
 < 	if (p_runtsk->raster) {
 ---
 > 	if (p_mtxcb->p_mtxinib->mtxatr == TA_NOEXS) {
@@ -5458,15 +5408,10 @@ diff -r ./kernel/mutex.c extension/dcre/kernel/mutex.c
 > 	else if (VIOLATE_ACPTN(p_mtxcb->p_mtxinib->acvct.acptn1)) {
 > 		ercd = E_OACV;
 > 	}
-> 	else if (MTX_CEILING(p_mtxcb)
-> 			&& p_mtxcb->p_mtxinib->ceilpri < p_runtsk->p_dominib->minpriority
-> 			&& VIOLATE_ACPTN(p_runtsk->p_dominib->acvct.acptn2)) {
-> 		ercd = E_OACV;									/*［NGKI5124］*/
-> 	}
 > 	else if (p_runtsk->raster) {
-509d757
+497d742
 < 	CHECK_ACPTN(p_mtxcb->p_mtxinib->acvct.acptn1);
-512c760,766
+500c745,751
 < 	if (p_mtxcb != p_runtsk->p_lastmtx) {
 ---
 > 	if (p_mtxcb->p_mtxinib->mtxatr == TA_NOEXS) {
@@ -5476,9 +5421,9 @@ diff -r ./kernel/mutex.c extension/dcre/kernel/mutex.c
 > 		ercd = E_OACV;
 > 	}
 > 	else if (p_mtxcb != p_runtsk->p_lastmtx) {
-549d802
+537d787
 < 	CHECK_ACPTN(p_mtxcb->p_mtxinib->acvct.acptn3);
-552,560c805,822
+540,548c790,807
 < 	init_wait_queue(&(p_mtxcb->wait_queue));
 < 	p_loctsk = p_mtxcb->p_loctsk;
 < 	if (p_loctsk != NULL) {
@@ -5507,11 +5452,11 @@ diff -r ./kernel/mutex.c extension/dcre/kernel/mutex.c
 > 					break;
 > 				}
 > 				pp_prevmtx = &((*pp_prevmtx)->p_prevmtx);
-562c824
+550c809
 < 			pp_prevmtx = &((*pp_prevmtx)->p_prevmtx);
 ---
 > 			mutex_drop_priority(p_loctsk, p_mtxcb);
-564,567c826,829
+552,555c811,814
 < 		mutex_drop_priority(p_loctsk, p_mtxcb);
 < 	}
 < 	if (p_runtsk != p_schedtsk) {
@@ -5521,11 +5466,11 @@ diff -r ./kernel/mutex.c extension/dcre/kernel/mutex.c
 > 			dispatch();
 > 		}
 > 		ercd = E_OK;
-569d830
+557d815
 < 	ercd = E_OK;
-595d855
+583d840
 < 	CHECK_ACPTN(p_mtxcb->p_mtxinib->acvct.acptn4);
-598,601c858,870
+586,589c843,855
 < 	pk_rmtx->htskid = (p_mtxcb->p_loctsk != NULL) ? TSKID(p_mtxcb->p_loctsk)
 < 													: TSK_NONE;
 < 	pk_rmtx->wtskid = wait_tskid(&(p_mtxcb->wait_queue));
@@ -5550,9 +5495,9 @@ diff -r ./kernel/mutex.h extension/dcre/kernel/mutex.h
 ---
 >  *  Copyright (C) 2005-2018 by Embedded and Real-Time Systems Laboratory
 38c38
-<  *  $Id: DIFF 688 2019-03-20 04:45:24Z ertl-hiro $
+<  *  $Id: DIFF 773 2019-10-02 09:01:03Z ertl-hiro $
 ---
->  *  $Id: DIFF 688 2019-03-20 04:45:24Z ertl-hiro $
+>  *  $Id: DIFF 773 2019-10-02 09:01:03Z ertl-hiro $
 94a95
 > extern const ID	tmax_smtxid;
 99a101
@@ -5564,9 +5509,9 @@ diff -r ./kernel/pridataq.c extension/dcre/kernel/pridataq.c
 ---
 >  *  Copyright (C) 2005-2019 by Embedded and Real-Time Systems Laboratory
 40c40
-<  *  $Id: DIFF 688 2019-03-20 04:45:24Z ertl-hiro $
+<  *  $Id: DIFF 773 2019-10-02 09:01:03Z ertl-hiro $
 ---
->  *  $Id: DIFF 688 2019-03-20 04:45:24Z ertl-hiro $
+>  *  $Id: DIFF 773 2019-10-02 09:01:03Z ertl-hiro $
 48a49
 > #include "domain.h"
 55a57,80
@@ -5980,9 +5925,9 @@ diff -r ./kernel/pridataq.h extension/dcre/kernel/pridataq.h
 ---
 >  *  Copyright (C) 2005-2018 by Embedded and Real-Time Systems Laboratory
 40c40
-<  *  $Id: DIFF 688 2019-03-20 04:45:24Z ertl-hiro $
+<  *  $Id: DIFF 773 2019-10-02 09:01:03Z ertl-hiro $
 ---
->  *  $Id: DIFF 688 2019-03-20 04:45:24Z ertl-hiro $
+>  *  $Id: DIFF 773 2019-10-02 09:01:03Z ertl-hiro $
 121a122
 > extern const ID	tmax_spdqid;
 126a128
@@ -5994,9 +5939,9 @@ diff -r ./kernel/semaphore.c extension/dcre/kernel/semaphore.c
 ---
 >  *  Copyright (C) 2005-2019 by Embedded and Real-Time Systems Laboratory
 40c40
-<  *  $Id: DIFF 688 2019-03-20 04:45:24Z ertl-hiro $
+<  *  $Id: DIFF 773 2019-10-02 09:01:03Z ertl-hiro $
 ---
->  *  $Id: DIFF 688 2019-03-20 04:45:24Z ertl-hiro $
+>  *  $Id: DIFF 773 2019-10-02 09:01:03Z ertl-hiro $
 48a49
 > #include "domain.h"
 55a57,80
@@ -6347,9 +6292,9 @@ diff -r ./kernel/semaphore.h extension/dcre/kernel/semaphore.h
 ---
 >  *  Copyright (C) 2005-2018 by Embedded and Real-Time Systems Laboratory
 40c40
-<  *  $Id: DIFF 688 2019-03-20 04:45:24Z ertl-hiro $
+<  *  $Id: DIFF 773 2019-10-02 09:01:03Z ertl-hiro $
 ---
->  *  $Id: DIFF 688 2019-03-20 04:45:24Z ertl-hiro $
+>  *  $Id: DIFF 773 2019-10-02 09:01:03Z ertl-hiro $
 96a97
 > extern const ID	tmax_ssemid;
 101a103
@@ -6487,9 +6432,9 @@ diff -r ./kernel/startup.c extension/dcre/kernel/startup.c
 > #endif /* TOPPERS_kermem */
 diff -r ./kernel/svc.def extension/dcre/kernel/svc.def
 40c40
-< #  $Id: DIFF 688 2019-03-20 04:45:24Z ertl-hiro $
+< #  $Id: DIFF 773 2019-10-02 09:01:03Z ertl-hiro $
 ---
-> #  $Id: DIFF 688 2019-03-20 04:45:24Z ertl-hiro $
+> #  $Id: DIFF 773 2019-10-02 09:01:03Z ertl-hiro $
 269,281c269,281
 < -193	-				ER_ID	acre_tsk(const T_CTSK *pk_ctsk)
 < 		-				ER_ID	acre_sem(const T_CSEM *pk_csem)
@@ -6577,7 +6522,7 @@ diff -r ./kernel/svc.def extension/dcre/kernel/svc.def
 Only in ./kernel: svc_manage.h
 Only in ./kernel: svc_manage.trb
 diff -r ./kernel/svc_table.c extension/dcre/kernel/svc_table.c
-41a42,80
+45a46,84
 > #ifndef TOPPERS_SUPPORT_DYNAMIC_CRE
 > #define acre_tsk no_support
 > #define acre_sem no_support
@@ -6617,7 +6562,7 @@ diff -r ./kernel/svc_table.c extension/dcre/kernel/svc_table.c
 > #define sac_spn no_support
 > #endif /* TOPPERS_SUPPORT_DYNAMIC_CRE */
 > 
-241a281,292
+245a285,296
 > 	(SVC)(acre_tsk),
 > 	(SVC)(acre_sem),
 > 	(SVC)(acre_flg),
@@ -6630,7 +6575,7 @@ diff -r ./kernel/svc_table.c extension/dcre/kernel/svc_table.c
 > 	(SVC)(acre_cyc),
 > 	(SVC)(acre_alm),
 > 	(SVC)(acre_isr),
-245a297,308
+249a301,312
 > 	(SVC)(del_tsk),
 > 	(SVC)(del_sem),
 > 	(SVC)(del_flg),
@@ -6643,7 +6588,7 @@ diff -r ./kernel/svc_table.c extension/dcre/kernel/svc_table.c
 > 	(SVC)(del_cyc),
 > 	(SVC)(del_alm),
 > 	(SVC)(del_isr),
-250,285c313,324
+254,289c317,328
 < 	(SVC)(no_support),
 < 	(SVC)(no_support),
 < 	(SVC)(no_support),
@@ -6762,10 +6707,6 @@ diff -r ./kernel/task.trb extension/dcre/kernel/task.trb
 ---
 > $kernelCfgC.add("const ID _kernel_torder_table[TNUM_STSKID] = { ")
 diff -r ./kernel/task_manage.c extension/dcre/kernel/task_manage.c
-8c8
-<  *  Copyright (C) 2005-2015 by Embedded and Real-Time Systems Laboratory
----
->  *  Copyright (C) 2005-2018 by Embedded and Real-Time Systems Laboratory
 51a52
 > #include "memory.h"
 55a57,80
@@ -6793,7 +6734,7 @@ diff -r ./kernel/task_manage.c extension/dcre/kernel/task_manage.c
 > #define LOG_DEL_TSK_LEAVE(ercd)
 > #endif /* LOG_DEL_TSK_LEAVE */
 > 
-104a130,386
+104a130,383
 >  *  ユーザスタック領域のチェックのデフォルトの定義
 >  */
 > #ifndef CHECK_TARGET_USTACK
@@ -6897,9 +6838,6 @@ diff -r ./kernel/task_manage.c extension/dcre/kernel/task_manage.c
 > 												/*［NGKI1057］［NGKI1066］*/
 > 	}
 > 	CHECK_ACPTN(p_dominib->acvct.acptn1);		/*［NGKI3966］*/
-> 	if (INT_PRIORITY(itskpri) < p_dominib->minpriority) {
-> 		CHECK_ACPTN(p_dominib->acvct.acptn2);	/*［NGKI5123］*/
-> 	}
 > 
 > 	lock_cpu();
 > 	if (queue_empty(&(p_dominib->p_domcb->free_tcb))) {
@@ -7051,9 +6989,9 @@ diff -r ./kernel/task_manage.c extension/dcre/kernel/task_manage.c
 > #endif /* TOPPERS_del_tsk */
 > 
 > /*
-124d405
+124d402
 < 	CHECK_ACPTN(p_tcb->p_tinib->acvct.acptn1);	/*［NGKI1117］*/
-127c408,414
+127c405,411
 < 	if (TSTAT_DORMANT(p_tcb->tstat)) {
 ---
 > 	if (p_tcb->p_tinib->tskatr == TA_NOEXS) {
@@ -7063,9 +7001,9 @@ diff -r ./kernel/task_manage.c extension/dcre/kernel/task_manage.c
 > 		ercd = E_OACV;							/*［NGKI1117］*/
 > 	}
 > 	else if (TSTAT_DORMANT(p_tcb->tstat)) {
-175d461
+175d458
 < 	CHECK_ACPTN(p_tcb->p_tinib->acvct.acptn1);	/*［NGKI1143］*/
-178,179c464,473
+178,179c461,470
 < 	ercd = p_tcb->actque ? 1 : 0;				/*［NGKI1144］*/
 < 	p_tcb->actque = false;						/*［NGKI1144］*/
 ---
@@ -7079,9 +7017,9 @@ diff -r ./kernel/task_manage.c extension/dcre/kernel/task_manage.c
 > 		ercd = p_tcb->actque ? 1 : 0;			/*［NGKI1144］*/
 > 		p_tcb->actque = false;					/*［NGKI1144］*/
 > 	}
-211d504
+211d501
 < 	CHECK_ACPTN(p_tcb->p_tinib->acvct.acptn4);	/*［NGKI3618］*/
-214,227c507,508
+214,227c504,505
 < 	tstat = p_tcb->tstat;
 < 	if (TSTAT_DORMANT(tstat)) {					/*［NGKI3620］*/
 < 		*p_tskstat = TTS_DMT;
@@ -7099,13 +7037,13 @@ diff -r ./kernel/task_manage.c extension/dcre/kernel/task_manage.c
 ---
 > 	if (p_tcb->p_tinib->tskatr == TA_NOEXS) {
 > 		ercd = E_NOEXS;							/*［NGKI3617］*/
-229,230c510,511
+229,230c507,508
 < 	else if (p_tcb == p_runtsk) {
 < 		*p_tskstat = TTS_RUN;
 ---
 > 	else if (VIOLATE_ACPTN(p_tcb->p_tinib->acvct.acptn4)) {
 > 		ercd = E_OACV;							/*［NGKI3618］*/
-233c514,535
+233c511,532
 < 		*p_tskstat = TTS_RDY;
 ---
 > 		tstat = p_tcb->tstat;
@@ -7130,21 +7068,17 @@ diff -r ./kernel/task_manage.c extension/dcre/kernel/task_manage.c
 > 			*p_tskstat = TTS_RDY;
 > 		}
 > 		ercd = E_OK;
-235d536
+235d533
 < 	ercd = E_OK;
-266d566
+266d563
 < 	CHECK_ACPTN(p_tcb->p_tinib->acvct.acptn2);	/*［NGKI1190］*/
-267a568,572
+267a565,569
 > 		/*
 > 		 *  以下の代入文は，対象タスクが未登録の場合に無効なフィールド
 > 		 *  を参照するが，その場合はnewbpriの値を使わないので，問題な
 > 		 *  い．
 > 		 */
-274,276d578
-< 	if (newbpri < p_tcb->p_dominib->minpriority) {
-< 		CHECK_ACPTN(p_tcb->p_dominib->acvct.acptn2);	/*［NGKI3751］*/
-< 	}
-279c581,587
+276c578,584
 < 	if (TSTAT_DORMANT(p_tcb->tstat)) {
 ---
 > 	if (p_tcb->p_tinib->tskatr == TA_NOEXS) {
@@ -7154,14 +7088,9 @@ diff -r ./kernel/task_manage.c extension/dcre/kernel/task_manage.c
 > 		ercd = E_OACV;							/*［NGKI1190］*/
 > 	}
 > 	else if (TSTAT_DORMANT(p_tcb->tstat)) {
-281a590,593
-> 	else if (newbpri < p_tcb->p_dominib->minpriority
-> 				&& VIOLATE_ACPTN(p_tcb->p_dominib->acvct.acptn2)) {
-> 		ercd = E_OACV;							/*［NGKI3751］*/
-> 	}
-326d637
+323d630
 < 	CHECK_ACPTN(p_tcb->p_tinib->acvct.acptn4);	/*［NGKI1207］*/
-329c640,646
+326c633,639
 < 	if (TSTAT_DORMANT(p_tcb->tstat)) {
 ---
 > 	if (p_tcb->p_tinib->tskatr == TA_NOEXS) {
@@ -7503,9 +7432,9 @@ diff -r ./kernel/task_sync.c extension/dcre/kernel/task_sync.c
 > 	else if (!TSTAT_SUSPENDED(p_tcb->tstat)) {
 diff -r ./kernel/task_term.c extension/dcre/kernel/task_term.c
 40c40
-<  *  $Id: DIFF 688 2019-03-20 04:45:24Z ertl-hiro $
+<  *  $Id: DIFF 773 2019-10-02 09:01:03Z ertl-hiro $
 ---
->  *  $Id: DIFF 688 2019-03-20 04:45:24Z ertl-hiro $
+>  *  $Id: DIFF 773 2019-10-02 09:01:03Z ertl-hiro $
 173d172
 < 	CHECK_ACPTN(p_tcb->p_tinib->acvct.acptn2);	/*［NGKI3474］*/
 176c175,181
@@ -7540,9 +7469,9 @@ diff -r ./kernel/time_manage.c extension/dcre/kernel/time_manage.c
 ---
 >  *  Copyright (C) 2005-2019 by Embedded and Real-Time Systems Laboratory
 40c40
-<  *  $Id: DIFF 688 2019-03-20 04:45:24Z ertl-hiro $
+<  *  $Id: DIFF 773 2019-10-02 09:01:03Z ertl-hiro $
 ---
->  *  $Id: DIFF 688 2019-03-20 04:45:24Z ertl-hiro $
+>  *  $Id: DIFF 773 2019-10-02 09:01:03Z ertl-hiro $
 48a49,52
 > #include "task.h"
 > #include "semaphore.h"
@@ -7760,6 +7689,10 @@ Only in .: library
 Only in ./sample: Makefile
 Only in ./sample: Makefile_mml
 diff -r ./sample/sample1.c extension/dcre/sample/sample1.c
+40c40
+<  *  $Id: DIFF 773 2019-10-02 09:01:03Z ertl-hiro $
+---
+>  *  $Id: DIFF 773 2019-10-02 09:01:03Z ertl-hiro $
 112a113,116
 >  *  '@' : タスク3をacre_tskにより生成する．
 >  *  '!' : 対象タスクをdel_tskにより削除する．
@@ -7822,9 +7755,9 @@ diff -r ./sample/sample1.c extension/dcre/sample/sample1.c
 Only in ./sample: sample1.cdl
 diff -r ./sample/sample1.cfg extension/dcre/sample/sample1.cfg
 4c4
-<  *  $Id: DIFF 688 2019-03-20 04:45:24Z ertl-hiro $
+<  *  $Id: DIFF 773 2019-10-02 09:01:03Z ertl-hiro $
 ---
->  *  $Id: DIFF 688 2019-03-20 04:45:24Z ertl-hiro $
+>  *  $Id: DIFF 773 2019-10-02 09:01:03Z ertl-hiro $
 27c27,28
 < 	CRE_ALM(ALMHDR1, { TA_NULL, { TNFY_ACTTSK, ALM_TASK }});
 ---

@@ -5,7 +5,7 @@
  * 
  *  Copyright (C) 2000-2003 by Embedded and Real-Time Systems Laboratory
  *                              Toyohashi Univ. of Technology, JAPAN
- *  Copyright (C) 2005-2018 by Embedded and Real-Time Systems Laboratory
+ *  Copyright (C) 2005-2019 by Embedded and Real-Time Systems Laboratory
  *              Graduate School of Information Science, Nagoya Univ., JAPAN
  * 
  *  上記著作権者は，以下の(1)〜(4)の条件を満たす場合に限り，本ソフトウェ
@@ -37,7 +37,7 @@
  *  アの利用により直接的または間接的に生じたいかなる損害に関しても，そ
  *  の責任を負わない．
  * 
- *  $Id: mpcore_timer.h 559 2018-11-25 15:15:52Z ertl-hiro $
+ *  $Id: mpcore_timer.h 738 2019-07-10 01:01:21Z ertl-hiro $
  */
 
 /*
@@ -51,8 +51,8 @@
  *  USE_MPCORE_TMRWDG_HRT：
  *		プライベートタイマとウォッチドッグを用いて，高分解能タイマを実
  *		現する．具体的には，ウォッチドッグをタイマモードに設定して現在
- *		時刻の管理のために用い，タイマを相対時間割込みの発生のために用
- *		いる．
+ *		時刻の管理のために用い，プライベートタイマを相対時間割込みの発
+ *		生のために用いる．
  *
  *  USE_MPCORE_GTC_HRT：
  *		グローバルタイマを用いて，高分解能タイマを実現する．グローバル
@@ -280,6 +280,25 @@ target_hrt_set_event(HRTCNT hrtcnt)
 }
 
 /*
+ *  高分解能タイマへの割込みタイミングのクリア
+ */
+#ifdef USE_64BIT_HRTCNT
+
+Inline void
+target_hrt_clear_event(void)
+{
+	sil_wrw_mem(MPCORE_GTC_CTRL,
+					sil_rew_mem(MPCORE_GTC_CTRL) & ~(MPCORE_GTC_CTRL_ENACOMP));
+#ifdef ARM_CA9_GTC_ERRATA
+	/* ARM Cortex-A9 Errata 740657への対策 */
+	sil_wrw_mem(MPCORE_GTC_ISR, MPCORE_GTC_ISR_EVENTFLAG);
+	clear_int(MPCORE_IRQNO_GTC);
+#endif /* ARM_CA9_GTC_ERRATA */
+}
+
+#endif /* USE_64BIT_HRTCNT */
+
+/*
  *  高分解能タイマ割込みの要求
  */
 Inline void
@@ -291,11 +310,15 @@ target_hrt_raise_event(void)
 /*
  *  割込みタイミングに指定する最大値
  */
+#ifndef USE_64BIT_HRTCNT
+
 #if !defined(TCYC_HRTCNT) || (TCYC_HRTCNT > 4002000002U)
 #define HRTCNT_BOUND		4000000002U
 #else
 #define HRTCNT_BOUND		(TCYC_HRTCNT - 2000000U)
 #endif
+
+#endif /* USE_64BIT_HRTCNT */
 
 /*
  *  高分解能タイマ割込みハンドラ

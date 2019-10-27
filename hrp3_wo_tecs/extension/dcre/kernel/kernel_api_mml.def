@@ -43,7 +43,6 @@ DEF_INH .inhno* { .inhatr &inthdr }
 DEF_EXC .excno* { .excatr &exchdr }
 DEF_SVC .fncd* { .svcatr &extsvc .stksz }
 ACV_DOM { .acptn1 .acptn2 .acptn3 .acptn4 }
-LMT_DOM { +mintpri }
 DEF_SCY { .scyctim }
 CRE_SOM #somid* { .somatr &nxtsom? }
 ATT_TWD { .domid %somid .twdord .twdlen {? .nfymode &par1 &par2? &par3? &par4? } }

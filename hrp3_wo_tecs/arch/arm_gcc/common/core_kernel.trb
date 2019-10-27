@@ -5,7 +5,7 @@
 #       High Reliable system Profile Kernel
 # 
 #   Copyright (C) 2015 by FUJI SOFT INCORPORATED, JAPAN
-#   Copyright (C) 2015-2018 by Embedded and Real-Time Systems Laboratory
+#   Copyright (C) 2015-2019 by Embedded and Real-Time Systems Laboratory
 #               Graduate School of Information Science, Nagoya Univ., JAPAN
 # 
 #   上記著作権者は，以下の(1)〜(4)の条件を満たす場合に限り，本ソフトウェ
@@ -37,7 +37,7 @@
 #   アの利用により直接的または間接的に生じたいかなる損害に関しても，そ
 #   の責任を負わない．
 # 
-#   $Id: core_kernel.trb 648 2019-01-14 05:26:19Z ertl-hiro $
+#   $Id: core_kernel.trb 747 2019-07-17 00:47:02Z ertl-hiro $
 # 
 
 #
@@ -47,12 +47,12 @@
 #
 #  有効なCPU例外ハンドラ番号
 #
-$EXCNO_VALID = [ 0, 1, 2, 3, 4, 5, 6 ]
+$EXCNO_VALID = [ 0, 1, 2, 3, 4, 5, 6, 7 ]
 
 #
 #  DEF_EXCで使用できるCPU例外ハンドラ番号
 #
-$EXCNO_DEFEXC_VALID = [ 0, 1, 2, 3, 5, 6 ]
+$EXCNO_DEFEXC_VALID = [ 0, 1, 2, 3, 5, 6, 7 ]
 
 #
 #  保護ドメイン初期化コンテキストブロック

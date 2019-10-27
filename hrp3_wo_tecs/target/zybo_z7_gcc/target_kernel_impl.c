@@ -1,8 +1,9 @@
 /*
- *  TOPPERS Software
- *      Toyohashi Open Platform for Embedded Real-Time Systems
+ *  TOPPERS/HRP Kernel
+ *      Toyohashi Open Platform for Embedded Real-Time Systems/
+ *      High Reliable system Profile Kernel
  * 
- *  Copyright (C) 2015-2018 by Embedded and Real-Time Systems Laboratory
+ *  Copyright (C) 2007-2018 by Embedded and Real-Time Systems Laboratory
  *              Graduate School of Information Science, Nagoya Univ., JAPAN
  * 
  *  上記著作権者は，以下の(1)〜(4)の条件を満たす場合に限り，本ソフトウェ
@@ -34,41 +35,96 @@
  *  アの利用により直接的または間接的に生じたいかなる損害に関しても，そ
  *  の責任を負わない．
  * 
- *  $Id: test_lmtdom2.h 457 2018-09-22 13:13:08Z ertl-hiro $
+ *  $Id: target_kernel_impl.c 761 2019-09-30 03:18:30Z ertl-honda $
  */
-
-/* 
- *		保護ドメインに対する制限に関するテスト(2)
- */
-
-#include <kernel.h>
 
 /*
- *  ターゲット依存の定義
+ *		カーネルのターゲット依存部（ZYBO_Z7用）
  */
-#include "target_test.h"
+
+#include "kernel_impl.h"
+#include <sil.h>
+#include "arm.h"
+#include "zybo_z7.h"
+#include "pl310.h"
 
 /*
- *  各タスクの優先度の定義
+ *  システムログの低レベル出力のための初期化
+ *
+ *  セルタイプtPutLogSIOPort内に実装されている関数を直接呼び出す．
  */
-#define HIGH_PRIORITY	9
-#define MID_PRIORITY	10
+extern void	tPutLogSIOPort_initialize(void);
 
 /*
- *  ターゲットに依存する可能性のある定数の定義
+ *  OS起動時の初期化
  */
-#ifndef STACK_SIZE
-#define	STACK_SIZE		4096		/* タスクのスタックサイズ */
-#endif /* STACK_SIZE */
+void
+hardware_init_hook(void)
+{
+	arm_disable_dcache();
+	pl310_disable();
+	arm_disable_icache();
+}
 
 /*
- *  関数のプロトタイプ宣言
+ *  ターゲット依存の初期化
  */
-#ifndef TOPPERS_MACRO_ONLY
+void
+target_initialize(void)
+{
+	extern void	*vector_table;		/* ベクタテーブル */
 
-extern void	task1(intptr_t exinf);
-extern void	task2(intptr_t exinf);
-extern void	task3(intptr_t exinf);
-extern void	task4(intptr_t exinf);
+	/*
+	 *  チップ依存の初期化
+	 */
+	chip_initialize();
 
-#endif /* TOPPERS_MACRO_ONLY */
+	/*
+	 *  ベクタテーブルの設定
+	 */
+	CP15_WRITE_VBAR((uint32_t) &vector_table);
+
+	/*
+	 *  SIOを初期化
+	 */
+#ifndef TOPPERS_OMIT_TECS
+	tPutLogSIOPort_initialize();
+#endif /* TOPPERS_OMIT_TECS */
+}
+
+/*
+ *  ターゲット依存の終了処理
+ */
+void
+target_exit(void)
+{
+	extern void	software_term_hook(void);
+	void (*volatile fp)(void) = software_term_hook;
+
+	/*
+	 *  software_term_hookへのポインタを，一旦volatile指定のあるfpに代
+	 *  入してから使うのは，0との比較が最適化で削除されないようにするた
+	 *  めである．
+	 */
+	if (fp != 0) {
+		(*fp)();
+	}
+
+	/*
+	 *  チップ依存の終了処理
+	 */
+	chip_terminate();
+
+	/*
+	 *  ターゲット依存の終了処理
+	 */
+#if defined(TOPPERS_USE_QEMU) && !defined(TOPPERS_OMIT_QEMU_SEMIHOSTING)
+	/*
+	 *  QEMUを終了させる．
+	 */
+	Asm("ldr r1, =#0x20026\n\t"		/* ADP_Stopped_ApplicationExit */ 
+		"mov r0, #0x18\n\t"			/* angel_SWIreason_ReportException */
+		"svc 0x00123456");
+#endif
+	while (true) ;
+}
