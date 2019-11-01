@@ -64,7 +64,6 @@
 #pragma inline check_intno_clear
 #pragma inline check_intno_raise
 #pragma inline define_inh
-#pragma inline define_exc
 #pragma inline exc_sense_context
 #pragma inline exc_get_ipl
 #pragma inline exc_sense_i

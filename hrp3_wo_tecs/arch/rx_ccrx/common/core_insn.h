@@ -50,6 +50,7 @@
  */
 #define PSW_I_MASK		( 0x00010000UL )
 #define PSW_U_MASK		( 0x1UL << 17UL )
+#define PSW_PM_MASK		( 0x1UL << 20UL )
 #define PSW_IPL_MASK	( 0x0F000000UL )
 
 #ifndef TOPPERS_MACRO_ONLY

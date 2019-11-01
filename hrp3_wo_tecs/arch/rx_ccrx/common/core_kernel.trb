@@ -83,7 +83,12 @@ end
 #
 #  有効なCPU例外ハンドラ番号
 #
-$EXCNO_VALID = [ 20, 21, 23, 25, 30, 31 ]
+$EXCNO_VALID = [ 0, *(2..$INTNO_MAX_UNCONDITIONAL_TRAP), 20, 21, 23, 25, 30, 31 ]
+
+#
+#  ターゲット定義のCPU例外ハンドラ属性
+#
+$TARGET_EXCATR = $TA_DIRECT
 
 IncludeTrb("rx_mpu_lib.trb")
 
@@ -231,7 +236,7 @@ INHNO_RANGE.each do |inhno|
   elsif DEBUG_UNREG_INT
     inthdr = "__kernel_default_int_handler"
   end
-  if inthdr && inhno != $SVC_SERVICE_CALL && inhno != $SVC_SCYCOVR
+  if inthdr && inhno > $INTNO_MAX_UNCONDITIONAL_TRAP
     kernelCfgAsm.add(<<EOS)
 	.glb	#{inthdr}
 	.glb	__kernel#{inthdr}_#{inhno}_entry
@@ -262,21 +267,26 @@ end
 # 
 #  CPU例外ハンドラ入口処理
 #
+hExcEntry = {}
 $EXCNO_VALID.each do |excno|
   exchdr = nil
   if $cfgData[:DEF_EXC].has_key?(excno)
     exc = $cfgData[:DEF_EXC][excno]
-    exchdr = "_#{exc[:exchdr]}"
+    if exc[:excatr] & $TA_DIRECT != 0
+      hExcEntry[excno] = "_#{exc[:exchdr]}"
+    else
+      exchdr = "_#{exc[:exchdr]}"
+    end
   elsif (excno == $EXCNO_SCYCOVR) || DEBUG_UNREG_EXC
     exchdr = "__kernel_default_exc_handler"
+  else
+    hExcEntry[excno] = "__kernel_default_exc_handler_entry"
   end
 
   next if !exchdr
-  if excno == $EXCNO_SCYCOVR
-    entry = "_kernel_scyovr_handler"
-  else
-    entry = "__kernel#{exchdr}_#{excno}_entry"
-  end
+
+  entry = "__kernel#{exchdr}_#{excno}_entry"
+  hExcEntry[excno] = entry
 
   kernelCfgAsm.add(<<EOS)
 	.glb	#{exchdr}
@@ -320,8 +330,8 @@ INHNO_RANGE.each do |inhno|
     kernelCfgAsm.add("\t.lword\t_kernel_service_call		; SVC_SERVICE_CALL")
     next
   end
-  if inhno == $SVC_SCYCOVR
-    kernelCfgAsm.add("\t.lword\t_kernel_scyovr_handler		; SVC_SCYCOVR")
+  if inhno <= $INTNO_MAX_UNCONDITIONAL_TRAP
+    kernelCfgAsm.add("\t.lword\t#{hExcEntry[inhno]}		; #{inhno}")
     next
   end
   
@@ -343,17 +353,6 @@ kernelCfgAsm.add
 # 
 #  例外ベクタテーブル
 # 
-exchdr = {}
-$EXCNO_VALID.each do |excno|
-  if $cfgData[:DEF_EXC].has_key?(excno)
-    exc = $cfgData[:DEF_EXC][excno]
-    exchdr[excno] = "_kernel_#{exc[:exchdr]}_#{excno}_entry"
-  elsif DEBUG_UNREG_EXC
-    exchdr[excno] = "_kernel__kernel_default_exc_handler_#{excno}_entry"
-  else
-    exchdr[excno] = "_kernel_default_exc_handler_entry"
-  end
-end
 
 kernelCfgAsm.add(<<EOS)
 ;
@@ -361,15 +360,15 @@ kernelCfgAsm.add(<<EOS)
 ;
 	.section EXTBASE, ROMDATA
 	.org 0FFFFFF80H + 050H
-	.lword _#{exchdr[20]}	; 20: 特権命令例外
+	.lword #{hExcEntry[20]}	; 20: 特権命令例外
 	.org 0FFFFFF80H + 054H
-	.lword _#{exchdr[21]}	; 21: アクセス例外
+	.lword #{hExcEntry[21]}	; 21: アクセス例外
 	.org 0FFFFFF80H + 05CH
-	.lword _#{exchdr[23]}	; 23: 未定義命令例外
+	.lword #{hExcEntry[23]}	; 23: 未定義命令例外
 	.org 0FFFFFF80H + 064H
-	.lword _#{exchdr[25]}	; 25: 浮動小数点例外
+	.lword #{hExcEntry[25]}	; 25: 浮動小数点例外
 	.org 0FFFFFF80H + 078H
-	.lword _#{exchdr[30]}	; 30: ノンマスカブル割り込み
+	.lword #{hExcEntry[30]}	; 30: ノンマスカブル割り込み
 	; 0FFFFFFFFCH
 	.lword _start			; リセット
 EOS

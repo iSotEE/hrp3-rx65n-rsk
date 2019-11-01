@@ -64,7 +64,7 @@
 /*
  *  システム周期オーバラン例外に使用するSVC番号
  */
-#define SVC_SCYCOVR		2
+#define SVC_SCYCOVR		(EXCNO_SCYCOVR)
 
 /*
  *  トレースログに関する設定
@@ -274,6 +274,7 @@ extern const MPU_INFO mpu_info_table[];
 #define USE_LATERPASS_DOMINIB
 #endif
 
+#ifndef OMIT_CORE_SET_GET_IPM
 /*
  * （モデル上の）割込み優先度マスクの設定
  *
@@ -321,6 +322,7 @@ t_get_ipm( void )
 #endif	/* TIPM_LOCK == TIPM_LOCK_ALL */
 	return IPL_TO_IPM( ipl );
 }
+#endif
 
 /*
  *  割込み要求ライン設定テーブル（kernel_cfg.c）
@@ -459,10 +461,13 @@ extern void config_int(INTNO intno, ATR intatr, PRI intpri);
 /*
  *  CPU例外ハンドラの設定
  *
- *  RXはROMに例外ベクタを配置するため，本関数は空関数で実装する．
+ *  RXはROMに例外ベクタを配置するため，初期化は不要．
  */
+
+#define OMIT_INITIALIZE_EXCEPTION
+
 Inline void
-define_exc( EXCNO excno, FP exchdr )
+initialize_exception(void)
 {
 }
 
@@ -475,16 +480,6 @@ define_exc( EXCNO excno, FP exchdr )
 #define _INTHDR_ENTRY(inhno, inhno_num ,inthdr)	\
 		extern _kernel_##inthdr##_##inhno##_entry(void);
 #define INTHDR_ENTRY(inhno, inhno_num ,inthdr)	_INTHDR_ENTRY(inhno, inhno_num ,inthdr)
-
-/*
- *  CPU例外ハンドラの入口処理の生成マクロ
- */
-#define _EXC_ENTRY(excno , exchdr)					_kernel_##exchdr##_##excno##_entry
-#define EXC_ENTRY(excno , exchdr)					_EXC_ENTRY(excno , exchdr)
-
-#define _EXCHDR_ENTRY(excno , excno_num , exchdr)	\
-		extern _kernel_##exchdr##_##excno##_entry(void);
-#define EXCHDR_ENTRY(excno , excno_num , exchdr)	_EXCHDR_ENTRY(excno , excno_num , exchdr)
 
 /*
  *  CPU例外の発生した時のコンテキストの参照

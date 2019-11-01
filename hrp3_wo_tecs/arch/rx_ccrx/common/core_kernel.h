@@ -54,12 +54,17 @@
 /*
  *  CPU例外ハンドラ番号の定義
  */
+#define EXCNO_SCYCOVR	2	/* システム周期オーバラン例外 */
 #define EXCNO_PRIV_INST	20	/* 特権命令例外 */
 #define EXCNO_ACCESS	21	/* アクセス例外 */
 #define EXCNO_UNDEF		23	/* 未定義命令例外 */
 #define EXCNO_FLOAT		25	/* 浮動小数点例外 */
 #define EXCNO_NMI		30	/* ノンマスカブル割込み */
-#define EXCNO_SCYCOVR	31	/* システム周期オーバラン例外 */
+
+/*
+ *  CPU例外ハンドラ番号の属性
+ */
+#define TA_DIRECT		1
 
 /*
  *  サポートする機能の定義
