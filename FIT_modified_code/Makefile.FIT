@@ -1,0 +1,23 @@
+#
+#  FIT (Firmware Integration Technology) for Renesas Starter Kit+ for RX65N-2MB
+#
+
+REAL_PWD := $(dir $(lastword $(MAKEFILE_LIST)))
+
+INCLUDES := $(INCLUDES) -I$(REAL_PWD)
+
+# smc_gen
+INCLUDES := $(INCLUDES) -I$(REAL_PWD)/smc_gen/r_config
+SYSSVC_DIRS := $(SYSSVC_DIRS) $(REAL_PWD)/smc_gen/r_pincfg
+SYSSVC_COBJS += r_ether_rx_pinset.obj
+
+# r_bsp
+INCLUDES := $(INCLUDES) -I$(REAL_PWD)/r_bsp -I$(REAL_PWD)/r_bsp/board/rskrx65n_2mb
+SYSSVC_DIRS := $(SYSSVC_DIRS) $(REAL_PWD)/r_bsp/mcu/rx65n
+SYSSVC_COBJS += cpu.obj locking.obj mcu_interrupts.obj mcu_locks.obj mcu_mapped_interrupts.obj
+
+# r_ether_rx
+INCLUDES := $(INCLUDES) -I$(REAL_PWD)/r_ether_rx
+SYSSVC_DIRS := $(SYSSVC_DIRS) $(REAL_PWD)/r_ether_rx/src $(REAL_PWD)/r_ether_rx/src/phy $(REAL_PWD)/r_ether_rx/src/targets/rx65n
+SYSSVC_COBJS += phy.obj r_ether_rx.obj r_ether_setting_rx65n.obj
+
