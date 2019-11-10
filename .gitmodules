@@ -1,0 +1,3 @@
+[submodule "isotee"]
+	path = isotee
+	url = https://github.com/iSotEE/isotee.git

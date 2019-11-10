@@ -71,10 +71,17 @@
 #define LOG_EXC_ENTER	( 0 )
 #define LOG_EXC_LEAVE	( 0 )
 
+#if SUPPORT_ISOTEE == 1
+/*
+ *  iSotEE Hypervisor Middleware
+ */
+#include "isotee_kernel_impl.h"
+#else
 /*
  *  プロセッサ依存部（RX65N用）
  */
 #include "prc_kernel_impl.h"
+#endif
 
 #ifndef TOPPERS_MACRO_ONLY
 

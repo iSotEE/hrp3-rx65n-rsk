@@ -1,3 +1,4 @@
+
 /*
  *  TOPPERS/ASP Kernel
  *      Toyohashi Open Platform for Embedded Real-Time Systems/
@@ -43,17 +44,18 @@
 /*
  *  割込み番号の定義(可変ベクタテーブル)
  */
-#define INT_SWINT2	26
-#define INT_SWINT	27
-#define INT_CMWI0	30
-#define INT_CMWI1	31
-#define INT_RXI1	60
-#define INT_TXI1	61
-#define INT_IRQ_MIN	64
-#define INT_IRQ_MAX	79
-#define INT_RXI8	100
-#define INT_TXI8	101
-#define TMAX_INTNO	255
+#define INT_SWINT2   26
+#define INT_SWINT    27
+#define INT_CMWI0    30
+#define INT_CMWI1    31
+#define INT_RXI1     60
+#define INT_TXI1     61
+#define INT_IRQ_MIN  64
+#define INT_IRQ_MAX  79
+#define INT_RXI8     100
+#define INT_TXI8     101
+#define INT_GROUPAL1 113
+#define TMAX_INTNO   255
 
 /*
  *  各モジュールのレジスタ及び設定ビット情報

@@ -274,6 +274,7 @@ $EXCNO_VALID.each do |excno|
     exc = $cfgData[:DEF_EXC][excno]
     if exc[:excatr] & $TA_DIRECT != 0
       hExcEntry[excno] = "_#{exc[:exchdr]}"
+      kernelCfgAsm.add("\t.glb	#{hExcEntry[excno]}")
     else
       exchdr = "_#{exc[:exchdr]}"
     end

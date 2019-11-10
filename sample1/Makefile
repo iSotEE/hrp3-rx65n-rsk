@@ -181,6 +181,12 @@ TARGETDIR = $(SRCDIR)/target/$(TARGET)
 include $(TARGETDIR)/Makefile.target
 
 #
+# iSotEE
+#
+include ../FIT_modified_code/Makefile.FIT
+include ../isotee/target/rx65n/hrp3/host/Makefile.host
+
+#
 #  TECS生成ファイルのディレクトリの定義
 #
 TECSGENDIR = ./gen
@@ -205,7 +211,7 @@ ifndef OMIT_WARNING_ALL
 	COPTS := $(COPTS)
 endif
 ifndef OMIT_OPTIMIZATION
-	COPTS := $(COPTS) -optimize=0
+	COPTS := $(COPTS) -optimize=2 -speed
 endif
 ifdef ML_MANUAL
 	CDEFS := -DTOPPERS_ML_MANUAL $(CDEFS)

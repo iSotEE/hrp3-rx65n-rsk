@@ -88,6 +88,12 @@
 	.glb	__kernel_call_exit_kernel
 	.glb	__kernel_start_dispatch
 
+.if SUPPORT_ISOTEE == 1
+	.glb	_isotee_guest_running
+	.glb	_isotee_guest_tcb
+	.glb	_isotee_guest_itfp
+.endif
+
 ;
 ;  TCB_sp への書込みマクロ
 ;
@@ -183,6 +189,14 @@ ld_TINIB_task	.macro	dst, tinib, tmp
 ;  ここでは, コンテキストの退避と, 実行再開番地の設定をする.
 ;
 __kernel_dispatch:
+.if SUPPORT_ISOTEE == 1
+	mov.l	#_isotee_guest_running, r1
+	btst	#0, [r1].b
+	bz		dispatch_after_isotee
+	mov.l	#_isotee_guest_itfp, r2
+	mov.l	#0, [r2]
+dispatch_after_isotee:
+.endif
 	mov.l	#__kernel_rundom, r4		; rundomを取得
 	mov.l	[r4], r4
 	mvfc	usp, r5						; uspを取得
@@ -202,6 +216,9 @@ __kernel_dispatch:
 ;  ここでは, タスク例外ハンドラ呼出しと, コンテキストの復帰をする.
 ;
 dispatch_r:
+.if SUPPORT_ISOTEE == 1
+	mvtipl	#(ISOTEE_GUEST_MAX_IPL >> 24)
+.endif
 	popm 	r4-r13							; rundom、uspと非スクラッチレジスタ復帰
 	mov.l	#__kernel_rundom, r3
 	mov.l	r4, [r3]
@@ -288,6 +305,12 @@ dispatcher_0:
 	mov.l	[r1], r6
 	mov.l	#__kernel_p_runtsk, r2
 	mov.l	r6, [r2]
+.if SUPPORT_ISOTEE == 1
+	mov.l	#_isotee_guest_tcb, r2
+	mov.l	#_isotee_guest_running, r3
+	cmp		[r2], r6
+	sceq.b	[r3]
+.endif
 	cmp		#0, r6
 	bz		dispatcher_1				; p_runtskがNULLならdispatcher_1へ
 	ld_TCB_sp	sp, r6, r5				; タスクスタックを復帰
@@ -382,6 +405,10 @@ dispatcher_1_after_twd:
 	mvtc	#0, psw					; 優先度0の割込み処理中を偽装
 .endif
 
+.if SUPPORT_ISOTEE == 1
+	mvtipl	#(ISOTEE_GUEST_MAX_IPL >> 24)
+.endif
+
 dispatcher_2:
 	setpsw	i				; 全割込み許可
 	clrpsw	i				; 全割込み禁止
@@ -421,6 +448,9 @@ __kernel_start_stask_r:
 	beq		start_stask_r_after_twd
 	bsr		__kernel_twdtimer_stop			; タイムウィンドウタイマの停止
 start_stask_r_after_twd:
+.if SUPPORT_ISOTEE == 1
+	mvtipl	#(ISOTEE_GUEST_MAX_IPL >> 24)
+.endif
 .if	TIPM_LOCK == TIPM_LOCK_ALL
 	setpsw	i								; 割込み許可(CPUロック解除状態)
 .else
@@ -465,6 +495,9 @@ start_utask_r_after_twd:
 
 	mov.l	TINIB_task[r1], r2				; タスク起動番地 → r2
 	mov.l	#00130000H, r3					; PSWの初期値（U、I、PM） → r3
+.if SUPPORT_ISOTEE == 1
+	or		#ISOTEE_GUEST_MAX_IPL, r3
+.endif
 	pushm	r2-r3							; r3、r2の順でスタックに積む
 
 .if	TIPM_LOCK != TIPM_LOCK_ALL
@@ -576,6 +609,16 @@ _kernel_interrupt:
 	beq		_kernel_interrupt_after_twd
 	bsr		__kernel_twdtimer_stop			; タイムウィンドウタイマの停止
 _kernel_interrupt_after_twd:
+
+.if SUPPORT_ISOTEE == 1
+	mov.l	#_isotee_guest_running, r1
+	btst	#0, [r1].b
+	bz		interrupt_after_isotee
+	mov.l	#_isotee_guest_itfp, r3
+	add		#(RET_INT_GET_PSW_OFFSET-4), sp, r4
+	mov.l	r4, [r3]
+interrupt_after_isotee:
+.endif
 
 	;
 	;  rundomをスタックに保存し，TACP_KERNELにする．
