@@ -39,6 +39,8 @@
 # 
 # 
 
+REAL_PWD := $(dir $(lastword $(MAKEFILE_LIST)))
+
 #
 # Compiler (ccrx) dependent functions
 #
@@ -58,7 +60,7 @@ define obj2srec # 1: obj file name, 2: srec file name
 $(LINK) $(1) -form=stype -output=$(2)
 endef
 define obj2syms # 1: obj file name, 2: syms file name, 3: section.csv (optional)
-$(PYTHON) map2syms.py $(1).map $(2) $(3)
+$(MAP2SYMS) $(1).map $(2) $(3)
 endef
 define section_cflags #1: file name
 -section=P=P_OBJ_$(notdir $(basename $(1))),C=C_OBJ_$(notdir $(basename $(1))),D=D_OBJ_$(notdir $(basename $(1))),B=B_OBJ_$(notdir $(basename $(1))),L=L_OBJ_$(notdir $(basename $(1))),W=W_OBJ_$(notdir $(basename $(1)))
@@ -66,10 +68,12 @@ endef
 PYTHON = $(E2STUDIODIR)\eclipse\features\com.renesas.python.win32.x86_2.7.12.002\python\python.exe
 SED = $(E2STUDIODIR)\Utilities\sed.exe
 CC_CONVERTER = $(E2STUDIODIR)\Utilities\ccrx\renesas_cc_converter.exe
-TOUCH = busybox touch
-CP = busybox cp
-DIFF = busybox diff
-MKDIR = busybox mkdir
+TOUCH := $(REAL_PWD)/busybox touch
+CP := $(REAL_PWD)/busybox cp
+DIFF := $(REAL_PWD)/busybox diff
+MKDIR := $(REAL_PWD)/busybox mkdir
+RMDIR := $(REAL_PWD)/busybox rmdir
+MAP2SYMS := $(PYTHON) $(REAL_PWD)/map2syms.py
 OBJ_LDFLAGS += -subcommand=section.clnk
 CFG2_OUT_LDFLAGS += -subcommand=section.clnk
 CFG2_OUT_LDSCRIPT = section.clnk section.csv
@@ -181,10 +185,9 @@ TARGETDIR = $(SRCDIR)/target/$(TARGET)
 include $(TARGETDIR)/Makefile.target
 
 #
-# iSotEE
+#  Include Project Makefile
 #
-include ../FIT_modified_code/Makefile.FIT
-include ../isotee/target/rx65n/hrp3/host/Makefile.host
+include $(PROJECT_DIR)/project.make
 
 #
 #  TECS生成ファイルのディレクトリの定義
@@ -229,18 +232,12 @@ CFLAGS = $(COPTS) $(CDEFS) $(INCLUDES)
 #  アプリケーションプログラムに関する定義
 #
 APPLNAME = sample1
-APPLDIRS = $(SRCDIR)/sample
-APPL_CFG = sample1.cfg
+APPLDIRS := $(PROJECT_DIR) $(APPLDIRS)
+APPL_CFG = $(PROJECT_DIR)/project.cfg
 APPL_CDL = sample1.cdl
 
 APPL_DIRS := $(APPLDIRS) $(SRCDIR)/library
 APPL_ASMOBJS :=
-ifdef USE_CXX
-	APPL_CXXOBJS := sample1.obj
-	APPL_COBJS :=
-else
-	APPL_COBJS := sample1.obj
-endif
 APPL_COBJS := $(APPL_COBJS) $(TECS_USER_COBJS) $(TECS_OUTOFDOMAIN_COBJS) \
 				log_output.obj vasyslog.obj t_perror.obj strerror.obj
 APPL_CFLAGS := $(APPL_CFLAGS)
@@ -570,6 +567,8 @@ ifndef KERNEL_LIB
 endif
 	rm -rf *.map
 	rm -rf kernel_cfg_asm.src
+	$(MKDIR) -p $(DEPDIR)
+	$(RMDIR) --ignore-fail-on-non-empty $(DEPDIR)
 
 .PHONY: cleankernel
 cleankernel:
