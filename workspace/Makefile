@@ -1,5 +1,6 @@
 # Select project to build
-PROJECT_DIR = sample1
+#PROJECT_DIR = sample1
+PROJECT_DIR = thread_metric_idle_baseline
 
 # Middleware folders
 ISOTEE_DIR = ../isotee

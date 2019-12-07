@@ -1,3 +1,6 @@
 [submodule "isotee"]
 	path = isotee
 	url = https://github.com/iSotEE/isotee.git
+[submodule "thread_metric_test_suite"]
+	path = thread_metric_test_suite
+	url = https://github.com/iSotEE/thread_metric_test_suite.git
