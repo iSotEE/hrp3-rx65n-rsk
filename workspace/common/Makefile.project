@@ -214,7 +214,7 @@ ifndef OMIT_WARNING_ALL
 	COPTS := $(COPTS)
 endif
 ifndef OMIT_OPTIMIZATION
-	COPTS := $(COPTS) -optimize=2 -speed
+	COPTS := $(COPTS) -optimize=2
 endif
 ifdef ML_MANUAL
 	CDEFS := -DTOPPERS_ML_MANUAL $(CDEFS)
