@@ -721,14 +721,14 @@ _kernel_interrupt_3:
 	beq		_kernel_interrupt_4			; 				  _kernel_interrupt_4へ
 
 .if	TIPM_LOCK == TIPM_LOCK_ALL
-	mov.l	RET_INT_GET_PSW_OFFSET[r0], r5	; 割込み/CPU例外発生前のIPL値取得
+	mov.l	(8+RET_INT_GET_PSW_OFFSET)[r0], r5	; 割込み/CPU例外発生前のIPL値取得
 	and		#PSW_IPL_MASK, r5
 	mvtc	r5, psw							; 全割込みロック(CPUロック)状態
 											; 割込み/CPU例外発生前の割込み優先度
 .else
 	mov.l	#__kernel_lock_flag, r5			; CPUロック状態へ
 	mov.l	#1, [r5]
-	mov.l	RET_INT_GET_PSW_OFFSET[r0], r5	; 割込み/CPU例外発生前のIPL値取得
+	mov.l	(8+RET_INT_GET_PSW_OFFSET)[r0], r5	; 割込み/CPU例外発生前のIPL値取得
 	and		#PSW_IPL_MASK, r5
 	mov.l	#__kernel_saved_ipl, r4
 	mov.l	r5, [r4]
