@@ -189,14 +189,6 @@ ld_TINIB_task	.macro	dst, tinib, tmp
 ;  ここでは, コンテキストの退避と, 実行再開番地の設定をする.
 ;
 __kernel_dispatch:
-.if SUPPORT_ISOTEE == 1
-	mov.l	#_isotee_guest_running, r1
-	btst	#0, [r1].b
-	bz		dispatch_after_isotee
-	mov.l	#_isotee_guest_itfp, r2
-	mov.l	#0, [r2]
-dispatch_after_isotee:
-.endif
 	mov.l	#__kernel_rundom, r4		; rundomを取得
 	mov.l	[r4], r4
 	mvfc	usp, r5						; uspを取得
@@ -205,6 +197,13 @@ dispatch_after_isotee:
 	mov.l	[r15], r1					; p_runtsk → r1
 	st_TCB_sp	r0, r1, r5				; スタックポインタをTCBに保存
 	st_TCB_pc	#dispatch_r, r1, r5		; 実行再開番地をTCBに保存
+.if SUPPORT_ISOTEE == 1
+	mov.l	#_isotee_guest_running, r1
+	btst	#0, [r1].b
+	bz		dispatcher
+	mov.l	#_isotee_guest_itfp, r2
+	mov.l	#0, [r2]
+.endif
 	bra		dispatcher
 
 ;
